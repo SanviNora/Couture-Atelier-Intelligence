@@ -1,0 +1,1572 @@
+<!doctype html><html><head><meta charset='utf-8'><style>
+@page { size: A4; margin: 18mm 17mm 20mm; @bottom-right { content: counter(page); color: #66716D; font: 9px sans-serif; } }
+body { color: #18211F; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; font-size: 10.5pt; line-height: 1.5; }
+h1, h2, h3 { color: #1F5B52; font-family: Georgia, serif; line-height: 1.2; page-break-after: avoid; }
+h1 { font-size: 25pt; border-bottom: 2px solid #B9975B; padding-bottom: 8px; margin-top: 0; }
+h2 { font-size: 17pt; margin-top: 25px; border-bottom: 1px solid #DCDDD5; padding-bottom: 4px; }
+h3 { font-size: 12.5pt; margin-top: 18px; color: #315F57; }
+p, ul, ol, table, pre { page-break-inside: avoid; }
+code { background: #F1EFE8; color: #315F57; padding: 1px 3px; border-radius: 2px; }
+pre { background: #18211F; color: #F5F3EE; padding: 10px; border-radius: 3px; white-space: pre-wrap; font-size: 8.5pt; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 9pt; }
+th { background: #1F5B52; color: #F5F3EE; text-align: left; }
+th, td { padding: 6px 8px; border: 1px solid #DCDDD5; }
+tr:nth-child(even) { background: #F5F3EE; }
+blockquote { border-left: 3px solid #B9975B; background: #EFE9DC; margin: 12px 0; padding: 8px 14px; }
+hr { border: 0; border-top: 1px solid #DCDDD5; margin: 22px 0; }
+</style></head><body><h1 id="couture-atelier-intelligence">Couture Atelier Intelligence</h1>
+<h2 id="complete-eli5-study-guide-and-interview-preparation-manual">Complete ELI5 Study Guide and Interview Preparation Manual</h2>
+<p><strong>Project type:</strong> Luxury retail analytics portfolio simulation<br />
+<strong>Fictional brand:</strong> Couture Atelier<br />
+<strong>Target roles:</strong> Fashion data analyst, retail data scientist, customer analytics scientist, inventory analytics analyst, merchandising analytics analyst<br />
+<strong>Last updated:</strong> September 2026</p>
+<hr />
+<h1 id="how-to-use-this-guide">How to Use This Guide</h1>
+<p>This guide explains the entire project from the beginning, in simple language first and technical language second.</p>
+<p>Study it in this order:</p>
+<ol>
+<li>Learn the one-minute explanation.</li>
+<li>Learn the business problem.</li>
+<li>Learn the three data layers.</li>
+<li>Learn the pipeline from raw data to dashboard.</li>
+<li>Study each model and metric.</li>
+<li>Practice the interview questions.</li>
+<li>Review the limitations and future improvements.</li>
+</ol>
+<p>You should be able to explain the project at three levels:</p>
+<ul>
+<li><strong>30 seconds:</strong> what the project does.</li>
+<li><strong>3 minutes:</strong> how the pipeline and models work.</li>
+<li><strong>15 minutes:</strong> technical decisions, validation, limitations, and business impact.</li>
+</ul>
+<hr />
+<h1 id="part-1-the-one-minute-explanation">Part 1: The One-Minute Explanation</h1>
+<h2 id="the-simple-version">The simple version</h2>
+<p>Couture Atelier Intelligence is a decision-support system for a fictional luxury fashion retailer.</p>
+<p>It helps answer four questions:</p>
+<ol>
+<li>
+<p><strong>What will customers buy?</strong><br />
+   Demand forecasting.</p>
+</li>
+<li>
+<p><strong>Where should products be placed?</strong><br />
+   Inventory allocation, transfers, and replenishment.</p>
+</li>
+<li>
+<p><strong>Which customers may need attention?</strong><br />
+   Customer lifetime value, churn prediction, and behavioral segmentation.</p>
+</li>
+<li>
+<p><strong>What should a sales associate do next?</strong><br />
+   Product recommendations and consent-aware clienteling.</p>
+</li>
+</ol>
+<p>The dashboard connects those decisions in one executive interface.</p>
+<h2 id="the-interview-version">The interview version</h2>
+<blockquote>
+<p>I built Couture Atelier Intelligence, a reproducible luxury retail analytics platform using public retail observations and a clearly labeled synthetic luxury layer. The system transforms transaction data into customer, product, and demand marts; forecasts product-country demand; estimates customer value; predicts churn; creates behavioral segments; recommends inventory transfers and replenishment; and produces consent-aware clienteling actions. I used chronological validation, explicit provenance, fail-closed data checks, and a no-action option so the system supports responsible luxury retail decisions rather than blindly maximizing outreach or revenue.</p>
+</blockquote>
+<h2 id="the-most-important-sentence">The most important sentence</h2>
+<blockquote>
+<p>The project is not pretending to have Louis Vuitton’s private data. Public data supports the analytical methodology, while boutique, luxury product, inventory, consent, and clienteling fields are explicitly synthetic.</p>
+</blockquote>
+<p>That sentence demonstrates judgment and protects the credibility of the project.</p>
+<hr />
+<h1 id="part-2-why-this-project-exists">Part 2: Why This Project Exists</h1>
+<h2 id="the-business-problem">The business problem</h2>
+<p>Luxury retail is not only about selling more units.</p>
+<p>A luxury house must balance:</p>
+<ul>
+<li>Product desirability</li>
+<li>Scarcity and exclusivity</li>
+<li>Availability in the right location</li>
+<li>Full-price selling</li>
+<li>Customer relationship quality</li>
+<li>Personalization without intrusion</li>
+<li>Inventory efficiency</li>
+<li>Service quality</li>
+<li>Brand consistency</li>
+</ul>
+<p>A normal retail system might ask:</p>
+<blockquote>
+<p>How can we maximize conversions?</p>
+</blockquote>
+<p>A luxury retail system should ask:</p>
+<blockquote>
+<p>How can we make the right product available to the right client in the right place, while protecting the experience and the brand?</p>
+</blockquote>
+<h2 id="why-generic-machine-learning-is-not-enough">Why generic machine learning is not enough</h2>
+<p>A model can have excellent accuracy and still be commercially wrong.</p>
+<p>For example:</p>
+<ul>
+<li>It may recommend a product that is out of stock.</li>
+<li>It may contact someone who did not consent.</li>
+<li>It may treat a return as a purchase.</li>
+<li>It may interpret a stockout as lack of demand.</li>
+<li>It may over-contact a high-value client.</li>
+<li>It may optimize sales while damaging exclusivity.</li>
+</ul>
+<p>This project therefore treats business rules, data lineage, consent, and explainability as part of the product.</p>
+<hr />
+<h1 id="part-3-what-the-project-is-and-is-not">Part 3: What the Project Is and Is Not</h1>
+<h2 id="what-it-is">What it is</h2>
+<ul>
+<li>A portfolio simulation.</li>
+<li>A reproducible analytics pipeline.</li>
+<li>A demonstration of retail, customer, forecasting, and decision-support skills.</li>
+<li>A bridge between public data science and luxury retail business logic.</li>
+<li>A system designed to be discussed with merchandising, retail, clienteling, and technology teams.</li>
+</ul>
+<h2 id="what-it-is-not">What it is not</h2>
+<ul>
+<li>It is not Louis Vuitton data.</li>
+<li>It is not LVMH internal data.</li>
+<li>It is not a claim about private luxury-company performance.</li>
+<li>It is not a production CRM.</li>
+<li>It is not an automatic marketing system.</li>
+<li>It is not a causal experiment.</li>
+<li>It is not evidence that the simulated numbers represent real luxury demand.</li>
+</ul>
+<h2 id="why-the-fictional-name-matters">Why the fictional name matters</h2>
+<p>Couture Atelier is an invented project identity. It avoids implying affiliation with a real luxury brand and makes it clear that the luxury operating layer is simulated.</p>
+<hr />
+<h1 id="part-4-the-three-data-layers">Part 4: The Three Data Layers</h1>
+<p>The project has three important kinds of data.</p>
+<h2 id="layer-1-observed-public-data">Layer 1: Observed public data</h2>
+<p>This is data downloaded from public datasets.</p>
+<p>Main source:</p>
+<ul>
+<li>UCI Online Retail II</li>
+</ul>
+<p>Other planned or supporting sources:</p>
+<ul>
+<li>H&amp;M Personalized Fashion Recommendations</li>
+<li>M5 Forecasting Accuracy</li>
+<li>Fashion Product Images Dataset</li>
+<li>Google Trends</li>
+</ul>
+<p>The UCI dataset is the source currently acquired and used throughout the working pipeline.</p>
+<h2 id="layer-2-derived-data">Layer 2: Derived data</h2>
+<p>Derived data is calculated from observed data.</p>
+<p>Examples:</p>
+<ul>
+<li>Net revenue</li>
+<li>Recency days</li>
+<li>Purchase frequency</li>
+<li>Rolling demand averages</li>
+<li>Churn probability</li>
+<li>Segment assignments</li>
+<li>Forecast error</li>
+<li>Transfer recommendations</li>
+</ul>
+<p>Derived data is not directly observed. It is produced by code and can be regenerated.</p>
+<h2 id="layer-3-synthetic-data">Layer 3: Synthetic data</h2>
+<p>Synthetic data is generated by project rules.</p>
+<p>Examples:</p>
+<ul>
+<li>Couture Atelier customer IDs</li>
+<li>Fictional product categories</li>
+<li>Fictional boutiques</li>
+<li>Luxury price tiers</li>
+<li>Inventory positions</li>
+<li>Consent status</li>
+<li>Warehouse replenishment</li>
+<li>Transfer decisions</li>
+</ul>
+<p>Synthetic data allows the project to demonstrate luxury-specific use cases without exposing or inventing private company data.</p>
+<h2 id="provenance-labels">Provenance labels</h2>
+<p>Every important output uses a provenance class:</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>observed_public</code></td>
+<td>Loaded from a public source</td>
+</tr>
+<tr>
+<td><code>derived</code></td>
+<td>Calculated from source data</td>
+</tr>
+<tr>
+<td><code>synthetic</code></td>
+<td>Generated by simulation rules</td>
+</tr>
+<tr>
+<td><code>scenario</code></td>
+<td>A user-controlled assumption or what-if setting</td>
+</tr>
+</tbody>
+</table>
+<p>When asked whether a result is real, answer using this vocabulary.</p>
+<hr />
+<h1 id="part-5-the-source-dataset">Part 5: The Source Dataset</h1>
+<h2 id="uci-online-retail-ii">UCI Online Retail II</h2>
+<p>The UCI dataset contains approximately 1.07 million transaction rows from a UK-based online retailer between December 2009 and December 2011.</p>
+<p>Important fields:</p>
+<ul>
+<li><code>Invoice</code>: invoice identifier</li>
+<li><code>StockCode</code>: product identifier</li>
+<li><code>Description</code>: product description</li>
+<li><code>Quantity</code>: number of units</li>
+<li><code>InvoiceDate</code>: transaction timestamp</li>
+<li><code>Price</code>: unit price</li>
+<li><code>Customer ID</code>: customer identifier</li>
+<li><code>Country</code>: customer country</li>
+</ul>
+<h2 id="why-it-was-useful">Why it was useful</h2>
+<p>It provides enough information to demonstrate:</p>
+<ul>
+<li>Customer segmentation</li>
+<li>Revenue analysis</li>
+<li>Repeat-purchase behavior</li>
+<li>Product demand</li>
+<li>Churn labeling</li>
+<li>CLV estimation</li>
+<li>Country-level demand analysis</li>
+</ul>
+<h2 id="why-it-is-not-a-perfect-luxury-dataset">Why it is not a perfect luxury dataset</h2>
+<p>The source is online giftware, not luxury fashion.</p>
+<p>It does not contain:</p>
+<ul>
+<li>Boutique IDs</li>
+<li>Luxury product categories</li>
+<li>Store inventory</li>
+<li>Appointments</li>
+<li>Clienteling actions</li>
+<li>Product images linked to transactions</li>
+<li>Luxury price tiers</li>
+<li>Full customer consent history</li>
+</ul>
+<p>That is why the project uses it as a methodological foundation and adds a separate synthetic luxury layer.</p>
+<h2 id="source-cleaning-decisions">Source cleaning decisions</h2>
+<h3 id="exact-duplicates">Exact duplicates</h3>
+<p>Exact duplicate rows were removed before staging.</p>
+<p>Why?</p>
+<p>If the same row appears twice because of a source duplication issue, counting both rows would artificially inflate revenue and demand.</p>
+<p>The pipeline records how many duplicate rows were found and removed.</p>
+<h3 id="cancellations">Cancellations</h3>
+<p>Invoices beginning with <code>C</code> are treated as cancellation or return events.</p>
+<p>They remain in the staged data for auditability, but they are not treated as normal purchases.</p>
+<h3 id="adjustments">Adjustments</h3>
+<p>Some rows represent accounting or stock adjustments, such as:</p>
+<ul>
+<li>Damages</li>
+<li>Lost items</li>
+<li>Bad debt</li>
+<li>Zero-price negative quantities</li>
+<li>Adjustment invoice codes beginning with <code>A</code></li>
+<li>Product code <code>B</code></li>
+</ul>
+<p>These rows are retained and labeled as <code>is_adjustment</code>, but excluded from commercial sales metrics.</p>
+<h3 id="missing-customer-ids">Missing customer IDs</h3>
+<p>Rows with missing customer IDs remain useful for:</p>
+<ul>
+<li>Product demand</li>
+<li>Country demand</li>
+<li>Inventory analysis</li>
+</ul>
+<p>But they are excluded from customer-level features because there is no reliable person to attach the purchase to.</p>
+<h3 id="invalid-records">Invalid records</h3>
+<p>The staging layer fails if it finds:</p>
+<ul>
+<li>Missing required keys</li>
+<li>Invalid dates</li>
+<li>Invalid quantities</li>
+<li>Negative prices that are not adjustments</li>
+<li>Negative quantities that are not cancellations or recognized adjustments</li>
+</ul>
+<p>This is called fail-closed validation: the pipeline stops rather than quietly producing questionable results.</p>
+<hr />
+<h1 id="part-6-the-full-pipeline">Part 6: The Full Pipeline</h1>
+<pre><code class="language-text">Public source files
+        |
+        v
+Raw immutable files
+        |
+        v
+Source profile and quality report
+        |
+        v
+Validated staging table
+        |
+        v
+Analytical marts
+        |
+        +--&gt; Customer 360
+        +--&gt; Product catalog
+        +--&gt; Daily sales
+        +--&gt; Complete demand panel
+        |
+        +--&gt; Forecasting
+        +--&gt; CLV
+        +--&gt; Churn
+        +--&gt; Behavioral segments
+        |
+Synthetic luxury layer
+        |
+        +--&gt; Customers
+        +--&gt; Products
+        +--&gt; Stores
+        +--&gt; Inventory
+        |
+        +--&gt; Transfers
+        +--&gt; Replenishment
+        +--&gt; Clienteling
+        |
+        v
+Executive dashboard and portfolio case study
+</code></pre>
+<h2 id="repository-map">Repository map</h2>
+<pre><code class="language-text">Couture Atelier Intelligence/
+├── data/
+│   ├── raw/
+│   ├── staging/
+│   ├── synthetic/
+│   └── processed/
+├── scripts/
+├── tests/
+├── docs/
+├── dashboard/
+├── configs/
+├── src/
+├── notebooks/
+├── sql/
+├── README.md
+└── pyproject.toml
+</code></pre>
+<h2 id="main-scripts">Main scripts</h2>
+<table>
+<thead>
+<tr>
+<th>Script</th>
+<th>Job</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ingest_uci_online_retail.py</code></td>
+<td>Downloads and registers UCI data</td>
+</tr>
+<tr>
+<td><code>profile_uci_online_retail.py</code></td>
+<td>Profiles sheets, dates, missing values, cancellations</td>
+</tr>
+<tr>
+<td><code>build_uci_staging.py</code></td>
+<td>Cleans, validates, and normalizes transactions</td>
+</tr>
+<tr>
+<td><code>build_analytical_marts.py</code></td>
+<td>Creates customer, product, and daily-sales marts</td>
+</tr>
+<tr>
+<td><code>build_demand_panel.py</code></td>
+<td>Adds explicit zero-demand dates</td>
+</tr>
+<tr>
+<td><code>build_baselines.py</code></td>
+<td>Creates RFM/CLV baseline and seasonal forecast benchmark</td>
+</tr>
+<tr>
+<td><code>build_demand_model.py</code></td>
+<td>Trains the stronger demand model</td>
+</tr>
+<tr>
+<td><code>build_synthetic_luxury_layer.py</code></td>
+<td>Creates fictional luxury customers, products, stores, inventory</td>
+</tr>
+<tr>
+<td><code>optimize_inventory.py</code></td>
+<td>Creates transfers and replenishment recommendations</td>
+</tr>
+<tr>
+<td><code>build_client_clv.py</code></td>
+<td>Creates the improved as-of CLV snapshot</td>
+</tr>
+<tr>
+<td><code>build_churn_and_segments.py</code></td>
+<td>Builds churn predictions and behavioral segments</td>
+</tr>
+<tr>
+<td><code>build_clienteling.py</code></td>
+<td>Creates consent-aware clienteling decisions</td>
+</tr>
+<tr>
+<td><code>dashboard/app.py</code></td>
+<td>Runs the executive Streamlit dashboard</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="part-7-staging-and-analytical-marts">Part 7: Staging and Analytical Marts</h1>
+<h2 id="the-staging-table">The staging table</h2>
+<p>The normalized staging table is:</p>
+<p><code>data/staging/uci_online_retail_ii.parquet</code></p>
+<p>Important normalized columns:</p>
+<ul>
+<li><code>invoice_id</code></li>
+<li><code>product_id</code></li>
+<li><code>product_description</code></li>
+<li><code>quantity</code></li>
+<li><code>transaction_at</code></li>
+<li><code>unit_price</code></li>
+<li><code>line_revenue</code></li>
+<li><code>customer_id</code></li>
+<li><code>country</code></li>
+<li><code>is_cancelled</code></li>
+<li><code>is_adjustment</code></li>
+<li><code>has_customer_id</code></li>
+<li><code>data_provenance</code></li>
+</ul>
+<h2 id="line-revenue">Line revenue</h2>
+<p>The basic formula is:</p>
+<pre><code class="language-text">line_revenue = quantity × unit_price
+</code></pre>
+<p>This is a line-level amount, not necessarily a complete customer order value until invoice lines are aggregated.</p>
+<h2 id="commercial-metrics">Commercial metrics</h2>
+<p>The pipeline separates:</p>
+<ul>
+<li>Gross units</li>
+<li>Returned units</li>
+<li>Gross revenue</li>
+<li>Return value</li>
+<li>Net units</li>
+<li>Net revenue</li>
+</ul>
+<p>The basic net formulas are:</p>
+<pre><code class="language-text">net_units = gross_units - returned_units
+net_revenue = gross_revenue - return_value
+</code></pre>
+<h2 id="customer-360-mart">Customer 360 mart</h2>
+<p>Output:</p>
+<p><code>data/processed/customer_360.parquet</code></p>
+<p>Contains customer-level features such as:</p>
+<ul>
+<li>First purchase date</li>
+<li>Last purchase date</li>
+<li>Order count</li>
+<li>Line count</li>
+<li>Gross units</li>
+<li>Returned units</li>
+<li>Gross revenue</li>
+<li>Return value</li>
+<li>Net units</li>
+<li>Net revenue</li>
+<li>Distinct products</li>
+<li>Primary country</li>
+</ul>
+<p>Purchase dates are calculated from actual purchases, not cancellations.</p>
+<h2 id="product-catalog-mart">Product catalog mart</h2>
+<p>Output:</p>
+<p><code>data/processed/product_catalog.parquet</code></p>
+<p>Contains product-level summaries:</p>
+<ul>
+<li>First seen date</li>
+<li>Last seen date</li>
+<li>Transaction-line count</li>
+<li>Unique customers</li>
+<li>Gross units</li>
+<li>Returned units</li>
+<li>Gross revenue</li>
+<li>Return value</li>
+<li>Net units</li>
+<li>Net revenue</li>
+</ul>
+<h2 id="daily-sales-mart">Daily sales mart</h2>
+<p>Output:</p>
+<p><code>data/processed/daily_sales.parquet</code></p>
+<p>Grain:</p>
+<pre><code class="language-text">one row = one date × one product × one country
+</code></pre>
+<p>This is useful for country-level product demand, but it is sparse: rows exist only when activity was observed.</p>
+<hr />
+<h1 id="part-8-the-complete-demand-panel">Part 8: The Complete Demand Panel</h1>
+<h2 id="why-the-sparse-daily-table-was-a-problem">Why the sparse daily table was a problem</h2>
+<p>Suppose a product did not sell on Tuesday.</p>
+<p>There are two possible meanings:</p>
+<ol>
+<li>It was available but nobody bought it.</li>
+<li>It was not represented in the source table because there was no transaction.</li>
+</ol>
+<p>A forecasting model needs an explicit row for the date so it can learn from zero demand.</p>
+<h2 id="what-the-demand-panel-does">What the demand panel does</h2>
+<p>The demand panel creates a row for every date between the first and last active date of each product-country pair.</p>
+<p>Output:</p>
+<p><code>data/processed/demand_panel.parquet</code></p>
+<p>Important flag:</p>
+<ul>
+<li><code>is_observed = true</code>: original source row existed.</li>
+<li><code>is_observed = false</code>: a zero-demand row was filled in by the pipeline.</li>
+</ul>
+<p>Current size:</p>
+<ul>
+<li>28,804 product-country keys</li>
+<li>5,773,244 date rows</li>
+<li>5,177,176 filled zero-demand rows</li>
+</ul>
+<h2 id="why-this-matters-for-luxury-retail">Why this matters for luxury retail</h2>
+<p>A luxury product may sell intermittently. The model must distinguish:</p>
+<ul>
+<li>Popular product</li>
+<li>Rare product</li>
+<li>New product</li>
+<li>Product with no recent demand</li>
+<li>Product unavailable due to stockout</li>
+</ul>
+<p>The demand panel solves only the missing-date problem. It does not yet solve stockout-censored demand; that is why the synthetic inventory layer matters.</p>
+<hr />
+<h1 id="part-9-demand-forecasting">Part 9: Demand Forecasting</h1>
+<h2 id="the-business-question">The business question</h2>
+<blockquote>
+<p>How many units of each product should we expect to sell in each product-country series over the next period?</p>
+</blockquote>
+<p>The current public-data model forecasts product-country demand, not yet true boutique-level luxury demand.</p>
+<h2 id="baseline-model-seasonal-naive">Baseline model: seasonal naive</h2>
+<p>The baseline uses demand from seven days earlier as the forecast.</p>
+<p>Example:</p>
+<pre><code class="language-text">Forecast for Tuesday = actual demand from last Tuesday
+</code></pre>
+<p>Why use a simple baseline?</p>
+<p>Because a complicated model is only useful if it beats a simple alternative.</p>
+<p>Baseline results on the 28-day holdout:</p>
+<ul>
+<li>MAE: 6.88 units</li>
+<li>RMSE: 242.30 units</li>
+<li>Bias: 5.24 units</li>
+</ul>
+<h2 id="stronger-model">Stronger model</h2>
+<p>The model is:</p>
+<p><code>HistGradientBoostingRegressor</code></p>
+<p>It is trained on:</p>
+<pre><code class="language-text">log1p(gross_units)
+</code></pre>
+<h3 id="why-log-transform-the-target">Why log-transform the target?</h3>
+<p>Retail demand is usually uneven:</p>
+<ul>
+<li>Many rows have zero or small demand.</li>
+<li>A few products have very large demand spikes.</li>
+</ul>
+<p>The logarithm compresses extreme values so the model is not dominated by the largest transactions.</p>
+<p>After prediction, the inverse transformation is applied:</p>
+<pre><code class="language-text">predicted_units = expm1(model_prediction)
+</code></pre>
+<p>Predictions are clipped to be nonnegative.</p>
+<h2 id="model-features">Model features</h2>
+<h3 id="lag-features">Lag features</h3>
+<ul>
+<li><code>lag_1</code>: demand yesterday</li>
+<li><code>lag_7</code>: demand seven days ago</li>
+<li><code>lag_14</code>: demand fourteen days ago</li>
+<li><code>lag_28</code>: demand twenty-eight days ago</li>
+</ul>
+<p>A lag is simply an old value used to help predict a new value.</p>
+<h3 id="rolling-features">Rolling features</h3>
+<ul>
+<li>Seven-day rolling mean</li>
+<li>Twenty-eight-day rolling mean</li>
+</ul>
+<p>Important: rolling features use prior observations only. The current day’s target cannot leak into its own feature.</p>
+<h3 id="calendar-features">Calendar features</h3>
+<ul>
+<li>Day of week</li>
+<li>Month</li>
+<li>Day of month</li>
+</ul>
+<p>These help capture weekly and seasonal patterns.</p>
+<h3 id="lifecycle-features">Lifecycle features</h3>
+<ul>
+<li>Product-country active age</li>
+<li>Days since previous sale</li>
+</ul>
+<p>These help distinguish a new product from a mature product and an active product from a dormant one.</p>
+<h2 id="leakage-prevention">Leakage prevention</h2>
+<p>The model uses a chronological split:</p>
+<pre><code class="language-text">training dates &lt; cutoff date
+testing dates &gt;= cutoff date
+</code></pre>
+<p>The last 28 calendar days are held out.</p>
+<p>The test data is never used to train the model.</p>
+<p>The code also rejects:</p>
+<ul>
+<li>Invalid dates</li>
+<li>Duplicate product-country-date keys</li>
+<li>Missing required columns</li>
+</ul>
+<h2 id="stronger-model-result">Stronger model result</h2>
+<ul>
+<li>MAE: 5.79 units</li>
+<li>RMSE: 241.93 units</li>
+<li>Bias: 4.33 units</li>
+</ul>
+<p>Compared with the seasonal baseline, MAE improved from 6.88 to 5.79, approximately a 15.7% reduction.</p>
+<h2 id="how-to-explain-the-result-correctly">How to explain the result correctly</h2>
+<p>Say:</p>
+<blockquote>
+<p>The feature-based model improves the public-data forecasting benchmark on a chronological holdout.</p>
+</blockquote>
+<p>Do not say:</p>
+<blockquote>
+<p>The model will reduce Louis Vuitton stockouts by 15.7%.</p>
+</blockquote>
+<p>The first statement is supported. The second is not.</p>
+<h2 id="forecasting-limitations">Forecasting limitations</h2>
+<p>The model does not yet include:</p>
+<ul>
+<li>Luxury product attributes</li>
+<li>Price elasticity</li>
+<li>Promotions</li>
+<li>Boutique inventory availability</li>
+<li>Store-level demand</li>
+<li>External fashion trends</li>
+<li>Prediction intervals</li>
+<li>Intermittent-demand-specific models</li>
+<li>Hierarchical reconciliation</li>
+</ul>
+<p>These are future improvements, not hidden capabilities.</p>
+<hr />
+<h1 id="part-10-synthetic-luxury-layer">Part 10: Synthetic Luxury Layer</h1>
+<h2 id="why-synthetic-data-was-needed">Why synthetic data was needed</h2>
+<p>The public transaction data does not have the fields needed for luxury retail decisions.</p>
+<p>The synthetic layer creates a fictional operating environment with:</p>
+<ul>
+<li>Clients</li>
+<li>Products</li>
+<li>Boutiques</li>
+<li>Product attributes</li>
+<li>Consent</li>
+<li>Inventory</li>
+</ul>
+<h2 id="synthetic-customers">Synthetic customers</h2>
+<p>Output:</p>
+<p><code>data/synthetic/customers.parquet</code></p>
+<p>Fields include:</p>
+<ul>
+<li><code>customer_id</code></li>
+<li><code>home_region</code></li>
+<li><code>signup_date</code></li>
+<li><code>acquisition_channel</code></li>
+<li><code>consent_status</code></li>
+<li><code>data_provenance</code></li>
+</ul>
+<p>Customer IDs are remapped to forms such as:</p>
+<pre><code class="language-text">CA-CLIENT-12345
+</code></pre>
+<p>No names, emails, addresses, ethnicity, or inferred wealth are used.</p>
+<h2 id="synthetic-products">Synthetic products</h2>
+<p>Output:</p>
+<p><code>data/synthetic/products.parquet</code></p>
+<p>The project selects 100 hero products from the source product universe by derived net revenue, then maps them to fictional luxury products.</p>
+<p>Fields include:</p>
+<ul>
+<li>Category</li>
+<li>Subcategory</li>
+<li>Material</li>
+<li>Color family</li>
+<li>Collection</li>
+<li>Price tier</li>
+<li>Launch date</li>
+<li>List price</li>
+<li>Heritage flag</li>
+</ul>
+<p>Important nuance:</p>
+<p>The source product IDs help select the universe, but the luxury product attributes are synthetic. They are not factual descriptions of real products.</p>
+<h2 id="synthetic-stores">Synthetic stores</h2>
+<p>Output:</p>
+<p><code>data/synthetic/stores.parquet</code></p>
+<p>Six fictional locations:</p>
+<ul>
+<li>Paris flagship</li>
+<li>London boutique</li>
+<li>Milan boutique</li>
+<li>New York flagship</li>
+<li>Tokyo boutique</li>
+<li>Dubai airport location</li>
+</ul>
+<p>Store attributes include:</p>
+<ul>
+<li>Region</li>
+<li>Store type</li>
+<li>Floor-area band</li>
+<li>Tourism index</li>
+<li>Affluence index</li>
+</ul>
+<p>These indices are synthetic scenario inputs, not claims about actual cities.</p>
+<h2 id="synthetic-inventory">Synthetic inventory</h2>
+<p>Output:</p>
+<p><code>data/synthetic/inventory_daily.parquet</code></p>
+<p>The simulation covers:</p>
+<ul>
+<li>90 days</li>
+<li>6 stores</li>
+<li>100 products</li>
+<li>54,000 inventory rows</li>
+</ul>
+<p>The inventory equation is:</p>
+<pre><code class="language-text">closing_stock = opening_stock
+              + units_received
+              + transfer_in
+              - units_sold
+              - transfer_out
+</code></pre>
+<p>Every generated row is checked against this equation.</p>
+<h2 id="demand-simulation">Demand simulation</h2>
+<p>The current synthetic demand uses a gamma-Poisson process.</p>
+<p>ELI5 explanation:</p>
+<ul>
+<li>The gamma distribution creates different demand intensities.</li>
+<li>The Poisson distribution turns that intensity into unit counts.</li>
+<li>Some store-product pairs sell more often than others.</li>
+<li>Inventory limits the number of units that can be sold.</li>
+</ul>
+<p>The current synthetic layer is independent of observed public product-country demand. This is documented and is an important limitation.</p>
+<hr />
+<h1 id="part-11-inventory-transfers-and-replenishment">Part 11: Inventory, Transfers, and Replenishment</h1>
+<h2 id="the-business-question_1">The business question</h2>
+<blockquote>
+<p>Given current stock and recent demand, where should inventory move and how much should the warehouse replenish?</p>
+</blockquote>
+<h2 id="target-stock">Target stock</h2>
+<p>For each store-product pair:</p>
+<pre><code class="language-text">target_stock = ceil(daily_demand_rate × horizon_days + safety_units)
+</code></pre>
+<p>Current settings:</p>
+<ul>
+<li>Lookback: 14 days</li>
+<li>Horizon: 14 days</li>
+<li>Safety stock: 2 units</li>
+<li>Minimum display stock: 1 unit</li>
+</ul>
+<p>The minimum display stock reflects a luxury-specific concern: a store should not look empty simply because inventory was moved out.</p>
+<h2 id="donors-and-recipients">Donors and recipients</h2>
+<p>A donor has stock above its target.</p>
+<p>A recipient has stock below its target.</p>
+<p>Transfers are matched by:</p>
+<ul>
+<li>Largest donor surplus first</li>
+<li>Largest recipient deficit first</li>
+<li>Same product only</li>
+<li>No store-to-itself transfer</li>
+</ul>
+<h2 id="constraints">Constraints</h2>
+<p>Current constraints:</p>
+<ul>
+<li>Donor cannot transfer more than its surplus.</li>
+<li>Donor is capped at 12 transfer units.</li>
+<li>Every target retains at least one display unit.</li>
+<li>Warehouse replenishment is capped at 200 units.</li>
+</ul>
+<h2 id="replenishment">Replenishment</h2>
+<p>After constrained transfers are allocated, remaining deficits may be covered by the central warehouse.</p>
+<p>This is not full procurement optimization yet. It is a transparent warehouse-capacity scenario.</p>
+<h2 id="current-results">Current results</h2>
+<ul>
+<li>13 transfer recommendations</li>
+<li>59 transfer units</li>
+<li>14 replenishment recommendations</li>
+<li>200 replenishment units</li>
+<li>Baseline projected stockout rate: 69.85%</li>
+<li>Recommended projected stockout rate: 69.36%</li>
+<li>Improvement: 0.49 percentage points</li>
+</ul>
+<h2 id="why-the-improvement-is-modest">Why the improvement is modest</h2>
+<p>The synthetic system has:</p>
+<ul>
+<li>High stockout pressure</li>
+<li>Limited transfer capacity</li>
+<li>Limited warehouse capacity</li>
+<li>No transfer cost</li>
+<li>No lead time</li>
+<li>No service-level optimization</li>
+</ul>
+<p>A modest improvement is more credible than claiming an unrealistic result.</p>
+<h2 id="what-remains-for-a-more-advanced-optimizer">What remains for a more advanced optimizer</h2>
+<ul>
+<li>Transfer cost</li>
+<li>Transfer lead time</li>
+<li>Warehouse lead time</li>
+<li>Minimum order quantities</li>
+<li>Reorder points</li>
+<li>Service-level objectives</li>
+<li>Full-price availability</li>
+<li>Product priority weights</li>
+<li>Regional restrictions</li>
+<li>Sensitivity analysis</li>
+</ul>
+<hr />
+<h1 id="part-12-client-intelligence">Part 12: Client Intelligence</h1>
+<h2 id="the-business-question_2">The business question</h2>
+<blockquote>
+<p>Which clients are valuable, which may leave, and how are their behaviors different?</p>
+</blockquote>
+<p>The project has three client-intelligence components:</p>
+<ol>
+<li>CLV</li>
+<li>Churn prediction</li>
+<li>Behavioral segmentation</li>
+</ol>
+<hr />
+<h2 id="121-customer-lifetime-value">12.1 Customer Lifetime Value</h2>
+<h3 id="eli5-explanation">ELI5 explanation</h3>
+<p>CLV estimates how much value a customer may generate in the future.</p>
+<p>It is not a crystal ball. It is a structured estimate based on past behavior.</p>
+<h3 id="as-of-date">As-of date</h3>
+<p>The model uses a cutoff date.</p>
+<p>Only purchases on or before the cutoff are allowed to create features.</p>
+<p>Future purchases are kept separate for evaluation.</p>
+<p>This prevents a serious error called target leakage.</p>
+<h3 id="features">Features</h3>
+<ul>
+<li>Order count</li>
+<li>Historical revenue</li>
+<li>First purchase date</li>
+<li>Last purchase date</li>
+<li>Recency days</li>
+<li>Active customer age</li>
+<li>Average order value</li>
+<li>Purchase rate</li>
+<li>Product breadth</li>
+<li>Return rate</li>
+</ul>
+<h3 id="purchase-rate">Purchase rate</h3>
+<p>A simple purchase rate is approximately:</p>
+<pre><code class="language-text">orders_per_day = order_count / active_days
+</code></pre>
+<p>Expected future orders are adjusted for:</p>
+<ul>
+<li>A small prior order count</li>
+<li>Recency decay</li>
+</ul>
+<h3 id="recency-factor">Recency factor</h3>
+<p>The current model uses exponential decay:</p>
+<pre><code class="language-text">recency_factor = exp(-recency_days / 180)
+</code></pre>
+<p>This means a customer who has been inactive longer receives a lower expected future value.</p>
+<h3 id="smoothed-order-value">Smoothed order value</h3>
+<p>The model uses a small revenue prior:</p>
+<pre><code class="language-text">smoothed_order_value = (historical_revenue + prior_revenue)
+                       / (order_count + 1)
+</code></pre>
+<p>This prevents very small histories from producing unstable values.</p>
+<h3 id="clv-formula">CLV formula</h3>
+<p>Conceptually:</p>
+<pre><code class="language-text">predicted_clv_90d = expected_orders_90d
+                   × smoothed_order_value
+                   × (1 - return_rate)
+</code></pre>
+<h3 id="current-result">Current result</h3>
+<ul>
+<li>5,283 customers evaluated</li>
+<li>90-day horizon</li>
+<li>MAE: 467.26 revenue units</li>
+<li>Prediction/realization correlation: 0.686</li>
+</ul>
+<p>The model underpredicts aggregate future revenue. This is honestly documented as a calibration target.</p>
+<h3 id="what-to-say-in-an-interview">What to say in an interview</h3>
+<blockquote>
+<p>I began with an interpretable CLV baseline rather than pretending a complex model was automatically better. It uses an as-of feature window and evaluates against a strictly future 90-day revenue window. The correlation is useful but the aggregate underprediction shows that calibration and probabilistic CLV are still needed.</p>
+</blockquote>
+<hr />
+<h2 id="122-churn-prediction">12.2 Churn prediction</h2>
+<h3 id="eli5-explanation_1">ELI5 explanation</h3>
+<p>Churn means the customer did not purchase again during a defined future period.</p>
+<p>Current definition:</p>
+<pre><code class="language-text">churned_90d = 1 if no eligible purchase occurs in the next 90 days
+churned_90d = 0 if at least one eligible purchase occurs
+</code></pre>
+<h3 id="time-based-setup">Time-based setup</h3>
+<p>The model is trained using an earlier as-of date and evaluated using a later as-of date.</p>
+<p>Current dates:</p>
+<ul>
+<li>Training as-of date: March 14, 2011</li>
+<li>Test as-of date: June 12, 2011</li>
+</ul>
+<p>This is better than randomly splitting customers because random splitting can mix future and past behavior.</p>
+<h3 id="model">Model</h3>
+<p>The current churn model is logistic regression with:</p>
+<ul>
+<li>Standardized features</li>
+<li>Balanced class weights</li>
+<li>Deterministic random seed</li>
+</ul>
+<h3 id="features_1">Features</h3>
+<ul>
+<li>Recency days</li>
+<li>Order count</li>
+<li>Historical revenue</li>
+<li>Distinct products</li>
+<li>Purchase cadence</li>
+<li>Average order value</li>
+<li>Lines per order</li>
+<li>Product breadth</li>
+</ul>
+<h3 id="metrics">Metrics</h3>
+<ul>
+<li>ROC-AUC: 0.816</li>
+<li>Average precision: 0.889</li>
+<li>Brier score: 0.173</li>
+</ul>
+<h3 id="metric-meanings">Metric meanings</h3>
+<h4 id="roc-auc">ROC-AUC</h4>
+<p>Measures whether the model ranks a future churner above a future non-churner.</p>
+<p>A value of 0.5 is roughly random ranking.</p>
+<p>A value of 1.0 is perfect ranking.</p>
+<h4 id="average-precision">Average precision</h4>
+<p>Useful when the positive class is important or imbalanced. It summarizes precision/recall behavior across thresholds.</p>
+<h4 id="brier-score">Brier score</h4>
+<p>Measures probability quality. Lower is better.</p>
+<p>A model can rank customers well but still have poorly calibrated probabilities. That is why Brier score matters.</p>
+<h3 id="important-limitation">Important limitation</h3>
+<p>The test churn rate is high because of the definition and time window. The model result should not be interpreted as a real luxury retention rate.</p>
+<p>Future improvement:</p>
+<ul>
+<li>Probability calibration</li>
+<li>Multiple rolling windows</li>
+<li>Cost-sensitive threshold selection</li>
+<li>Retention experiment or uplift modeling</li>
+</ul>
+<hr />
+<h2 id="123-behavioral-segmentation">12.3 Behavioral segmentation</h2>
+<h3 id="eli5-explanation_2">ELI5 explanation</h3>
+<p>Segmentation groups customers with similar behavior.</p>
+<p>The goal is not to label people socially. The goal is to make repeated purchasing patterns easier to understand.</p>
+<h3 id="method">Method</h3>
+<p>The project uses K-means clustering.</p>
+<p>K-means works like this:</p>
+<ol>
+<li>Choose a number of groups.</li>
+<li>Place customers into groups based on distance in feature space.</li>
+<li>Recalculate each group center.</li>
+<li>Repeat until assignments stabilize.</li>
+</ol>
+<p>Current number of segments:</p>
+<pre><code class="language-text">K = 5
+</code></pre>
+<h3 id="features_2">Features</h3>
+<ul>
+<li>Recency</li>
+<li>Order count</li>
+<li>Historical revenue</li>
+<li>Distinct products</li>
+<li>Purchase cadence</li>
+<li>Average order value</li>
+<li>Lines per order</li>
+<li>Product breadth</li>
+</ul>
+<p>Revenue features are log-transformed before clustering so extremely large customers do not dominate all groups.</p>
+<p>Features are standardized so different units are comparable.</p>
+<h3 id="output">Output</h3>
+<ul>
+<li>5,283 customer assignments</li>
+<li>5 segment profiles</li>
+<li>Average feature values per segment</li>
+<li>Customer count per segment</li>
+</ul>
+<h3 id="how-to-interpret-segments">How to interpret segments</h3>
+<p>The numeric cluster IDs are not meaningful by themselves.</p>
+<p>You must inspect the profile table and name groups based on behavior, for example:</p>
+<ul>
+<li>High value, frequent, recent</li>
+<li>High value, lapsed</li>
+<li>Emerging, low history</li>
+<li>Broad-category shoppers</li>
+<li>Narrow-category specialists</li>
+</ul>
+<p>Never claim that a segment represents wealth, ethnicity, personality, or social class.</p>
+<h3 id="future-improvement">Future improvement</h3>
+<ul>
+<li>Segment stability over time</li>
+<li>Compare K values</li>
+<li>Use silhouette score</li>
+<li>Add category and channel behavior</li>
+<li>Give segments business names only after inspecting profiles</li>
+</ul>
+<hr />
+<h1 id="part-13-recommendations-and-clienteling">Part 13: Recommendations and Clienteling</h1>
+<h2 id="the-business-question_3">The business question</h2>
+<blockquote>
+<p>What should a sales associate consider next for a consenting client?</p>
+</blockquote>
+<p>The clienteling system is decision support, not automatic outreach.</p>
+<h2 id="inputs">Inputs</h2>
+<ul>
+<li>Consent status</li>
+<li>Current inventory availability</li>
+<li>Purchase history</li>
+<li>Predicted CLV</li>
+<li>Churn probability</li>
+<li>Product ranking</li>
+</ul>
+<h2 id="candidate-selection">Candidate selection</h2>
+<p>The system:</p>
+<ol>
+<li>Looks at the fictional product universe.</li>
+<li>Removes products already purchased by the customer.</li>
+<li>Checks whether the product is currently in stock.</li>
+<li>Selects an eligible product.</li>
+<li>Chooses an action based on value, churn, and consent.</li>
+</ol>
+<h2 id="action-rules">Action rules</h2>
+<h3 id="no-consent">No consent</h3>
+<p>Action:</p>
+<pre><code class="language-text">no_action
+</code></pre>
+<p>Reason:</p>
+<pre><code class="language-text">personalization consent unavailable
+</code></pre>
+<p>This is a hard privacy rule.</p>
+<h3 id="high-churn-probability">High churn probability</h3>
+<p>Action:</p>
+<pre><code class="language-text">re_engagement
+</code></pre>
+<h3 id="high-clv">High CLV</h3>
+<p>Action:</p>
+<pre><code class="language-text">private_appointment
+</code></pre>
+<h3 id="other-consenting-customer">Other consenting customer</h3>
+<p>Action:</p>
+<pre><code class="language-text">product_suggestion
+</code></pre>
+<h3 id="no-eligible-product">No eligible product</h3>
+<p>Action:</p>
+<pre><code class="language-text">no_action
+</code></pre>
+<h2 id="current-output">Current output</h2>
+<ul>
+<li>5,942 client decisions</li>
+<li>4,766 consented clients</li>
+<li>1,176 no-action decisions</li>
+<li>2,184 product suggestions</li>
+<li>1,553 re-engagement actions</li>
+<li>1,029 private-appointment actions</li>
+</ul>
+<h2 id="why-no-action-matters">Why no-action matters</h2>
+<p>A luxury brand should not contact every possible client merely because a model found a possible product.</p>
+<p>No-action is a valid recommendation when:</p>
+<ul>
+<li>Consent is absent.</li>
+<li>The product is unavailable.</li>
+<li>The customer was contacted recently.</li>
+<li>The recommendation is weak.</li>
+<li>The relationship should be left undisturbed.</li>
+</ul>
+<h2 id="what-is-missing">What is missing</h2>
+<p>The current system does not yet have real or simulated outcomes such as:</p>
+<ul>
+<li>Message opened</li>
+<li>Appointment booked</li>
+<li>Product viewed</li>
+<li>Product purchased</li>
+<li>Client response</li>
+<li>Contact fatigue</li>
+<li>Associate workload</li>
+</ul>
+<p>Those are important future improvements because a recommendation cannot be judged only by whether a product was selected.</p>
+<hr />
+<h1 id="part-14-the-dashboard">Part 14: The Dashboard</h1>
+<h2 id="how-to-run-it">How to run it</h2>
+<p>From the project root:</p>
+<pre><code class="language-bash">cd &quot;/Users/nora/Desktop/jobs/Fashion Projects/Couture Atelier Intelligence&quot;
+&quot;/Users/nora/Desktop/jobs/Fashion Projects/.venv/bin/streamlit&quot; run dashboard/app.py --server.headless true --server.port 8503
+</code></pre>
+<p>Then open:</p>
+<pre><code class="language-text">http://localhost:8503
+</code></pre>
+<p>Port 8502 may already be occupied by another process. If so, use 8503 or another available port.</p>
+<h2 id="dashboard-design-philosophy">Dashboard design philosophy</h2>
+<p>The dashboard is intentionally restrained:</p>
+<ul>
+<li>Four views</li>
+<li>Few high-signal KPIs</li>
+<li>Clear section labels</li>
+<li>Explicit provenance</li>
+<li>Minimal decoration</li>
+<li>Luxury-inspired ivory, jade, gold, coral, and charcoal palette</li>
+<li>Serif display headings with practical sans-serif data text</li>
+<li>No automatic outreach</li>
+<li>No overcrowded KPI grid</li>
+</ul>
+<h2 id="view-1-executive-pulse">View 1: Executive Pulse</h2>
+<p>Purpose:</p>
+<p>Give an executive the full-system signal in seconds.</p>
+<p>Shows:</p>
+<ul>
+<li>Client universe</li>
+<li>Projected stockout rate</li>
+<li>Forecast MAE</li>
+<li>Churn ROC-AUC</li>
+<li>Executive read</li>
+<li>Action mix</li>
+</ul>
+<p>Important design decision:</p>
+<p>Forecast MAE is shown with its percentage change against the seasonal baseline. This gives context instead of showing a number with no comparison.</p>
+<h2 id="view-2-demand-and-inventory">View 2: Demand and Inventory</h2>
+<p>Purpose:</p>
+<p>Show where inventory pressure exists and what should move.</p>
+<p>Shows:</p>
+<ul>
+<li>Hero products</li>
+<li>Boutiques</li>
+<li>Transfer units</li>
+<li>Stockout rows</li>
+<li>Transfer ledger</li>
+<li>Stockout pressure by store</li>
+<li>Current operating constraints</li>
+</ul>
+<p>The chart uses percentage formatting for stockout rates so the user does not need to mentally convert decimals.</p>
+<h2 id="view-3-client-intelligence">View 3: Client Intelligence</h2>
+<p>Purpose:</p>
+<p>Show customer value and risk without turning clients into opaque labels.</p>
+<p>Shows:</p>
+<ul>
+<li>Predicted 90-day value</li>
+<li>High-risk clients</li>
+<li>Behavioral segment count</li>
+<li>CLV correlation</li>
+<li>Value/risk scatter plot</li>
+<li>Behavioral profiles</li>
+</ul>
+<h2 id="view-4-clienteling">View 4: Clienteling</h2>
+<p>Purpose:</p>
+<p>Give an associate or manager a ranked decision list.</p>
+<p>Filters:</p>
+<ul>
+<li>All decisions</li>
+<li>Eligible actions</li>
+<li>Re-engagement</li>
+<li>Private appointment</li>
+<li>Product suggestion</li>
+<li>No action</li>
+</ul>
+<p>Each row shows:</p>
+<ul>
+<li>Customer ID</li>
+<li>Action type</li>
+<li>Recommended product</li>
+<li>Predicted CLV</li>
+<li>Churn probability</li>
+<li>Reason</li>
+</ul>
+<p>The dashboard explicitly says this is associate decision support, not automatic outreach.</p>
+<hr />
+<h1 id="part-15-how-to-explain-the-plots">Part 15: How to Explain the Plots</h1>
+<h2 id="action-mix-bar-chart">Action mix bar chart</h2>
+<p>Question it answers:</p>
+<blockquote>
+<p>How many clients fall into each next-best-action category?</p>
+</blockquote>
+<p>Read it by comparing the bars, not by treating the chart as revenue impact.</p>
+<p>It shows model decisions, not successful conversions.</p>
+<h2 id="stockout-pressure-chart">Stockout pressure chart</h2>
+<p>Question it answers:</p>
+<blockquote>
+<p>Which stores have the greatest share of inventory rows flagged as stockouts?</p>
+</blockquote>
+<p>It is a pressure indicator, not a complete lost-sales estimate.</p>
+<p>A stockout rate can be influenced by:</p>
+<ul>
+<li>Demand simulation</li>
+<li>Starting stock</li>
+<li>Receipts</li>
+<li>Horizon</li>
+<li>Product mix</li>
+</ul>
+<h2 id="valuerisk-map">Value/risk map</h2>
+<p>X-axis:</p>
+<ul>
+<li>Predicted 90-day CLV</li>
+</ul>
+<p>Y-axis:</p>
+<ul>
+<li>Churn probability</li>
+</ul>
+<p>Interpretation:</p>
+<ul>
+<li>High value, high churn: possible priority for careful re-engagement.</li>
+<li>High value, low churn: protect the relationship and avoid unnecessary pressure.</li>
+<li>Low value, high churn: lower-cost or no-action strategies may be appropriate.</li>
+<li>Low value, low churn: maintain normal service.</li>
+</ul>
+<p>The chart supports prioritization; it does not prove causal effects.</p>
+<h2 id="behavioral-profile-chart">Behavioral profile chart</h2>
+<p>Question it answers:</p>
+<blockquote>
+<p>How do the average behaviors of the five segments differ?</p>
+</blockquote>
+<p>Do not name a cluster solely from its number. Inspect its averages first.</p>
+<h2 id="transfer-ledger">Transfer ledger</h2>
+<p>Question it answers:</p>
+<blockquote>
+<p>What movement is recommended, from where, to where, and why?</p>
+</blockquote>
+<p>It should be read together with:</p>
+<ul>
+<li>Donor capacity</li>
+<li>Recipient deficit</li>
+<li>Minimum display stock</li>
+<li>Warehouse replenishment</li>
+<li>Product importance</li>
+</ul>
+<hr />
+<h1 id="part-16-testing-and-quality-assurance">Part 16: Testing and Quality Assurance</h1>
+<h2 id="current-test-count">Current test count</h2>
+<p>The project currently has <strong>30 passing tests</strong>.</p>
+<h2 id="test-categories">Test categories</h2>
+<h3 id="staging-tests">Staging tests</h3>
+<ul>
+<li>Cancellation handling</li>
+<li>Missing customer IDs</li>
+<li>Duplicate removal</li>
+<li>Adjustment classification</li>
+</ul>
+<h3 id="mart-tests">Mart tests</h3>
+<ul>
+<li>Return separation</li>
+<li>Purchase-date correctness</li>
+<li>Net values</li>
+</ul>
+<h3 id="demand-panel-tests">Demand panel tests</h3>
+<ul>
+<li>Zero-demand date creation</li>
+<li>Provenance</li>
+</ul>
+<h3 id="forecasting-tests">Forecasting tests</h3>
+<ul>
+<li>Lag correctness</li>
+<li>Group isolation</li>
+<li>Rolling means</li>
+<li>Zero-demand recency</li>
+<li>Duplicate-key failure</li>
+<li>Missing-column failure</li>
+<li>Deterministic model behavior</li>
+</ul>
+<h3 id="synthetic-layer-tests">Synthetic layer tests</h3>
+<ul>
+<li>Anonymous IDs</li>
+<li>Consent field</li>
+<li>Product validity</li>
+<li>Inventory determinism</li>
+<li>Nonnegative stock</li>
+<li>Inventory reconciliation</li>
+</ul>
+<h3 id="inventory-tests">Inventory tests</h3>
+<ul>
+<li>Donor/recipient matching</li>
+<li>Stockout improvement</li>
+<li>Replenishment output</li>
+<li>Transfer capacity</li>
+</ul>
+<h3 id="client-intelligence-tests">Client intelligence tests</h3>
+<ul>
+<li>Future-only CLV features</li>
+<li>CLV evaluation</li>
+<li>Churn label correctness</li>
+<li>Deterministic segmentation</li>
+</ul>
+<h3 id="clienteling-tests">Clienteling tests</h3>
+<ul>
+<li>Consent gating</li>
+<li>In-stock recommendation</li>
+<li>Churn-aware action</li>
+<li>No-action behavior</li>
+</ul>
+<h2 id="quality-commands">Quality commands</h2>
+<p>Run tests:</p>
+<pre><code class="language-bash">&quot;/Users/nora/Desktop/jobs/Fashion Projects/.venv/bin/python&quot; -m pytest -q
+</code></pre>
+<p>Run lint:</p>
+<pre><code class="language-bash">&quot;/Users/nora/Desktop/jobs/Fashion Projects/.venv/bin/ruff&quot; check scripts tests dashboard
+</code></pre>
+<p>Compile key files:</p>
+<pre><code class="language-bash">&quot;/Users/nora/Desktop/jobs/Fashion Projects/.venv/bin/python&quot; -m py_compile dashboard/app.py
+</code></pre>
+<h2 id="why-tests-matter-in-an-interview">Why tests matter in an interview</h2>
+<p>The tests show that the project is not just a notebook with attractive charts.</p>
+<p>They protect:</p>
+<ul>
+<li>Data assumptions</li>
+<li>Time boundaries</li>
+<li>Privacy rules</li>
+<li>Inventory equations</li>
+<li>Recommendation eligibility</li>
+<li>Reproducibility</li>
+</ul>
+<hr />
+<h1 id="part-17-metrics-cheat-sheet">Part 17: Metrics Cheat Sheet</h1>
+<h2 id="forecasting">Forecasting</h2>
+<h3 id="mae">MAE</h3>
+<p>Mean absolute error:</p>
+<pre><code class="language-text">average(|actual - forecast|)
+</code></pre>
+<p>Easy to interpret in units.</p>
+<h3 id="rmse">RMSE</h3>
+<p>Root mean squared error:</p>
+<pre><code class="language-text">sqrt(average((actual - forecast)^2))
+</code></pre>
+<p>Punishes large mistakes more heavily than MAE.</p>
+<h3 id="bias">Bias</h3>
+<pre><code class="language-text">average(actual - forecast)
+</code></pre>
+<p>Positive bias here means the model tends to underpredict.</p>
+<h3 id="wape">WAPE</h3>
+<p>Weighted absolute percentage error. Useful when total demand scale matters, but can be unstable when actual demand is near zero.</p>
+<h3 id="mase">MASE</h3>
+<p>Mean absolute scaled error. Compares the model with a naive benchmark and is useful across series with different scales.</p>
+<h2 id="classification">Classification</h2>
+<h3 id="precision">Precision</h3>
+<p>Of those predicted positive, how many were actually positive?</p>
+<h3 id="recall">Recall</h3>
+<p>Of all actual positives, how many did the model find?</p>
+<h3 id="roc-auc_1">ROC-AUC</h3>
+<p>How well does the model rank positives above negatives across thresholds?</p>
+<h3 id="average-precision_1">Average precision</h3>
+<p>Summarizes precision-recall behavior, especially useful for imbalanced outcomes.</p>
+<h3 id="brier-score_1">Brier score</h3>
+<p>Measures the quality of probability predictions. Lower is better.</p>
+<h2 id="clv">CLV</h2>
+<h3 id="mae-revenue">MAE revenue</h3>
+<p>Average absolute difference between predicted and realized future revenue.</p>
+<h3 id="correlation">Correlation</h3>
+<p>Measures whether higher predicted value tends to correspond to higher realized value.</p>
+<p>Correlation is not calibration. A model can rank well while predicting the wrong absolute amounts.</p>
+<h2 id="clustering">Clustering</h2>
+<h3 id="segment-count">Segment count</h3>
+<p>How many groups were created.</p>
+<h3 id="segment-profile">Segment profile</h3>
+<p>Average feature values for each group.</p>
+<h3 id="stability">Stability</h3>
+<p>Whether similar customers remain assigned to similar groups when the time window or random seed changes.</p>
+<hr />
+<h1 id="part-18-interview-questions-and-answers">Part 18: Interview Questions and Answers</h1>
+<h2 id="q1-what-problem-does-this-project-solve">Q1. What problem does this project solve?</h2>
+<p><strong>Answer:</strong></p>
+<p>It connects four luxury retail decisions: demand forecasting, inventory movement, customer intelligence, and clienteling. The goal is to help a fictional luxury retailer decide what demand may occur, where products should be available, which customers may need attention, and when no action is more appropriate.</p>
+<h2 id="q2-why-did-you-use-public-data-instead-of-claiming-luxury-house-data">Q2. Why did you use public data instead of claiming luxury-house data?</h2>
+<p><strong>Answer:</strong></p>
+<p>Private luxury transaction and clienteling data is not publicly available and should not be fabricated. I used public data for the analytical foundation and clearly separated it from a synthetic luxury layer. That lets me demonstrate the methods while maintaining data integrity and privacy.</p>
+<h2 id="q3-why-is-the-uci-dataset-not-enough-by-itself">Q3. Why is the UCI dataset not enough by itself?</h2>
+<p><strong>Answer:</strong></p>
+<p>It has transactions, products, customers, dates, prices, and countries, but it lacks boutiques, inventory, appointments, consent, luxury product attributes, and clienteling outcomes. It is strong for methodology but insufficient for the complete luxury retail use case.</p>
+<h2 id="q4-how-did-you-prevent-leakage">Q4. How did you prevent leakage?</h2>
+<p><strong>Answer:</strong></p>
+<p>I used chronological cutoffs. Features are created only from data available at the as-of date, while future windows are held out for evaluation. I also test that lag features do not cross product-country groups and that duplicate keys fail fast.</p>
+<h2 id="q5-why-did-you-create-a-complete-demand-panel">Q5. Why did you create a complete demand panel?</h2>
+<p><strong>Answer:</strong></p>
+<p>The sparse transaction table only contains dates with observed activity. Forecasting needs explicit zero-demand dates. I generated each product-country pair’s active date range and added zero rows with an <code>is_observed</code> flag, so missing dates are distinguishable from original observations.</p>
+<h2 id="q6-why-did-you-choose-gradient-boosting">Q6. Why did you choose gradient boosting?</h2>
+<p><strong>Answer:</strong></p>
+<p>It handles nonlinear relationships between lag, calendar, lifecycle, and demand features while remaining practical for tabular retail data. I introduced it only after establishing a seasonal-naive benchmark.</p>
+<h2 id="q7-why-did-you-log-transform-demand">Q7. Why did you log-transform demand?</h2>
+<p><strong>Answer:</strong></p>
+<p>Retail demand is skewed: many small or zero values coexist with a few large spikes. <code>log1p</code> reduces the influence of extreme values and makes the regression problem easier to model. Predictions are transformed back with <code>expm1</code> and clipped at zero.</p>
+<h2 id="q8-is-the-157-improvement-a-business-impact-result">Q8. Is the 15.7% improvement a business impact result?</h2>
+<p><strong>Answer:</strong></p>
+<p>No. It is a model MAE improvement on a public-data chronological holdout. It does not prove a 15.7% stockout or revenue improvement in a real luxury business.</p>
+<h2 id="q9-what-is-your-strongest-model-limitation">Q9. What is your strongest model limitation?</h2>
+<p><strong>Answer:</strong></p>
+<p>The demand model does not yet observe true availability. A low sale count may mean low demand or a stockout. The synthetic inventory layer begins addressing that, but a more advanced system would model censored demand explicitly.</p>
+<h2 id="q10-how-is-clv-calculated">Q10. How is CLV calculated?</h2>
+<p><strong>Answer:</strong></p>
+<p>The baseline estimates expected future orders using historical purchase rate, active age, recency decay, and a small prior. It multiplies expected orders by a smoothed order value and adjusts for return rate. It is transparent and evaluated against future 90-day revenue.</p>
+<h2 id="q11-what-does-churn-mean-here">Q11. What does churn mean here?</h2>
+<p><strong>Answer:</strong></p>
+<p>Churn means no eligible purchase during the 90 days after an as-of date. It is an operational definition for this project, not a universal truth about customer relationships.</p>
+<h2 id="q12-why-use-logistic-regression-for-churn">Q12. Why use logistic regression for churn?</h2>
+<p><strong>Answer:</strong></p>
+<p>It is interpretable, fast, and produces probabilities. For a first time-based benchmark, that is more useful than jumping immediately to a black-box model.</p>
+<h2 id="q13-why-use-k-means">Q13. Why use K-means?</h2>
+<p><strong>Answer:</strong></p>
+<p>K-means creates understandable behavioral groups from standardized numeric features. It is a baseline, not a claim that customer behavior naturally has exactly five permanent groups.</p>
+<h2 id="q14-why-is-consent-a-hard-gate">Q14. Why is consent a hard gate?</h2>
+<p><strong>Answer:</strong></p>
+<p>Clienteling is relationship management, not unrestricted targeting. A recommendation should never become an outreach action when consent is unavailable.</p>
+<h2 id="q15-why-include-no-action">Q15. Why include no-action?</h2>
+<p><strong>Answer:</strong></p>
+<p>In luxury, restraint can protect the relationship. No-action prevents the system from treating every client as an opportunity for contact and gives associates permission not to intervene.</p>
+<h2 id="q16-what-does-the-inventory-optimizer-do">Q16. What does the inventory optimizer do?</h2>
+<p><strong>Answer:</strong></p>
+<p>It estimates recent daily demand, calculates target stock for a future horizon, identifies store-level surpluses and deficits, creates constrained transfers, and sends remaining deficits to a finite warehouse replenishment plan.</p>
+<h2 id="q17-what-inventory-constraints-exist">Q17. What inventory constraints exist?</h2>
+<p><strong>Answer:</strong></p>
+<p>Minimum display stock, donor surplus, a 12-unit transfer capacity per donor, no self-transfer, product matching, and a 200-unit warehouse capacity.</p>
+<h2 id="q18-what-would-you-improve-next">Q18. What would you improve next?</h2>
+<p><strong>Answer:</strong></p>
+<p>I would calibrate churn and CLV probabilities, evaluate across multiple rolling windows, add transfer cost and lead time, then add clienteling response outcomes. I would prioritize those before adding more visual complexity.</p>
+<h2 id="q19-how-would-you-deploy-this">Q19. How would you deploy this?</h2>
+<p><strong>Answer:</strong></p>
+<p>The current dashboard is a Streamlit portfolio application. In production, I would separate ingestion, feature generation, model serving, recommendation approval, and dashboard presentation. I would add access controls, audit logs, monitoring, model versioning, and human approval before any client-facing action.</p>
+<h2 id="q20-what-would-you-monitor-in-production">Q20. What would you monitor in production?</h2>
+<p><strong>Answer:</strong></p>
+<p>I would monitor data freshness, schema drift, missing customer IDs, forecast error, forecast bias, stockout rate, transfer feasibility, churn calibration, recommendation coverage, consent violations, contact frequency, and segment drift.</p>
+<hr />
+<h1 id="part-19-questions-you-should-ask-the-interviewer">Part 19: Questions You Should Ask the Interviewer</h1>
+<p>Strong candidates also ask good questions.</p>
+<p>Examples:</p>
+<ol>
+<li>How does the team define success for retail analytics: forecast accuracy, availability, full-price sell-through, client retention, or a combination?</li>
+<li>How are store and e-commerce data joined today?</li>
+<li>How does the business distinguish low demand from out-of-stock demand?</li>
+<li>What level of explainability do merchandising and retail teams expect?</li>
+<li>How are clienteling recommendations approved and measured?</li>
+<li>What privacy and consent constraints govern customer analytics?</li>
+<li>Does the team prefer centralized models or market-specific models?</li>
+<li>How are model outputs incorporated into associate workflows?</li>
+</ol>
+<hr />
+<h1 id="part-20-what-is-actually-finished">Part 20: What Is Actually Finished?</h1>
+<h2 id="completed">Completed</h2>
+<ul>
+<li>Public source ingestion</li>
+<li>Source profiling</li>
+<li>Staging validation</li>
+<li>Duplicate handling</li>
+<li>Cancellation handling</li>
+<li>Adjustment handling</li>
+<li>Customer 360 mart</li>
+<li>Product catalog mart</li>
+<li>Daily sales mart</li>
+<li>Complete demand panel</li>
+<li>Seasonal forecast baseline</li>
+<li>Feature-based demand model</li>
+<li>Synthetic customers</li>
+<li>Synthetic products</li>
+<li>Synthetic stores</li>
+<li>Synthetic inventory</li>
+<li>Stockout simulation</li>
+<li>Constrained transfers</li>
+<li>Warehouse replenishment</li>
+<li>Improved CLV baseline</li>
+<li>Churn prediction</li>
+<li>Behavioral segmentation</li>
+<li>Product recommendation baseline</li>
+<li>Consent rules</li>
+<li>Next-best-action logic</li>
+<li>No-action logic</li>
+<li>Executive Streamlit dashboard</li>
+<li>Architecture documentation</li>
+<li>Executive presentation outline</li>
+<li>Interview case study</li>
+<li>30 automated tests</li>
+</ul>
+<h2 id="still-worth-improving">Still worth improving</h2>
+<p>These are meaningful, but not required to explain the current project:</p>
+<ol>
+<li>Churn probability calibration.</li>
+<li>CLV calibration.</li>
+<li>Multiple rolling-window evaluations.</li>
+<li>Transfer cost and lead time.</li>
+<li>Full-price availability objective.</li>
+<li>Clienteling response and conversion simulation.</li>
+<li>Category affinity.</li>
+<li>Recommendation diversity.</li>
+<li>Segment stability.</li>
+<li>Visual similarity.</li>
+</ol>
+<p>Do not claim these are already implemented. Say they are the next improvements.</p>
+<hr />
+<h1 id="part-21-the-best-study-routine">Part 21: The Best Study Routine</h1>
+<h2 id="day-1-business-understanding">Day 1: Business understanding</h2>
+<p>Study:</p>
+<ul>
+<li>One-minute explanation</li>
+<li>Business problem</li>
+<li>What the project is and is not</li>
+<li>Three data layers</li>
+</ul>
+<p>Practice explaining the project without mentioning algorithms.</p>
+<h2 id="day-2-data-pipeline">Day 2: Data pipeline</h2>
+<p>Study:</p>
+<ul>
+<li>UCI fields</li>
+<li>Cleaning decisions</li>
+<li>Staging columns</li>
+<li>Analytical marts</li>
+<li>Demand panel</li>
+</ul>
+<p>Practice answering:</p>
+<blockquote>
+<p>What happens to a cancelled invoice?</p>
+</blockquote>
+<h2 id="day-3-forecasting">Day 3: Forecasting</h2>
+<p>Study:</p>
+<ul>
+<li>Seasonal baseline</li>
+<li>Lag features</li>
+<li>Rolling means</li>
+<li>Log transform</li>
+<li>Chronological split</li>
+<li>MAE, RMSE, bias</li>
+</ul>
+<p>Practice explaining why the stronger model is better without overstating the result.</p>
+<h2 id="day-4-synthetic-layer-and-inventory">Day 4: Synthetic layer and inventory</h2>
+<p>Study:</p>
+<ul>
+<li>Why simulation is necessary</li>
+<li>Inventory equation</li>
+<li>Target stock</li>
+<li>Transfers</li>
+<li>Replenishment</li>
+<li>Constraints</li>
+</ul>
+<p>Practice calculating target stock with a simple example.</p>
+<h2 id="day-5-client-intelligence">Day 5: Client intelligence</h2>
+<p>Study:</p>
+<ul>
+<li>CLV formula</li>
+<li>As-of date</li>
+<li>Future evaluation</li>
+<li>Churn definition</li>
+<li>ROC-AUC and Brier score</li>
+<li>K-means segmentation</li>
+</ul>
+<h2 id="day-6-clienteling-and-dashboard">Day 6: Clienteling and dashboard</h2>
+<p>Study:</p>
+<ul>
+<li>Consent gate</li>
+<li>Product eligibility</li>
+<li>Action hierarchy</li>
+<li>No-action behavior</li>
+<li>Dashboard views</li>
+<li>Plot interpretation</li>
+</ul>
+<h2 id="day-7-interview-simulation">Day 7: Interview simulation</h2>
+<p>Answer the 20 questions aloud.</p>
+<p>For every answer, include:</p>
+<ol>
+<li>Business reason</li>
+<li>Technical method</li>
+<li>Validation method</li>
+<li>Limitation</li>
+</ol>
+<p>That four-part answer structure will make you sound prepared without sounding memorized.</p>
+<hr />
+<h1 id="final-mental-model">Final Mental Model</h1>
+<p>Remember the project as one chain:</p>
+<pre><code class="language-text">Observe demand
+    -&gt; clean the data
+    -&gt; build trustworthy features
+    -&gt; forecast demand
+    -&gt; simulate luxury stores and inventory
+    -&gt; move or replenish stock
+    -&gt; understand client value and risk
+    -&gt; respect consent
+    -&gt; recommend a useful action or no action
+    -&gt; show the decisions clearly in a dashboard
+</code></pre>
+<p>The project’s strongest quality is not one model score.</p>
+<p>It is the connection between:</p>
+<ul>
+<li>Data quality</li>
+<li>Forecasting</li>
+<li>Inventory</li>
+<li>Customer intelligence</li>
+<li>Privacy</li>
+<li>Human judgment</li>
+<li>Luxury brand restraint</li>
+</ul>
+<p>That is the story you should carry into every interview.</p></body></html>

@@ -1,0 +1,95 @@
+project:
+  name: Couture Atelier Intelligence
+  type: portfolio simulation
+  affiliated_brand: none
+
+sources:
+  - id: hm_personalized_fashion
+    name: H&M Personalized Fashion Recommendations
+    role: fashion transaction, customer, and product foundation
+    status: planned
+    observed: true
+    license: Kaggle competition rules; review before redistribution
+    url: https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations
+    supports:
+      - customer segmentation
+      - product affinity
+      - recommendation benchmarking
+    limitations:
+      - mass-market rather than luxury
+      - no store inventory
+      - no boutique appointments
+
+  - id: m5_forecasting
+    name: M5 Forecasting Accuracy
+    role: hierarchical store-item forecasting benchmark
+    status: planned
+    observed: true
+    license: Kaggle competition rules; review before redistribution
+    url: https://www.kaggle.com/competitions/m5-forecasting-accuracy
+    supports:
+      - time-series forecasting
+      - store-item hierarchy
+      - price and event features
+    limitations:
+      - Walmart rather than fashion or luxury
+      - separate benchmark, not joined to H&M customers
+
+  - id: uci_online_retail_ii
+    name: UCI Online Retail II
+    role: customer value and repeat-purchase robustness benchmark
+    status: acquired_and_staged
+    observed: true
+    license: CC BY 4.0
+    url: https://archive.ics.uci.edu/dataset/502/online+retail+ii
+    supports:
+      - RFM segmentation
+      - customer lifetime value
+      - repeat purchase analysis
+    limitations:
+      - many customers are wholesalers
+      - online giftware rather than luxury fashion
+
+  - id: fashion_product_images
+    name: Fashion Product Images Dataset
+    role: visual product intelligence support
+    status: planned
+    observed: true
+    license: MIT (as listed by dataset publisher; verify source terms)
+    url: https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset
+    supports:
+      - image embeddings
+      - visual similarity
+      - product attribute modeling
+    limitations:
+      - no transaction outcomes
+      - separate product catalog
+
+  - id: google_trends
+    name: Google Trends
+    role: external demand signal
+    status: planned
+    observed: true
+    license: Google Trends terms and attribution requirements
+    url: https://trends.google.com/trends/
+    supports:
+      - normalized search-interest features
+      - regional trend context
+    limitations:
+      - search interest is not sales
+      - relative index rather than absolute demand
+
+  - id: couture_atelier_synthetic
+    name: Couture Atelier Synthetic Luxury Layer
+    role: boutique, inventory, appointments, and clienteling simulation
+    status: planned
+    observed: false
+    license: project-created synthetic data
+    url: null
+    supports:
+      - boutique-level allocation
+      - stockout and transfer simulation
+      - consent-aware clienteling evaluation
+    limitations:
+      - simulated outcomes are not real commercial results
+      - assumptions must be documented and stress-tested

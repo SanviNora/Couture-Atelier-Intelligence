@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+.DS_Store
+
+# Data files are acquired locally and are not committed.
+data/raw/
+data/staging/
+data/synthetic/
+data/processed/
+
+# Local analytical databases and secrets.
+*.duckdb
+.env
+*.egg-info/
+*.log
