@@ -16,12 +16,13 @@ import streamlit as st
 
 BUNDLE = Path(__file__).resolve().parents[1] / "public_bundle"
 
-# Categorical slots, validated for colour-vision deficiency on the page surface (adjacent and all pairs).
-JADE, GOLD, SAPPHIRE, OXBLOOD = "#00866f", "#c99212", "#2f6bc0", "#b8402f"
-CONTEXT = "#c9c7bf"  # de-emphasised marks
-INK, INK_2, MUTED, GRID, AXIS = "#1a1c23", "#52514e", "#898781", "#e1e0d9", "#c3c2b7"
+# Categorical slots, validated for colour-vision deficiency on the page surface (all pairs, contrast >= 3:1).
+LAVENDER, HONEY, CHERRY, TEAL = "#5b4fe0", "#b88200", "#d2384f", "#009180"
+CONTEXT = "#d9d3c8"  # de-emphasised marks
+INK, INK_2, MUTED, GRID, AXIS = "#16151a", "#4f4c55", "#75717a", "#eee9e0", "#d6d0c4"
 STATUS = {"stable": ("#0ca30c", "✓"), "watch": ("#fab219", "●"), "act": ("#d03b3b", "▲")}
-FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif'
+FONT = 'Geist, system-ui, -apple-system, "Segoe UI", sans-serif'
+REPO = "https://github.com/SanviNora/Couture-Atelier-Intelligence"
 FEATURE_LABELS = {
     "spend_12m": "Spend, last 12 months", "visits_12m": "Visits, last 12 months", "recency_weeks": "Weeks since last visit",
     "lifetime_visits": "Visits, all time", "products_12m": "Different pieces bought, 12 months",
@@ -66,21 +67,27 @@ def style() -> None:
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&display=swap');
-        h1, h2 { font-family: 'Bodoni Moda', Didot, Georgia, serif !important; font-weight: 500 !important;
-                 letter-spacing: 0 !important; }
-        h1 { font-size: 2.3rem !important; }
-        .eyebrow { color: #00866f; font: 700 0.72rem system-ui, sans-serif; letter-spacing: 0.14em;
-                   text-transform: uppercase; margin-bottom: 0.2rem; }
-        .lede { color: #52514e; font-size: 1.02rem; max-width: 70ch; margin-bottom: 1.2rem; }
-        .tile { border: 1px solid #e1e0d9; border-radius: 6px; padding: 1rem 1.1rem; background: #ffffff;
+        .block-container { max-width: 1180px; padding-top: 2.6rem; padding-bottom: 4rem; }
+        h1 { font-size: clamp(2.5rem, 5vw, 3.6rem) !important; line-height: 1.02 !important;
+             letter-spacing: -0.015em !important; padding-bottom: 0.4rem !important; }
+        h1 em, h2 em { color: #5b4fe0; }
+        h2, h3 { letter-spacing: -0.01em !important; }
+        .eyebrow { display: inline-block; background: #ece9fd; color: #4436c9; border-radius: 999px;
+                   padding: 0.28rem 0.8rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+                   text-transform: uppercase; margin-bottom: 0.6rem; }
+        .lede { color: #4f4c55; font-size: 1.06rem; line-height: 1.55; max-width: 68ch; margin-bottom: 1.6rem; }
+        .tile { border: 1px solid #e8e2d7; border-radius: 20px; padding: 1.15rem 1.25rem 1.1rem; background: #ffffff;
                 height: 100%; }
-        .tile .value { font: 600 2rem system-ui, sans-serif; color: #1a1c23; line-height: 1.1; }
-        .tile .label { color: #52514e; font-size: 0.86rem; margin-top: 0.35rem; }
-        .tile .note { color: #898781; font-size: 0.76rem; margin-top: 0.35rem; }
-        .chip { display: inline-block; padding: 0.1rem 0.55rem; margin: 0 0.25rem 0.35rem 0; border-radius: 999px;
-                font-size: 0.8rem; font-weight: 500; color: #1a1c23; border: 1.5px solid; background: #ffffff; }
-        .prov { color: #898781; font-size: 0.78rem; }
+        .tile .value { font-family: 'Instrument Serif', Georgia, serif; font-size: 2.7rem; color: #16151a;
+                       line-height: 1; letter-spacing: -0.01em; }
+        .tile .label { color: #16151a; font-size: 0.9rem; font-weight: 500; margin-top: 0.55rem; }
+        .tile .note { color: #75717a; font-size: 0.78rem; margin-top: 0.3rem; }
+        .chip { display: inline-block; padding: 0.22rem 0.7rem; margin: 0 0.3rem 0.4rem 0; border-radius: 999px;
+                font-size: 0.8rem; font-weight: 500; color: #16151a; border: 1.5px solid; background: #ffffff; }
+        .prov { color: #75717a; font-size: 0.78rem; line-height: 1.5; margin-top: 1rem; }
+        .footer { color: #75717a; font-size: 0.78rem; border-top: 1px solid #e8e2d7; margin-top: 3rem;
+                  padding-top: 1rem; }
+        .footer a { color: #4436c9; text-decoration: none; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -103,6 +110,12 @@ def provenance(text: str) -> None:
     st.markdown(f'<div class="prov">{text}</div>', unsafe_allow_html=True)
 
 
+def footer() -> None:
+    st.markdown(f'<div class="footer">Couture Atelier Intelligence · built by Sanvi · '
+                f'<a href="{REPO}">source on GitHub</a> · aggregates, model outputs and synthetic examples only</div>',
+                unsafe_allow_html=True)
+
+
 def chart(fig: go.Figure, data: pd.DataFrame, height: int = 340, key: str | None = None) -> None:
     has_legend = sum(1 for trace in fig.data if trace.showlegend is not False) > 1
     fig.update_layout(
@@ -111,20 +124,21 @@ def chart(fig: go.Figure, data: pd.DataFrame, height: int = 340, key: str | None
         plot_bgcolor="rgba(0,0,0,0)", font={"family": FONT, "color": INK_2, "size": 12},
         legend={"orientation": "h", "x": 0, "y": 1.0, "yanchor": "bottom", "font": {"color": INK_2}},
         barcornerradius=4, bargap=0.35, hoverlabel={"font_family": FONT},
-        title={"font": {"size": 13, "color": INK}, "x": 0.005, "xref": "container", "xanchor": "left",
+        title={"font": {"family": FONT, "size": 14, "color": INK, "weight": 600}, "x": 0.005, "xref": "container", "xanchor": "left",
                "y": 0.985, "yref": "container", "yanchor": "top"},
     )
     fig.update_xaxes(showgrid=False, linecolor=AXIS, tickfont={"color": MUTED}, title_font={"color": INK_2})
     fig.update_yaxes(gridcolor=GRID, gridwidth=1, zeroline=False, linecolor=AXIS, tickfont={"color": MUTED},
                      title_font={"color": INK_2})
-    st.plotly_chart(fig, use_container_width=True, key=key)
-    with st.expander("Show data"):
-        st.dataframe(data, hide_index=True, use_container_width=True)
+    with st.container(border=True):
+        st.plotly_chart(fig, use_container_width=True, key=key)
+        with st.expander("Show data"):
+            st.dataframe(data, hide_index=True, use_container_width=True)
 
 
 def emphasis_bar(labels: list[str], values: list[float], highlight: set[str], fmt: str, title: str,
                  horizontal: bool = True, reference: tuple[float, str] | None = None) -> go.Figure:
-    colours = [JADE if label in highlight else CONTEXT for label in labels]
+    colours = [LAVENDER if label in highlight else CONTEXT for label in labels]
     text = [fmt.format(v) if label in highlight else "" for label, v in zip(labels, values, strict=True)]
     hover = [f"{label}: {fmt.format(v)}" for label, v in zip(labels, values, strict=True)]
     kwargs = {"y": labels, "x": values, "orientation": "h"} if horizontal else {"x": labels, "y": values}
@@ -155,7 +169,7 @@ def money(value: float) -> str:
 
 # ---- pages ------------------------------------------------------------------------------
 def executive() -> None:
-    header("Couture Atelier · decision brief", "Sharper decisions, a quieter brand",
+    header("Couture Atelier · decision brief", "Sharper decisions, a *quieter* brand",
            "A luxury retail decision system built on 665,000 real fashion clients and 110 stores (Visuelle 2.0), "
            "with luxury prices, client tiers and scarcity calibrated to published industry figures. "
            "Every number below is read from the project's reports.")
@@ -203,7 +217,7 @@ def executive() -> None:
 
 
 def clients() -> None:
-    header("Client intelligence", "Who matters next year",
+    header("Client intelligence", "Who matters *next* year",
            "Value, return and VIC-upgrade models chosen on pre-test data and tested once on 2019, with "
            "paired-bootstrap intervals. 2020 is a COVID stress test.")
     cv = report("client_value.json")
@@ -215,9 +229,9 @@ def clients() -> None:
               "upgrade avg precision ml minus naive": "VIC upgrade (avg. precision) vs current spend"}
     ci["comparison"] = ci["comparison"].map(labels)
     fig = go.Figure(go.Scatter(
-        x=ci["difference"], y=ci["comparison"], mode="markers", marker={"size": 10, "color": JADE},
+        x=ci["difference"], y=ci["comparison"], mode="markers", marker={"size": 10, "color": LAVENDER},
         error_x={"type": "data", "symmetric": False, "array": ci["ci_high"] - ci["difference"],
-                 "arrayminus": ci["difference"] - ci["ci_low"], "color": JADE, "thickness": 2, "width": 0},
+                 "arrayminus": ci["difference"] - ci["ci_low"], "color": LAVENDER, "thickness": 2, "width": 0},
         hovertemplate="%{y}<br>model minus baseline: %{x:.3f}<extra></extra>"))
     fig.add_vline(x=0, line_color=INK_2, line_width=1)
     fig.update_layout(title="Model minus baseline on the 2019 test, with 95% intervals (right of 0 = better)",
@@ -229,7 +243,7 @@ def clients() -> None:
     with left:
         tiers = pd.Series(cv["tier_counts"]).reindex(["top_tier", "vic", "core", "aspirational", "lapsed"])
         names = ["Top tier (0.1%)", "VIC (next 0.9%)", "Core (next 9%)", "Aspirational", "Lapsed"]
-        fig = go.Figure(go.Bar(y=names, x=tiers.values, orientation="h", marker_color=SAPPHIRE,
+        fig = go.Figure(go.Bar(y=names, x=tiers.values, orientation="h", marker_color=TEAL,
                                text=[f"{v:,}" for v in tiers.values], textposition="outside", cliponaxis=False,
                                textfont={"color": INK}))
         fig.update_layout(title="Clients by value tier, 31 Dec 2019")
@@ -242,7 +256,7 @@ def clients() -> None:
         model = st.segmented_control("Model", options, default=options[0], key="importance_model") or options[0]
         top = importance[importance["model"] == model].nlargest(8, "importance").copy()
         top["feature"] = top["feature"].map(readable)
-        fig = go.Figure(go.Bar(y=top["feature"], x=top["importance"], orientation="h", marker_color=SAPPHIRE,
+        fig = go.Figure(go.Bar(y=top["feature"], x=top["importance"], orientation="h", marker_color=TEAL,
                                error_x={"type": "data", "array": top["std"], "color": INK_2, "thickness": 1}))
         fig.update_layout(title=f"What drives it: {top['metric'].iloc[0]} when a feature is shuffled")
         fig.update_yaxes(autorange="reversed", showgrid=False)
@@ -269,7 +283,7 @@ def clients() -> None:
 
 
 def clienteling() -> None:
-    header("Clienteling", "Whom each advisor calls this quarter",
+    header("Clienteling", "Whom each advisor *calls* this quarter",
            "Calling each advisor's most valuable clients is the champion. A trusted uplift model runs as a "
            "randomised challenger. Contact effects are simulated from a documented rule because no public data "
            "records luxury outreach.")
@@ -280,10 +294,10 @@ def clienteling() -> None:
     with left:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[f"Draw {d}" for d in draws["draw"]], y=draws["uplift_share_of_oracle"],
-                                 mode="markers+text", name="Uplift challenger", marker={"size": 11, "color": GOLD},
+                                 mode="markers+text", name="Uplift challenger", marker={"size": 11, "color": HONEY},
                                  text=[("trusted" if t else "flagged") for t in draws["trusted"]],
                                  textposition="bottom center", textfont={"color": INK_2}))
-        fig.add_hline(y=status_quo, line_color=JADE, line_width=2,
+        fig.add_hline(y=status_quo, line_color=LAVENDER, line_width=2,
                       annotation_text=f"Champion: best clients {status_quo:.1%}", annotation_font_color=INK)
         fig.update_layout(title="Share of the best achievable incremental euros, by pilot draw")
         fig.update_yaxes(tickformat=".0%", range=[0.5, 0.95])
@@ -291,8 +305,8 @@ def clienteling() -> None:
     with right:
         sweep = pd.DataFrame(cl["capacity_sweep"])
         fig = go.Figure()
-        for policy, colour, name in (("status_quo_best_clients", JADE, "Champion: best clients"),
-                                     (cl["challenger_policy"], GOLD, "Uplift challenger"),
+        for policy, colour, name in (("status_quo_best_clients", LAVENDER, "Champion: best clients"),
+                                     (cl["challenger_policy"], HONEY, "Uplift challenger"),
                                      ("random", CONTEXT, "Random")):
             part = sweep[sweep["policy"] == policy]
             fig.add_trace(go.Scatter(x=part["contacts_per_advisor"], y=part["share_of_oracle"], mode="lines+markers",
@@ -350,7 +364,7 @@ def clienteling() -> None:
 
 
 def planning() -> None:
-    header("Demand and allocation", "Where scarce pieces should go",
+    header("Demand and allocation", "Where *scarce* pieces should go",
            "Demand recovered from stock-outs, a store-level launch forecast with uncertainty, and allocation "
            "judged on true demand for 890 launches (Jul–Nov 2019).")
     demand = report("demand.json")
@@ -360,10 +374,10 @@ def planning() -> None:
     with left:
         sweep = pd.DataFrame(alloc["supply_sweep"])
         fig = go.Figure()
-        for policy, colour, name in (("optimal_with_uncertainty", JADE, "Forecast-based (optimal)"),
-                                     ("equal_split", GOLD, "Equal split"),
-                                     ("retailer_opening_share", OXBLOOD, "Retailer's opening split"),
-                                     ("oracle_true_demand", SAPPHIRE, "Oracle (true demand)")):
+        for policy, colour, name in (("optimal_with_uncertainty", LAVENDER, "Forecast-based (optimal)"),
+                                     ("equal_split", HONEY, "Equal split"),
+                                     ("retailer_opening_share", CHERRY, "Retailer's opening split"),
+                                     ("oracle_true_demand", TEAL, "Oracle (true demand)")):
             part = sweep[sweep["policy"] == policy]
             fig.add_trace(go.Scatter(x=part["supply_share_of_forecast"], y=part["revenue_eur_m"],
                                      mode="lines+markers", name=name, line={"color": colour, "width": 2},
@@ -410,7 +424,7 @@ def planning() -> None:
 
 
 def tier_dial() -> None:
-    header("Brand Tier Dial", "What it costs to stop discounting",
+    header("Brand Tier Dial", "What it costs to *stop* discounting",
            "The same real demand under three brand policies. Markdown lift is measured on real data "
            "(staggered difference-in-differences); prices, margins and exit values are assumptions.")
     dial = report("tier_dial.json")
@@ -424,7 +438,7 @@ def tier_dial() -> None:
     column = f"profit_after_brand_cost_{cost.rstrip('%')}pct_eur_m"
     names = {"luxury": "Luxury", "aspirational": "Aspirational", "premium_optimised_markdowns": "Premium",
              "retailer_actual_markdowns": "Retailer's actual"}
-    colours = {"Luxury": JADE, "Aspirational": GOLD, "Premium": SAPPHIRE, "Retailer's actual": OXBLOOD}
+    colours = {"Luxury": LAVENDER, "Aspirational": HONEY, "Premium": TEAL, "Retailer's actual": CHERRY}
     policies["name"] = policies["policy"].map(names)
     fig = go.Figure(go.Bar(x=policies["name"], y=policies[column], marker_color=[colours[n] for n in policies["name"]],
                            text=[f"€{v:,.0f}M" for v in policies[column]], textposition="outside",
@@ -438,7 +452,7 @@ def tier_dial() -> None:
     with left:
         exits = pd.DataFrame(res["exit_value_sensitivity"])
         fig = go.Figure(go.Scatter(x=exits["exit_value_share_of_price"], y=exits["gross_profit_eur_m"],
-                                   mode="lines+markers+text", line={"color": JADE, "width": 2}, marker={"size": 8},
+                                   mode="lines+markers+text", line={"color": LAVENDER, "width": 2}, marker={"size": 8},
                                    text=[f"€{v:,.0f}M" for v in exits["gross_profit_eur_m"]],
                                    textposition="top center", textfont={"color": INK}))
         fig.update_layout(title="Profit with no markdowns, by value recovered per unsold unit")
@@ -466,7 +480,7 @@ def tier_dial() -> None:
 
 
 def health() -> None:
-    header("Model health", "Would we have seen it coming?",
+    header("Model health", "Would we have seen it *coming*?",
            "Input drift (population stability index against the previous scoring date) and outcome monitoring. "
            "PSI below 0.10 is stable, 0.10–0.25 worth watching, above 0.25 a reason to act.")
     drift = table("drift.csv")
@@ -494,7 +508,7 @@ def health() -> None:
 
 
 def method() -> None:
-    header("Method and gaps", "What is real, what is modelled, what is still open",
+    header("Method and gaps", "What is real, what is modelled, what is still *open*",
            "Every data issue, shortcut and judgment call found while building the project, with its status and "
            "the interview question it invites.")
     gaps = table("gaps_log.csv")
@@ -532,7 +546,8 @@ def main() -> None:
     st.set_page_config(page_title="Couture Atelier Intelligence", page_icon="◆", layout="wide")
     style()
     pages = [st.Page(fn, title=title, icon=icon, default=(i == 0)) for i, (fn, title, icon) in enumerate(PAGES)]
-    st.navigation(pages).run()
+    st.navigation(pages, position="top").run()
+    footer()
 
 
 if __name__ == "__main__":

@@ -21,9 +21,10 @@ streamlit run dashboard/app.py             # http://localhost:8501
 
 ## Design rules
 
-- **Colour**: four categorical slots (jade, gold, sapphire, oxblood) validated for colour-vision deficiency on the page surface, adjacent and all pairs. The project's original palette failed (gold and coral indistinguishable under deuteranopia; three colours too grey), so it was re-stepped and re-validated.
+- **Look**: editorial luxury with an internet-native finish. Instrument Serif headlines (one italic lavender word) and big serif numbers, Geist body text, a cream page, white rounded cards, pill controls and top navigation. All set in `.streamlit/config.toml` plus a small style block.
+- **Colour**: four categorical slots (lavender, honey, cherry, teal) validated for colour-vision deficiency on the page surface across all pairs, each with at least 3:1 contrast. The project's first palette failed (gold and coral indistinguishable under deuteranopia), so it was replaced and re-validated.
 - **Emphasis over rainbow**: one or two marks that carry the point are coloured; the rest are grey.
-- **Every chart has a "Show data" table**, so no value depends on hover or colour alone; gold sits below 3:1 contrast, which is why labels and tables are always present.
+- **Every chart sits in a card with a "Show data" table**, so no value depends on hover or colour alone.
 - **No dual axes; values directly labelled only where they matter; status uses icon + label, never colour alone.**
 - Checked by rendering every page in a real browser at desktop and phone width (Playwright), not only by tests.
 

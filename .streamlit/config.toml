@@ -1,10 +1,25 @@
 [theme]
 base = "light"
-primaryColor = "#00866f"
-backgroundColor = "#fbfaf7"
-secondaryBackgroundColor = "#f2f0ea"
-textColor = "#1a1c23"
-font = "sans serif"
+primaryColor = "#5b4fe0"
+backgroundColor = "#fbf9f5"
+secondaryBackgroundColor = "#f3efe8"
+textColor = "#16151a"
+borderColor = "#e8e2d7"
+showWidgetBorder = true
+baseRadius = "0.9rem"
+buttonRadius = "full"
+linkColor = "#4436c9"
+font = "Geist:https://fonts.googleapis.com/css2?family=Geist:wght@300..700&display=swap"
+headingFont = "Instrument Serif:https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap"
+headingFontWeights = 400
+chartCategoricalColors = ["#5b4fe0", "#b88200", "#d2384f", "#009180"]
+dataframeHeaderBackgroundColor = "#f3efe8"
+
+[theme.sidebar]
+backgroundColor = "#f6f2ec"
+
+[client]
+toolbarMode = "minimal"
 
 [server]
 headless = true
