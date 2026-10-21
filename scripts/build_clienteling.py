@@ -25,7 +25,9 @@ from couture_atelier.client_frames import FEATURE_SETS, add_probabilistic, windo
 from couture_atelier.client_models import DEFAULT_PARAMS, fit_return, gbm
 from couture_atelier.clienteling import (
     allocate,
+    bagged,
     contact_effect,
+    fit_s_learner_logistic,
     fit_t_learner,
     fit_t_learner_logistic,
     fit_transformed_outcome,
@@ -33,6 +35,7 @@ from couture_atelier.clienteling import (
     qini_area,
     simulate_contacted_spend,
     true_incremental_value,
+    uplift_stability,
 )
 from couture_atelier.luxury import stable_uniform
 from couture_atelier.paths import CONFIGS, PROCESSED, REPORTS, WAREHOUSE
@@ -59,7 +62,11 @@ LEARNERS = {
     "t_gbm_full_large_leaves": lambda d: fit_t_learner(d, FEATURES, "visit_obs", LARGE_LEAVES),
     "transformed_outcome_core": lambda d: fit_transformed_outcome(d, CORE, "visit_obs", LARGE_LEAVES),
     "x_learner_spend": lambda d: fit_x_learner(d, FEATURES, "spend_obs", PARAMS),
+    "s_logistic_core": lambda d: fit_s_learner_logistic(d, CORE, "visit_obs"),
+    "bagged_t_logistic_core": bagged(lambda d: fit_t_learner_logistic(d, CORE, "visit_obs")),
 }
+TRUST_THRESHOLD = 0.5  # minimum ranking agreement across bootstrap refits before uplift targeting is trusted
+PILOT_DRAWS = 3        # independent randomisations of the pilot, to report how much results depend on one draw
 
 
 def frame_at(con: duckdb.DuckDBPyConnection, cutoff: str, horizon: int) -> pd.DataFrame:
@@ -155,22 +162,21 @@ def power_analysis(selected: pd.DataFrame, effect: pd.DataFrame, true_value: pd.
     return out
 
 
-def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
-    cfg = yaml.safe_load((CONFIGS / "clienteling.yml").read_text())
-    horizon = cfg["horizon_days"]
-    with duckdb.connect(str(warehouse), read_only=True) as con:
-        pilot_frame = frame_at(con, cfg["cutoffs"]["pilot"], horizon)
-        deploy = frame_at(con, cfg["cutoffs"]["deploy"], horizon)
+def choose_learner(pilot: pd.DataFrame) -> dict:
+    """Pick an uplift learner using the pilot only.
 
-    # ---- Pilot and model choice on observed outcomes only ------------------------------
-    pilot = run_pilot(pilot_frame, cfg)
+    Qini on a 20% pilot holdout identifies the learners that are statistically
+    indistinguishable from the best; among those, the one whose client ranking
+    is most stable across bootstrap refits is chosen. If even that one is
+    unstable, uplift targeting is not trusted for this pilot.
+    """
     holdout = stable_uniform(pilot["client_id"], seed=5) < 0.2
     fit_part, check_part = pilot[~holdout], pilot[holdout]
     treated_check = check_part["treated"].to_numpy()
     visits_check = check_part["visit_obs"].astype(float).to_numpy()
     rng_boot = np.random.default_rng(0)
     boots = [rng_boot.integers(0, len(check_part), len(check_part)) for _ in range(QINI_BOOTSTRAPS)]
-    qini = {}
+    qini, stability = {}, {}
     for name, make in LEARNERS.items():
         score = make(fit_part)(check_part)
         if name == "x_learner_spend":  # euro-scale learner: rank on the same visit outcome for comparability
@@ -180,44 +186,90 @@ def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
                       "ci_low": round(float(np.percentile(draws, 2.5)), 1),
                       "ci_high": round(float(np.percentile(draws, 97.5)), 1)}
     best = max(qini, key=lambda n: qini[n]["qini"])
-    # Learners are listed simplest first; take the simplest one statistically indistinguishable from the best.
-    chosen = next(n for n in LEARNERS if qini[n]["ci_high"] >= qini[best]["qini"])
+    tied = [n for n in LEARNERS if qini[n]["ci_high"] >= qini[best]["qini"]]
+    for name in tied:
+        stability[name] = round(uplift_stability(LEARNERS[name], pilot), 3)
+    chosen = max(tied, key=lambda n: stability[n])
+    return {"qini": qini, "best_qini": best, "indistinguishable_from_best": tied, "stability": stability,
+            "chosen": chosen, "trusted": stability[chosen] >= TRUST_THRESHOLD}
 
-    # ---- Refit on the full pilot and score the deployment population -------------------
-    uplift = {name: make(pilot)(deploy) for name, make in LEARNERS.items()}
-    value_at_stake = visit_value_proxy(deploy)
-    scorers = {name: (u if name == "x_learner_spend" else u * value_at_stake) for name, u in uplift.items()}
-    control = pilot[~pilot["treated"]].rename(columns={"visit_obs": "returned_next"})
-    p_return = fit_return("logistic", control, FEATURES, {})(deploy)
-    treated = pilot[pilot["treated"]]
-    response = gbm("regressor", PARAMS, "poisson").fit(treated[FEATURES], treated["spend_obs"] / 1000)
+
+def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
+    cfg = yaml.safe_load((CONFIGS / "clienteling.yml").read_text())
+    horizon = cfg["horizon_days"]
+    with duckdb.connect(str(warehouse), read_only=True) as con:
+        pilot_frame = frame_at(con, cfg["cutoffs"]["pilot"], horizon)
+        deploy = frame_at(con, cfg["cutoffs"]["deploy"], horizon)
 
     effect = contact_effect(deploy, cfg)
     true_value = true_incremental_value(effect, deploy["spend_h"])
     eligible = eligible_mask(deploy, cfg)
     capacity = cfg["capacity"]["contacts_per_advisor"]
+    value_at_stake = visit_value_proxy(deploy)
+    status_quo_score = deploy["spend_12m"].to_numpy()
+
+    def share(score: np.ndarray, positive_only: bool, cap: int = capacity) -> float:
+        oracle_value = true_value[allocate(true_value.to_numpy(), deploy["advisor_id"], eligible, cap, True)].sum()
+        mask = allocate(np.asarray(score, dtype=float), deploy["advisor_id"], eligible, cap, positive_only)
+        return round(float(true_value[mask].sum() / oracle_value), 3)
+
+    # ---- How much does the result depend on one pilot randomisation? -------------------
+    robustness = []
+    primary = None
+    for draw in range(PILOT_DRAWS):
+        draw_cfg = {**cfg, "pilot": {**cfg["pilot"], "seed": cfg["pilot"]["seed"] + 100 * draw}}
+        pilot = run_pilot(pilot_frame, draw_cfg)
+        choice = choose_learner(pilot)
+        uplift = LEARNERS[choice["chosen"]](pilot)(deploy)
+        score = uplift if choice["chosen"] == "x_learner_spend" else uplift * value_at_stake
+        uplift_share = share(score, True)
+        status_quo_share = share(status_quo_score, False)
+        robustness.append({
+            "draw": draw, "chosen": choice["chosen"], "stability": choice["stability"][choice["chosen"]],
+            "trusted": choice["trusted"],
+            "true_effect_correlation": round(float(np.corrcoef(uplift[eligible], effect["tau"][eligible])[0, 1]), 3),
+            "uplift_share_of_oracle": uplift_share, "status_quo_share_of_oracle": status_quo_share,
+            "with_trust_check_share_of_oracle": uplift_share if choice["trusted"] else status_quo_share,
+        })
+        if draw == 0:
+            primary = {"pilot": pilot, "choice": choice}
+
+    # ---- Full comparison on the primary pilot draw ------------------------------------
+    pilot, choice = primary["pilot"], primary["choice"]
+    chosen = choice["chosen"]
+    uplift = {name: make(pilot)(deploy) for name, make in LEARNERS.items()}
+    scorers = {name: (u if name == "x_learner_spend" else u * value_at_stake) for name, u in uplift.items()}
+    control = pilot[~pilot["treated"]].rename(columns={"visit_obs": "returned_next"})
+    p_return = fit_return("logistic", control, FEATURES, {})(deploy)
+    treated = pilot[pilot["treated"]]
+    response = gbm("regressor", PARAMS, "poisson").fit(treated[FEATURES], treated["spend_obs"] / 1000)
+    # Champion / challenger: calling best clients stays the deployed policy; a trusted uplift policy runs as a
+    # randomised challenger arm and replaces it only if a live test on visit rate shows a gain.
+    champion = "status_quo_best_clients"
+    challenger = f"uplift_{chosen}_no_contact_if_no_lift" if choice["trusted"] else None
+
     rng = np.random.default_rng(3)
     policies = {
         "random": (rng.random(len(deploy)), False),
-        "status_quo_best_clients": (deploy["spend_12m"].to_numpy(), False),
+        "status_quo_best_clients": (status_quo_score, False),
         "response_model": (response.predict(deploy[FEATURES]), False),
-        "churn_risk_x_value": (deploy["spend_12m"].to_numpy() * (1 - p_return), False),
+        "churn_risk_x_value": (status_quo_score * (1 - p_return), False),
         **{f"uplift_{n}": (s, False) for n, s in scorers.items()},
         f"uplift_{chosen}_no_contact_if_no_lift": (scorers[chosen], True),
         "oracle_true_effect": (true_value.to_numpy(), True),
     }
     results, selections = [], {}
     for name, (score, positive_only) in policies.items():
-        chosen_mask = allocate(np.asarray(score, dtype=float), deploy["advisor_id"], eligible, capacity, positive_only)
-        selections[name] = chosen_mask
-        picked = true_value[chosen_mask]
+        mask = allocate(np.asarray(score, dtype=float), deploy["advisor_id"], eligible, capacity, positive_only)
+        selections[name] = mask
+        picked = true_value[mask]
         results.append({
             "policy": name,
-            "contacts": int(chosen_mask.sum()),
+            "contacts": int(mask.sum()),
             "true_incremental_eur": round(float(picked.sum())),
             "eur_per_contact": round(float(picked.mean()), 1) if len(picked) else 0.0,
-            "share_do_not_disturb": round(float(effect.loc[chosen_mask, "do_not_disturb"].mean()), 4),
-            "share_harmful_contacts": round(float((effect.loc[chosen_mask, "tau"] < 0).mean()), 4),
+            "share_do_not_disturb": round(float(effect.loc[mask, "do_not_disturb"].mean()), 4),
+            "share_harmful_contacts": round(float((effect.loc[mask, "tau"] < 0).mean()), 4),
         })
     table = pd.DataFrame(results)
     oracle = table.loc[table.policy == "oracle_true_effect", "true_incremental_eur"].iloc[0]
@@ -225,48 +277,58 @@ def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
     status_quo = table.loc[table.policy == "status_quo_best_clients", "true_incremental_eur"].iloc[0]
     table["vs_status_quo"] = (table["true_incremental_eur"] / status_quo).round(2)
 
-    final_name = f"uplift_{chosen}_no_contact_if_no_lift"
-    final_mask = selections[final_name]
+    champion_mask = selections[champion]
+    test_policy = challenger or champion
+    challenger_mask = selections[test_policy]
     recovery = {n: round(float(np.corrcoef(u[eligible], effect["tau"][eligible])[0, 1]), 3) for n, u in uplift.items()}
     explainable = effect["tau"] - cfg["contact_effect"]["individual_noise_sd"] * effect["trait"]
     ceiling = round(float(np.corrcoef(explainable[eligible], effect["tau"][eligible])[0, 1]), 3)
-
-    # Does the ranking hold at other advisor capacities?
     sweep = []
     for cap in (10, 20, 40, 80):
-        oracle_cap = true_value[allocate(true_value.to_numpy(), deploy["advisor_id"], eligible, cap, True)].sum()
         for name in ("random", "status_quo_best_clients", f"uplift_{chosen}_no_contact_if_no_lift"):
             score, positive_only = policies[name]
             mask = allocate(np.asarray(score, dtype=float), deploy["advisor_id"], eligible, cap, positive_only)
-            sweep.append({"contacts_per_advisor": cap, "policy": name,
-                          "share_of_oracle": round(float(true_value[mask].sum() / oracle_cap), 3),
+            sweep.append({"contacts_per_advisor": cap, "policy": name, "share_of_oracle": share(score, positive_only, cap),
                           "share_harmful_contacts": round(float((effect.loc[mask, "tau"] < 0).mean()), 4)})
+    robust = pd.DataFrame(robustness)
     report = {
         "cutoffs": cfg["cutoffs"], "horizon_days": horizon, "capacity_per_advisor": capacity,
         "pilot": {"clients": len(pilot), "treated": int(pilot["treated"].sum()),
                   "observed_lift_eur_per_client": round(float(
                       pilot.loc[pilot.treated, "spend_obs"].mean() - pilot.loc[~pilot.treated, "spend_obs"].mean()), 1),
                   "true_mean_tau": round(float(pilot["true_tau"].mean()), 4)},
-        "model_choice_qini_on_pilot_holdout": qini, "best_qini": best, "chosen_uplift_model": chosen,
-        "selection_rule": "simplest learner whose Qini 95% interval reaches the best learner's Qini",
+        "model_choice": {**choice, "selection_rule": (
+            "among learners whose Qini 95% interval reaches the best Qini, the one with the most stable client "
+            f"ranking across bootstrap refits; trusted only if that stability is at least {TRUST_THRESHOLD}")},
+        "champion_policy": champion,
+        "challenger_policy": challenger,
         "deploy": {"clients": len(deploy), "eligible": int(eligible.sum()),
                    "true_effect_correlation_by_learner": recovery,
                    "true_effect_correlation_ceiling_from_features": ceiling},
+        "robustness_across_pilot_draws": {
+            "draws": robustness,
+            "mean_uplift_share": round(float(robust["uplift_share_of_oracle"].mean()), 3),
+            "worst_uplift_share": round(float(robust["uplift_share_of_oracle"].min()), 3),
+            "mean_with_trust_check": round(float(robust["with_trust_check_share_of_oracle"].mean()), 3),
+            "worst_with_trust_check": round(float(robust["with_trust_check_share_of_oracle"].min()), 3),
+            "status_quo_share": float(robust["status_quo_share_of_oracle"].iloc[0]),
+        },
         "capacity_sweep": sweep,
         "policies": table.to_dict(orient="records"),
-        "power_analysis": power_analysis(deploy[final_mask], effect[final_mask], true_value[final_mask]),
+        "power_analysis_for_challenger_contacts": power_analysis(
+            deploy[challenger_mask], effect[challenger_mask], true_value[challenger_mask]),
     }
 
     actions = deploy.loc[:, ["client_id", "advisor_id", "consent_status", "spend_12m", "recency_weeks"]].copy()
     actions["predicted_uplift_eur"] = scorers[chosen]
-    actions["action"] = np.where(final_mask, "contact", "no_action")
+    actions["action"] = np.where(champion_mask, "contact", "no_action")
+    actions["challenger_action"] = np.where(challenger_mask, "contact", "no_action")
     actions["reason"] = np.select(
-        [~eligible & deploy["consent_status"].ne("consented").to_numpy(), ~eligible, final_mask,
-         actions["predicted_uplift_eur"].to_numpy() <= 0],
-        ["no personalisation consent", "not active in the last two years", "contact expected to add sales",
-         "contact not expected to help; leave undisturbed"],
+        [~eligible & deploy["consent_status"].ne("consented").to_numpy(), ~eligible, champion_mask],
+        ["no personalisation consent", "not active in the last two years", "among this advisor's most valuable clients"],
         default="below this advisor's capacity cut-off",
     )
+    actions["predicted_harmful"] = actions["predicted_uplift_eur"] <= 0
     actions["as_of_date"] = pd.Timestamp(cfg["cutoffs"]["deploy"])
     actions["data_provenance"] = "derived"
     with duckdb.connect(str(warehouse)) as con:

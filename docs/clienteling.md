@@ -3,7 +3,8 @@
 Which clients each advisor should contact this quarter, judged by the sales a contact adds rather than by how many contacts are made, and which pieces to show them.
 
 ```bash
-python scripts/build_clienteling.py       # pilot, uplift models, policies, power analysis (about 30 seconds)
+python scripts/build_clienteling.py       # pilot, uplift models over 3 pilot draws, policies, power analysis (about 8 minutes)
+python -m scripts.pilot_size_value        # does a bigger pilot help? (about 1 minute)
 python scripts/build_recommendations.py   # product picks on real purchases (about 15 minutes)
 ```
 
@@ -28,70 +29,92 @@ The contact-effect rule: a contact raises the chance of an extra visit within 90
 2. **Choosing the uplift model:** six learners are trained on 80% of the pilot and compared by Qini area on the other 20%, using observed outcomes only, as a real team would have to.
 3. **Deployment (30 June 2019, same season):** every policy gets the same capacity, 40 contacts per advisor per quarter across 2,732 advisors, and is scored by the true incremental euros of the clients it contacts.
 
-## Choosing an uplift model when the pilot cannot tell them apart
+## Choosing an uplift model from the pilot alone
 
-| Learner (simplest first) | Qini on pilot holdout [95% CI] | Correlation with the true effect at deployment |
-|---|---|---|
-| **T-learner, logistic, core features** | 16.8 [−19.7, 68.0] | **0.32** |
-| T-learner, logistic, all features | 37.9 [6.3, 88.3] | 0.34 |
-| T-learner, gradient boosting | 45.2 [2.7, 106.7] | 0.09 |
-| T-learner, gradient boosting, large leaves | **53.3** [21.4, 94.8] | 0.02 |
-| Transformed outcome | 53.3 [11.5, 102.7] | 0.02 |
-| X-learner on spend | −14.5 [−57.9, 36.8] | 0.03 |
+Eight learners were compared on the pilot (simplest first): logistic T-learners on core or all features, gradient-boosting T-learners, a transformed-outcome model, an X-learner on spend, a regularised logistic S-learner, and a bagged logistic T-learner.
 
-The average contact effect is small (1.7 points on the chance of a visit), so the Qini intervals all overlap, and the highest Qini belongs to models that barely recover the true effect. The rule used: **take the simplest learner whose Qini interval reaches the best learner's Qini**. That picks the logistic T-learner on core features, which is also the one that recovers the effect best. Features could explain the effect up to a correlation of 0.71 (the rest is unobservable responsiveness), so the chosen model captures about half of what is achievable; a larger pilot is the main lever.
+| Learner | Qini on pilot holdout [95% CI] | Ranking stability across bootstrap refits | Correlation with the true effect |
+|---|---|---:|---:|
+| t_logistic_core | 16.8 [-19.7, 68.0] | 0.636 | 0.318 |
+| t_logistic_full | 37.9 [6.3, 88.3] | 0.647 | 0.34 |
+| t_gbm_full | 45.2 [2.7, 106.7] | 0.406 | 0.093 |
+| t_gbm_full_large_leaves | 53.3 [21.4, 94.8] | 0.43 | 0.024 |
+| transformed_outcome_core | 53.3 [11.5, 102.7] | 0.402 | 0.023 |
+| x_learner_spend | -14.5 [-57.9, 36.8] | – | 0.029 |
+| s_logistic_core | 43.4 [4.5, 85.6] | 0.644 | 0.357 |
+| bagged_t_logistic_core | 28.6 [-8.8, 74.0] | 0.553 | 0.392 |
 
-## Results at deployment
+The average contact effect is small (1.7 points on the chance of a visit), so the Qini intervals all overlap: seven of eight learners are statistically indistinguishable from the best, and the highest Qini belongs to models that barely recover the true effect. Two pilot-only checks are therefore used, both fixed before looking at deployment results:
 
-Contacts are ranked by predicted uplift × the value of a typical visit for that client, and nobody is contacted when the model predicts no lift.
+1. **Choose:** among learners indistinguishable from the best Qini, the one whose client ranking is most stable across bootstrap refits of the pilot. Chosen: `t_logistic_full` (stability 0.647).
+2. **Trust check:** uplift targeting is only trusted if that stability is at least 0.5; otherwise the pilot is too noisy and the house keeps its current targeting.
+
+## How much does the result depend on one pilot?
+
+The pilot was re-randomised three times and the whole choose-and-deploy process repeated (share of the best achievable incremental euros at 40 contacts per advisor):
+
+| Pilot draw | Learner chosen | Stability | Trusted? | Uplift policy | With the trust check |
+|---|---|---:|---|---:|---:|
+| 0 | t_logistic_full | 0.647 | yes | 81.7% | 81.7% |
+| 1 | t_logistic_full | 0.546 | yes | 79.6% | 79.6% |
+| 2 | t_gbm_full_large_leaves | 0.405 | **no** | 57.4% | 87.4% |
+| **Mean** | | | | **72.9%** | **82.9%** |
+| "Call your best clients" | | | | 87.4% | 87.4% |
+
+- The trust check works: it flags the bad pilot draw and lifts the worst case from 57.4% to 79.6%.
+- **But a trusted uplift model still did not beat calling the best clients** in two of two trusted draws. Stability is necessary, not sufficient.
+- In hindsight the core-feature variants (bagged 89.3%, S-learner 89.4%) did beat the status quo on the first draw, but the pilot could not single them out: choosing them now would be tuning to the simulation's known truth.
+
+**Is a bigger pilot the fix?** Re-running with 25%, 50%, 100% and 200% of a quarter's eligible clients (the last by pooling March and June 2018), three draws each, gave no reliable improvement: run-to-run variation swamps the effect of size (`reports/pilot_size_value.csv`). More data per client (a longer horizon, or a cleaner outcome such as appointments booked) would help more than more clients.
+
+## Recommendation: champion and challenger
+
+Calling each advisor's most valuable clients stays the deployed policy (the **champion**); in euros it already captures 87.4% of what is achievable, because a top client's typical visit is worth many times a mid-tier client's. The trusted uplift policy runs as a randomised **challenger**: advisors are split between the two lists and the challenger replaces the champion only if the live test shows more visits. `lux.clienteling_actions` carries both actions for every client.
+
+Results on the first pilot draw:
 
 | Policy (104,869 contacts) | True incremental € | € per contact | Share of best possible |
 |---|---:|---:|---:|
 | Random | €27.2M | €260 | 37.3% |
 | Highest predicted spend if contacted | €63.3M | €603 | 86.7% |
 | Churn risk × value | €63.8M | €608 | 87.3% |
-| **"Call your best clients" (status quo)** | €63.8M | €609 | 87.4% |
-| **Uplift policy (chosen)** | **€64.5M** | **€615** | **88.3%** |
-| Oracle (true effect known) | €73.0M | €698 | 100% |
+| **Call your best clients (champion)** | €63.8M | €609 | 87.4% |
+| Uplift challenger (chosen learner) | €59.7M | €569 | 81.7% |
+| Bagged logistic T-learner, core features (hindsight) | €65.2M | €622 | 89.3% |
+| Oracle (true effect known) | €73.0M | €698 | 100.0% |
 
-How the gap changes with advisor capacity:
-
-| Contacts per advisor per quarter | Status quo | Uplift policy |
+| Contacts per advisor per quarter | Champion | Challenger |
 |---|---:|---:|
-| 20 | **84.8%** | 83.6% |
-| 40 | 87.4% | **88.3%** |
-| 80 | 89.6% | **94.1%** |
+| 10 | 79.3% | 69.6% |
+| 20 | 84.8% | 76.4% |
+| 40 | 87.4% | 81.7% |
+| 80 | 89.6% | 88.0% |
 
-What this means:
+13–17% of contacts under any practical policy slightly reduce sales, mostly through unobservable client responsiveness; only the observable "do not disturb" pattern can be avoided. The uplift scores are kept as a `predicted_harmful` flag advisors can see.
 
-- **In euros, calling your best clients is a strong default.** A top client's typical visit is worth many times a mid-tier client's, so even a modest response from them adds a lot. This matches how luxury advisors already work.
-- **Uplift helps at the margin, and more as capacity grows.** When advisors only have time for their top clients, there is little to gain. With more capacity, uplift finds persuadable mid-tier clients that a value ranking misses (+4.5 points at 80 contacts per advisor).
-- **Harmful contacts are hard to avoid.** 13–17% of contacts under any practical policy reduce sales slightly, mostly because of the unobservable responsiveness. The model only catches the observable "do not disturb" pattern.
+## Experiment design for the challenger
 
-## Experiment design to confirm it in a real house
+Among the clients the challenger would contact:
 
-Among the clients the uplift policy would contact (from `reports/clienteling.json`):
-
-| Success metric | Effect per contact | Spread | Holdout needed (client randomised, with CUPED) | Holdout needed (whole advisors held out, with CUPED) |
+| Success metric | Effect per contact | Spread | Holdout needed (client randomised, with CUPED) | Holdout needed (whole advisors, with CUPED) |
 |---|---:|---:|---:|---:|
-| Euros spent in 90 days | €615 | SD €63,500 | Not detectable even with a 50% holdout | Not detectable |
-| **Visited in 90 days** | **+1.7 points** | SD 0.44 | **5%** | **22%** |
+| Euros spent in 90 days | €569 | SD €47,039 | Not detectable with up to a 50% holdout | Not detectable |
+| **Visited in 90 days** | **+1.8 points** | SD 0.43 | **5%** | **17%** |
 
-Recommendation: measure the pilot on **visit rate**, with euros as a secondary readout. Hold out about 5% of eligible clients at random, or about 22% of advisors if advisors would otherwise contact held-out clients anyway. Use last-12-month behaviour as a CUPED covariate. Randomising by advisor is safer operationally but needs a larger holdout because clients of the same advisor behave alike (design effect 3.5).
+Measure on visit rate, with euros as a secondary readout; use last-12-month behaviour as a CUPED covariate. Randomising whole advisors is operationally cleaner but needs a larger share because clients of the same advisor behave alike (design effect 3.42).
 
 ## Action list
 
-`lux.clienteling_actions` holds one row per client at 30 June 2019 with the action and the reason:
+`lux.clienteling_actions` holds one row per client at 30 June 2019: the champion action and reason, the challenger action, predicted uplift, and a `predicted_harmful` flag.
 
-| Reason | Clients |
+| Reason (champion) | Clients |
 |---|---:|
-| Contact expected to add sales | 104,869 |
-| Below this advisor's capacity cut-off | 193,507 |
+| Below this advisor's capacity cut-off | 193,573 |
 | No personalisation consent | 174,768 |
+| Among this advisor's most valuable clients | 104,869 |
 | Not active in the last two years | 25,401 |
-| Contact not expected to help; leave undisturbed | 66 |
 
-Consent is a hard gate, and "no action" is an explicit, explained outcome. The list is decision support for advisors, not automatic outreach.
+Consent is a hard gate and "no action" is an explicit, explained outcome. The list is decision support for advisors, not automatic outreach.
 
 ## Product picks
 

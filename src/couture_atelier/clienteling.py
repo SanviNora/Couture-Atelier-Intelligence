@@ -11,7 +11,7 @@ from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
+from scipy.stats import norm, spearmanr
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -89,6 +89,48 @@ def fit_t_learner_logistic(pilot: pd.DataFrame, features: list[str], outcome: st
     mu1 = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000)).fit(transform(treated), treated[outcome])
     mu0 = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000)).fit(transform(control), control[outcome])
     return lambda f: mu1.predict_proba(transform(f))[:, 1] - mu0.predict_proba(transform(f))[:, 1]
+
+
+def fit_s_learner_logistic(pilot: pd.DataFrame, features: list[str], outcome: str, strength: float = 0.1) -> Scorer:
+    """One regularised logistic model with treatment and treatment x feature interactions.
+
+    Sharing one model between contacted and not-contacted clients makes the
+    uplift estimate less sensitive to noise than the difference of two models.
+    """
+    scaler = StandardScaler().fit(np.log1p(pilot[features].clip(lower=0)))
+
+    def design(frame: pd.DataFrame, treated: np.ndarray) -> np.ndarray:
+        x = scaler.transform(np.log1p(frame[features].clip(lower=0)))
+        return np.hstack([x, treated[:, None], x * treated[:, None]])
+
+    model = LogisticRegression(C=strength, max_iter=3000).fit(
+        design(pilot, pilot["treated"].to_numpy(dtype=float)), pilot[outcome])
+    return lambda f: (model.predict_proba(design(f, np.ones(len(f))))[:, 1]
+                      - model.predict_proba(design(f, np.zeros(len(f))))[:, 1])
+
+
+def bagged(make: Callable[[pd.DataFrame], Scorer], copies: int = 10, seed: int = 0) -> Callable[[pd.DataFrame], Scorer]:
+    """Average a learner over bootstrap resamples of the pilot to reduce its variance."""
+    def fit(pilot: pd.DataFrame) -> Scorer:
+        rng = np.random.default_rng(seed)
+        scorers = [make(pilot.iloc[rng.integers(0, len(pilot), len(pilot))]) for _ in range(copies)]
+        return lambda f: np.mean([s(f) for s in scorers], axis=0)
+    return fit
+
+
+def uplift_stability(make: Callable[[pd.DataFrame], Scorer], pilot: pd.DataFrame, refits: int = 4,
+                     probe: int = 20_000, seed: int = 1) -> float:
+    """Pilot-only trust check: how consistently the learner ranks clients across bootstrap refits.
+
+    Mean pairwise Spearman correlation of predicted uplift on a fixed sample of
+    pilot clients. Low agreement means the ranking mostly reflects noise in
+    this particular pilot.
+    """
+    rng = np.random.default_rng(seed)
+    sample = pilot.sample(min(probe, len(pilot)), random_state=0)
+    preds = [make(pilot.iloc[rng.integers(0, len(pilot), len(pilot))])(sample) for _ in range(refits)]
+    pairs = [spearmanr(preds[i], preds[j]).statistic for i in range(refits) for j in range(i + 1, refits)]
+    return float(np.mean(pairs))
 
 
 def fit_transformed_outcome(pilot: pd.DataFrame, features: list[str], outcome: str, params: dict) -> Scorer:

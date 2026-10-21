@@ -5,11 +5,14 @@ import yaml
 
 from couture_atelier.clienteling import (
     allocate,
+    bagged,
     contact_effect,
+    fit_s_learner_logistic,
     fit_t_learner_logistic,
     qini_area,
     simulate_contacted_spend,
     true_incremental_value,
+    uplift_stability,
 )
 from couture_atelier.paths import CONFIGS
 
@@ -102,3 +105,31 @@ def test_logistic_t_learner_finds_who_responds() -> None:
     uplift = fit_t_learner_logistic(frame, ["engaged", "noise"], "visit_obs")(frame)
 
     assert uplift[frame["engaged"] == 1].mean() > uplift[frame["engaged"] == 0].mean() + 0.1
+
+
+def responsive_pilot(n: int = 40_000, effect: float = 0.2, seed: int = 3) -> pd.DataFrame:
+    rng = np.random.default_rng(seed)
+    frame = pd.DataFrame({"engaged": rng.integers(0, 2, n).astype(float), "noise": rng.normal(size=n) ** 2})
+    frame["treated"] = rng.random(n) < 0.5
+    frame["visit_obs"] = rng.random(n) < 0.2 + frame["treated"] * frame["engaged"] * effect
+    frame["client_id"] = np.arange(n)
+    return frame
+
+
+def test_s_learner_and_bagging_find_who_responds() -> None:
+    pilot = responsive_pilot()
+    for make in (lambda d: fit_s_learner_logistic(d, ["engaged", "noise"], "visit_obs"),
+                 bagged(lambda d: fit_t_learner_logistic(d, ["engaged", "noise"], "visit_obs"), copies=3)):
+        uplift = make(pilot)(pilot)
+        assert uplift[pilot["engaged"] == 1].mean() > uplift[pilot["engaged"] == 0].mean() + 0.1
+
+
+def test_stability_is_high_for_real_signal_and_low_for_noise() -> None:
+    def make(d: pd.DataFrame):
+        return fit_t_learner_logistic(d, ["engaged", "noise"], "visit_obs")
+
+    signal = uplift_stability(make, responsive_pilot(effect=0.2), refits=3, probe=5_000)
+    noise = uplift_stability(make, responsive_pilot(effect=0.0), refits=3, probe=5_000)
+
+    assert signal > 0.8
+    assert noise < signal

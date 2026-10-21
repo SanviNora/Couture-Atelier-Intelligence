@@ -17,9 +17,10 @@ select:
 models:
 	$(PY) scripts/build_client_value.py
 
-# Uplift pilot, policies and power analysis (30 seconds); product picks on real purchases (about 12 minutes).
+# Uplift over 3 pilot draws, policies, power analysis (8 minutes); pilot-size study (1 minute); product picks (12 minutes).
 clienteling:
 	$(PY) scripts/build_clienteling.py
+	$(PY) -m scripts.pilot_size_value
 	$(PY) scripts/build_recommendations.py
 
 # Lost-sales recovery and launch forecast (2 minutes), then the luxury scarcity scenario (1 minute).
