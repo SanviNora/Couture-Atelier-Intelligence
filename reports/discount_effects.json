@@ -1,0 +1,84 @@
+{
+  "markdown_lift": {
+    "events": 10448,
+    "pieces": 3859,
+    "overall_lift": 2.095,
+    "overall_ci": [
+      1.989,
+      2.183
+    ],
+    "overall_placebo": 0.882,
+    "by_depth": [
+      {
+        "depth": "up to 20%",
+        "events": 5184,
+        "mean_depth": 0.135,
+        "lift": 1.565,
+        "ci_low": 1.496,
+        "ci_high": 1.636,
+        "lift_weeks_3_4": 1.076,
+        "placebo_lift": 0.973,
+        "placebo_ci": [
+          0.945,
+          1.001
+        ]
+      },
+      {
+        "depth": "20-35%",
+        "events": 4105,
+        "mean_depth": 0.281,
+        "lift": 3.309,
+        "ci_low": 3.088,
+        "ci_high": 3.573,
+        "lift_weeks_3_4": 2.708,
+        "placebo_lift": 0.79,
+        "placebo_ci": [
+          0.741,
+          0.844
+        ]
+      },
+      {
+        "depth": "35-55%",
+        "events": 1085,
+        "mean_depth": 0.466,
+        "lift": 3.135,
+        "ci_low": 2.73,
+        "ci_high": 3.641,
+        "lift_weeks_3_4": 1.864,
+        "placebo_lift": 0.758,
+        "placebo_ci": [
+          0.687,
+          0.824
+        ]
+      },
+      {
+        "depth": "over 55%",
+        "events": 74,
+        "mean_depth": 0.644,
+        "lift": 2.925,
+        "ci_low": 1.516,
+        "ci_high": 7.377,
+        "lift_weeks_3_4": 1.27,
+        "placebo_lift": 0.235,
+        "placebo_ci": [
+          0.121,
+          0.386
+        ]
+      }
+    ]
+  },
+  "discount_acquired_clients": {
+    "clients_with_known_first_purchase": 152983,
+    "share_first_purchase_on_discount": 0.322,
+    "matched_discount_starters": 35019,
+    "matched_cells": 9812,
+    "raw_return_rate": {
+      "discount_start": 0.4224,
+      "full_price_start": 0.4404
+    },
+    "matched_difference_in_return_rate": 0.0035,
+    "matched_full_price_starter_spend_next_12m_eur": 16322,
+    "matched_difference_in_spend_next_12m_eur": 2105,
+    "matched_difference_in_spend_pct": 12.9
+  }
+}

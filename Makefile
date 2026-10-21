@@ -1,6 +1,6 @@
 PY ?= ../.venv/bin/python
 
-.PHONY: data select models clienteling demand allocation all test lint
+.PHONY: data select models clienteling demand allocation tiers all test lint
 
 # Rebuild the warehouse from the raw Visuelle and Google Trends files (about 10 seconds).
 data:
@@ -33,7 +33,12 @@ allocation:
 	$(PY) scripts/build_allocation.py
 	$(PY) -m scripts.build_client_allocation
 
-all: data models clienteling demand allocation
+# Markdown lift and discount-acquired clients on real data (1 minute), then the brand tier dial (seconds).
+tiers:
+	$(PY) scripts/discount_effects.py
+	$(PY) scripts/build_tier_dial.py
+
+all: data models clienteling demand allocation tiers
 
 test:
 	$(PY) -m pytest -q

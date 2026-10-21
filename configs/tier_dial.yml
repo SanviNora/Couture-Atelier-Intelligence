@@ -1,0 +1,32 @@
+# Brand Tier Dial: the same demand, three brand policies.
+# Demand, its lifecycle and the markdown lift come from real Visuelle data;
+# prices, costs and leftover values are assumptions shared with configs/allocation.yml.
+
+gross_margin: 0.70          # same cost structure for every tier, so only the policy differs (assumption)
+
+tiers:
+  luxury:
+    description: Full price all season, scarce buy, leftover carried over (after a brand-dilution cost) or recycled.
+    leftover_value: 0.13     # carry-over net value as a share of list price (configs/allocation.yml)
+    service_level_cap: 0.90
+    promotion: none
+  aspirational:
+    description: Full price, then one end-of-season event; leftover sold through outlet or certified pre-owned.
+    leftover_value: 0.30
+    service_level_cap: 0.90
+    promotion: {start_week: 9, depth: 0.20}
+  premium:
+    description: Markdowns chosen per piece to maximise expected profit; leftover to off-price.
+    leftover_value: 0.15
+    service_level_cap: 0.90
+    promotion: optimised     # start week and depth chosen from the grid below using the forecast, not the truth
+    markdown_grid: {start_weeks: [4, 6, 8, 10], depths: [0.2, 0.3, 0.5]}
+
+# The brand cost of discounting could not be shown in Visuelle (discount-acquired clients were not worse),
+# so it enters as an explicit assumption: a cost per unit sold on discount, as a share of list price.
+brand_cost_per_discounted_unit: [0.0, 0.05, 0.10, 0.20]
+
+# Lift uncertainty: deep-markdown lifts failed the placebo check (sales were already falling),
+# so the dial is also run with the extra lift above the clean shallow-markdown estimate halved.
+lift_scenarios: [central, conservative]
+seed: 17
