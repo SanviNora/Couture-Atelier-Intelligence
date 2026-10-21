@@ -1,6 +1,6 @@
 PY ?= ../.venv/bin/python
 
-.PHONY: data select models clienteling demand all test lint
+.PHONY: data select models clienteling demand allocation all test lint
 
 # Rebuild the warehouse from the raw Visuelle and Google Trends files (about 10 seconds).
 data:
@@ -28,7 +28,12 @@ demand:
 	$(PY) scripts/build_demand.py
 	$(PY) -m scripts.scarcity_scenario
 
-all: data models clienteling demand
+# Store allocation, end of season and buy depth (10 seconds); hero pieces to clients (2 minutes).
+allocation:
+	$(PY) scripts/build_allocation.py
+	$(PY) -m scripts.build_client_allocation
+
+all: data models clienteling demand allocation
 
 test:
 	$(PY) -m pytest -q

@@ -48,7 +48,8 @@ The project is being rebuilt on **Visuelle 2.0**, real fashion retail data from 
 **Done:** data foundation; VIC client intelligence with model selection on pre-test data, a one-time 2019 test with confidence intervals, a 9-variant sensitivity analysis and a COVID stress test (`docs/client_intelligence.md`); Google Trends market pulse for 2021–2026 (`reports/market_pulse.csv`).
 **Done:** clienteling: uplift models trained on a randomised pilot and judged against known contact effects, policies compared at fixed advisor capacity, an experiment design with power analysis, and product picks judged on real purchases using Silhouette Vision's image embeddings (`docs/clienteling.md`).
 **Done:** demand: stock rebuilt per store and week, lost sales recovered with a validated method, a store-level launch forecast with uncertainty, and a luxury scarcity scenario (`docs/demand.md`).
-**Next:** allocation, the brand tier dial and the dashboard. The inventory script and dashboard still use the retired UCI outputs until they are rebuilt.
+**Done:** allocation: scarce launches split across boutiques and judged on true demand, hero pieces offered to clients through an integer programme with relationship rules, and the economics of unsold stock under the EU destruction ban (`docs/allocation.md`).
+**Next:** the brand tier dial and the dashboard. The dashboard still uses the retired UCI outputs until it is rebuilt.
 
 ```bash
 make all    # ingest data, build SQL marts and the luxury layer, refit client models (a few minutes)

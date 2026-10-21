@@ -1,0 +1,46 @@
+# Allocation and full-price stock settings.
+
+scarcity:
+  units_share_of_forecast: 0.6   # a scarce launch: total units = 60% of forecast season demand (assumption)
+  season_weeks: 12               # full-price selling window; a luxury house does not mark down
+  max_units_per_store: 12        # display and stockroom limit per boutique (assumption)
+  min_units_flagship: 1          # every flagship shows the piece (assumption)
+
+economics:
+  gross_margin:
+    value: 0.70
+    meaning: Unit cost is 30% of list price.
+    source: >-
+      Assumption, in line with gross margins typically reported by listed luxury
+      houses. For reference, LVMH Fashion & Leather Goods reported a 35%
+      operating margin in 2025 (S&P Global, The Fashion Law).
+    url: https://www.thefashionlaw.com/lvmh-reports-revenue-and-profit-declines-in-2025-amid-shifting-demand/
+  destruction_ban:
+    effective: 2026-07-19
+    source: Ecodesign for Sustainable Products Regulation, Delegated Regulation (EU) 2026/296
+    url: https://cms.law/en/int/legal-updates/new-eu-rules-to-prevent-the-destruction-of-unsold-textiles
+  # Routes for a unit still unsold at the end of the season, as fractions of list price (assumptions).
+  leftover_routes:
+    destroy:            # no longer allowed for large companies in the EU
+      value: -0.02      # destruction cost; done historically to protect scarcity
+      allowed_after_ban: false
+    transfer:
+      value_per_unit_sold: 1.0
+      cost: 0.03        # shipping and handling between boutiques
+    carry_over:
+      sell_through_next_season: 0.4
+      desirability_decay: 0.3   # last season's piece is worth less to clients
+      holding_cost: 0.05        # storage, insurance and capital for a season
+      brand_dilution_cost: 0.10 # old stock lingering in boutiques weakens scarcity: why houses used to destroy it
+    certified_pre_owned:
+      value: 0.30       # recovery through a controlled resale channel (not for the luxury tier by default)
+      allowed_luxury: false
+    recycle:
+      value: -0.03      # material recovery cost
+
+client_allocation:
+  hero_offers_per_client: 1        # at most one hero piece per client per season
+  reserved_share_rising_clients: 0.3  # share of offers kept for non-VIC clients with high upgrade odds
+  reseller_rule: "bought the same piece two or more times"
+  candidates_per_unit: 8           # shortlist size per available unit before optimising
+  relationship_value_share: 0.05   # a hero purchase deepens the relationship by ~5% of the client's annual spend (assumption)

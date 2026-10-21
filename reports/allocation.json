@@ -1,0 +1,342 @@
+{
+  "launches": 890,
+  "store_launch_pairs": 18412,
+  "scarce_units_share_of_forecast": 0.6,
+  "store_allocation": [
+    {
+      "policy": "retailer_opening_share",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 138569,
+      "leftover": 15114,
+      "transferable": 14889,
+      "full_price_sell_through": 0.9017,
+      "demand_served": 0.558,
+      "revenue_eur_m": 529.96,
+      "leftover_cost_eur_m": 17.72
+    },
+    {
+      "policy": "store_size",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 141985,
+      "leftover": 11698,
+      "transferable": 11473,
+      "full_price_sell_through": 0.9239,
+      "demand_served": 0.5717,
+      "revenue_eur_m": 542.29,
+      "leftover_cost_eur_m": 14.02
+    },
+    {
+      "policy": "equal_split",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 146268,
+      "leftover": 7415,
+      "transferable": 7190,
+      "full_price_sell_through": 0.9518,
+      "demand_served": 0.589,
+      "revenue_eur_m": 559.65,
+      "leftover_cost_eur_m": 8.81
+    },
+    {
+      "policy": "optimal_ignoring_uncertainty",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 146629,
+      "leftover": 7054,
+      "transferable": 6829,
+      "full_price_sell_through": 0.9541,
+      "demand_served": 0.5904,
+      "revenue_eur_m": 560.99,
+      "leftover_cost_eur_m": 8.41
+    },
+    {
+      "policy": "optimal_with_uncertainty",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 146740,
+      "leftover": 6943,
+      "transferable": 6718,
+      "full_price_sell_through": 0.9548,
+      "demand_served": 0.5909,
+      "revenue_eur_m": 561.6,
+      "leftover_cost_eur_m": 8.22
+    },
+    {
+      "policy": "forecast_mean_share",
+      "units": 153683,
+      "demand": 248338,
+      "sold": 146856,
+      "leftover": 6827,
+      "transferable": 6602,
+      "full_price_sell_through": 0.9556,
+      "demand_served": 0.5914,
+      "revenue_eur_m": 562.03,
+      "leftover_cost_eur_m": 8.09
+    },
+    {
+      "policy": "oracle_true_demand",
+      "units": 151369,
+      "demand": 248338,
+      "sold": 151369,
+      "leftover": 0,
+      "transferable": 0,
+      "full_price_sell_through": 1.0,
+      "demand_served": 0.6095,
+      "revenue_eur_m": 580.92,
+      "leftover_cost_eur_m": 0.0
+    }
+  ],
+  "store_allocation_hero_pieces": [
+    {
+      "policy": "equal_split",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10725,
+      "leftover": 250,
+      "transferable": 250,
+      "full_price_sell_through": 0.9772,
+      "demand_served": 0.3678,
+      "revenue_eur_m": 34.81,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "forecast_mean_share",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10726,
+      "leftover": 249,
+      "transferable": 249,
+      "full_price_sell_through": 0.9773,
+      "demand_served": 0.3678,
+      "revenue_eur_m": 34.81,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "optimal_with_uncertainty",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10725,
+      "leftover": 250,
+      "transferable": 250,
+      "full_price_sell_through": 0.9772,
+      "demand_served": 0.3678,
+      "revenue_eur_m": 34.81,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "retailer_opening_share",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10723,
+      "leftover": 252,
+      "transferable": 252,
+      "full_price_sell_through": 0.977,
+      "demand_served": 0.3677,
+      "revenue_eur_m": 34.81,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "optimal_ignoring_uncertainty",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10728,
+      "leftover": 247,
+      "transferable": 247,
+      "full_price_sell_through": 0.9775,
+      "demand_served": 0.3679,
+      "revenue_eur_m": 34.82,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "store_size",
+      "units": 10975,
+      "demand": 29162,
+      "sold": 10730,
+      "leftover": 245,
+      "transferable": 245,
+      "full_price_sell_through": 0.9777,
+      "demand_served": 0.3679,
+      "revenue_eur_m": 34.82,
+      "leftover_cost_eur_m": 0.19
+    },
+    {
+      "policy": "oracle_true_demand",
+      "units": 10741,
+      "demand": 29162,
+      "sold": 10741,
+      "leftover": 0,
+      "transferable": 0,
+      "full_price_sell_through": 1.0,
+      "demand_served": 0.3683,
+      "revenue_eur_m": 34.83,
+      "leftover_cost_eur_m": 0.0
+    }
+  ],
+  "supply_sweep": [
+    {
+      "supply_share_of_forecast": 0.6,
+      "policy": "retailer_opening_share",
+      "revenue_eur_m": 529.96,
+      "leftover_units": 15114
+    },
+    {
+      "supply_share_of_forecast": 0.6,
+      "policy": "equal_split",
+      "revenue_eur_m": 559.65,
+      "leftover_units": 7415
+    },
+    {
+      "supply_share_of_forecast": 0.6,
+      "policy": "forecast_mean_share",
+      "revenue_eur_m": 562.03,
+      "leftover_units": 6827
+    },
+    {
+      "supply_share_of_forecast": 0.6,
+      "policy": "optimal_with_uncertainty",
+      "revenue_eur_m": 561.6,
+      "leftover_units": 6943
+    },
+    {
+      "supply_share_of_forecast": 0.6,
+      "policy": "oracle_true_demand",
+      "revenue_eur_m": 580.92,
+      "leftover_units": 0
+    },
+    {
+      "supply_share_of_forecast": 0.8,
+      "policy": "retailer_opening_share",
+      "revenue_eur_m": 634.08,
+      "leftover_units": 23681
+    },
+    {
+      "supply_share_of_forecast": 0.8,
+      "policy": "equal_split",
+      "revenue_eur_m": 652.59,
+      "leftover_units": 18914
+    },
+    {
+      "supply_share_of_forecast": 0.8,
+      "policy": "forecast_mean_share",
+      "revenue_eur_m": 654.98,
+      "leftover_units": 18248
+    },
+    {
+      "supply_share_of_forecast": 0.8,
+      "policy": "optimal_with_uncertainty",
+      "revenue_eur_m": 654.86,
+      "leftover_units": 18303
+    },
+    {
+      "supply_share_of_forecast": 0.8,
+      "policy": "oracle_true_demand",
+      "revenue_eur_m": 679.53,
+      "leftover_units": 0
+    },
+    {
+      "supply_share_of_forecast": 1.0,
+      "policy": "retailer_opening_share",
+      "revenue_eur_m": 687.1,
+      "leftover_units": 31444
+    },
+    {
+      "supply_share_of_forecast": 1.0,
+      "policy": "equal_split",
+      "revenue_eur_m": 692.89,
+      "leftover_units": 30060
+    },
+    {
+      "supply_share_of_forecast": 1.0,
+      "policy": "forecast_mean_share",
+      "revenue_eur_m": 694.29,
+      "leftover_units": 29678
+    },
+    {
+      "supply_share_of_forecast": 1.0,
+      "policy": "optimal_with_uncertainty",
+      "revenue_eur_m": 694.25,
+      "leftover_units": 29685
+    },
+    {
+      "supply_share_of_forecast": 1.0,
+      "policy": "oracle_true_demand",
+      "revenue_eur_m": 704.64,
+      "leftover_units": 0
+    },
+    {
+      "supply_share_of_forecast": 1.2,
+      "policy": "retailer_opening_share",
+      "revenue_eur_m": 704.38,
+      "leftover_units": 36149
+    },
+    {
+      "supply_share_of_forecast": 1.2,
+      "policy": "equal_split",
+      "revenue_eur_m": 705.27,
+      "leftover_units": 36004
+    },
+    {
+      "supply_share_of_forecast": 1.2,
+      "policy": "forecast_mean_share",
+      "revenue_eur_m": 705.65,
+      "leftover_units": 35914
+    },
+    {
+      "supply_share_of_forecast": 1.2,
+      "policy": "optimal_with_uncertainty",
+      "revenue_eur_m": 705.69,
+      "leftover_units": 35904
+    },
+    {
+      "supply_share_of_forecast": 1.2,
+      "policy": "oracle_true_demand",
+      "revenue_eur_m": 707.93,
+      "leftover_units": 0
+    }
+  ],
+  "end_of_season": {
+    "leftover_units": 6943,
+    "moved_to_boutiques_with_unmet_demand": 6718,
+    "value_recovered_by_transfers_eur_m": 25.7,
+    "still_unsold_after_transfers": 225,
+    "net_value_of_remaining_stock_by_route_eur_m": {
+      "destroy": -0.02,
+      "carry_over": 0.12,
+      "recycle": -0.03,
+      "certified_pre_owned": 0.27
+    },
+    "inventory_cost_tied_up_eur_m": 0.27
+  },
+  "buy_depth_by_regime": {
+    "before_ban_destroy": {
+      "salvage_value_share_of_price": -0.02,
+      "critical_ratio": 0.686,
+      "units_bought_vs_mean_demand": 1.153,
+      "expected_unsold_share": 0.228,
+      "overstock_costless_capped_at_99pct": false
+    },
+    "after_ban_carry_over": {
+      "salvage_value_share_of_price": 0.13,
+      "critical_ratio": 0.805,
+      "units_bought_vs_mean_demand": 1.337,
+      "expected_unsold_share": 0.299,
+      "overstock_costless_capped_at_99pct": false
+    },
+    "after_ban_recycle_only": {
+      "salvage_value_share_of_price": -0.03,
+      "critical_ratio": 0.68,
+      "units_bought_vs_mean_demand": 1.144,
+      "expected_unsold_share": 0.224,
+      "overstock_costless_capped_at_99pct": false
+    },
+    "aspirational_tier_certified_pre_owned": {
+      "salvage_value_share_of_price": 0.3,
+      "critical_ratio": 1.0,
+      "units_bought_vs_mean_demand": 2.245,
+      "expected_unsold_share": 0.556,
+      "overstock_costless_capped_at_99pct": true
+    }
+  }
+}
