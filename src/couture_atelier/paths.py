@@ -25,4 +25,7 @@ _DEFAULT_VISUELLE = (
     ROOT.parent / "Silhouette Vision" / "data" / "raw" / "visuelle2" / "visuelle2"
 )
 VISUELLE_DIR = Path(os.environ.get("COUTURE_VISUELLE_DIR", _DEFAULT_VISUELLE))
+# Image embeddings of Visuelle products from the sibling Silhouette Vision project
+# (Marqo-FashionSigLIP, row-aligned with its visuelle_products table).
+SILHOUETTE_DIR = Path(os.environ.get("COUTURE_SILHOUETTE_DIR", ROOT.parent / "Silhouette Vision"))
 WAREHOUSE = DATA / "couture.duckdb"

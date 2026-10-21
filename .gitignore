@@ -16,3 +16,5 @@ data/processed/
 .env
 *.egg-info/
 *.log
+data/logs/
+data/sensitivity/

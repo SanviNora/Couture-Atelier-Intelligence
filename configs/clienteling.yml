@@ -1,0 +1,40 @@
+# Clienteling simulation and policy settings.
+#
+# Real: each client's behaviour in the 90 days after a cut-off with no contact
+# (Visuelle). Simulated: the effect of an advisor contact on that behaviour.
+# No public data on luxury outreach effects exists, so the effect rule below is
+# a documented assumption; uplift models are judged on how well they recover it.
+
+cutoffs:
+  pilot: "2018-06-30"     # randomised pilot; uplift models are trained here
+  deploy: "2019-06-30"    # policies are compared here (same season, pre-COVID)
+horizon_days: 90
+
+pilot:
+  treated_share: 0.5      # of consented clients active in the last 2 years
+  seed: 11
+
+contact_effect:
+  meaning: >-
+    tau = change in the probability of an extra visit within 90 days because of
+    one advisor contact. It is largest for engaged clients who are starting to
+    drift (persuadables), small for clients who would come back anyway or have
+    gone cold, and negative for top-tier and VIC clients contacted right after a
+    purchase (do-not-disturb).
+  persuadable_peak: 0.10        # extra-visit probability at the most persuadable point
+  persuadable_recency_weeks: 13 # drift point where a contact helps most
+  engagement_visits_cap: 10     # engagement = min(lifetime visits, cap) / cap
+  base: 0.01                    # small effect for everyone contacted
+  do_not_disturb_penalty: 0.04  # top-tier and VIC clients who bought within the window below
+  do_not_disturb_weeks: 6
+  individual_noise_sd: 0.015    # client-level variation no feature can explain
+  floor: -0.05
+  basket_share_of_mean_visit: 0.8  # value of an extra visit, relative to the client's mean visit value
+  seed: 23
+
+capacity:
+  contacts_per_advisor: 40      # meaningful one-to-one contacts per advisor per quarter (assumption)
+
+eligibility:
+  require_consent: true
+  active_within_weeks: 104      # only clients seen in the last two years are eligible

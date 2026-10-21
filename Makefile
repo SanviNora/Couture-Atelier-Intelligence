@@ -1,6 +1,6 @@
 PY ?= ../.venv/bin/python
 
-.PHONY: data select models all test lint
+.PHONY: data select models clienteling all test lint
 
 # Rebuild the warehouse from the raw Visuelle and Google Trends files (about 10 seconds).
 data:
@@ -17,7 +17,12 @@ select:
 models:
 	$(PY) scripts/build_client_value.py
 
-all: data models
+# Uplift pilot, policies and power analysis (30 seconds); product picks on real purchases (about 12 minutes).
+clienteling:
+	$(PY) scripts/build_clienteling.py
+	$(PY) scripts/build_recommendations.py
+
+all: data models clienteling
 
 test:
 	$(PY) -m pytest -q

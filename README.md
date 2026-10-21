@@ -46,7 +46,8 @@ notebooks/            exploratory analysis
 The project is being rebuilt on **Visuelle 2.0**, real fashion retail data from one retailer: 665k clients, 110 stores, store-level weekly sales and discounts, and weekly restocks. On top of it sits a **luxury layer calibrated to published figures** (`configs/calibration.yml`). For example, VICs (the top 1% of clients) are calibrated to hold 30% of revenue, up from 11.6% in the raw data, through a time-safe trade-up that uses only each client's past visits.
 
 **Done:** data foundation; VIC client intelligence with model selection on pre-test data, a one-time 2019 test with confidence intervals, a 9-variant sensitivity analysis and a COVID stress test (`docs/client_intelligence.md`); Google Trends market pulse for 2021–2026 (`reports/market_pulse.csv`).
-**Next:** clienteling, demand, allocation and the brand tier dial. The clienteling, forecasting and inventory scripts still use the retired UCI outputs until they are rebuilt.
+**Done:** clienteling: uplift models trained on a randomised pilot and judged against known contact effects, policies compared at fixed advisor capacity, an experiment design with power analysis, and product picks judged on real purchases using Silhouette Vision's image embeddings (`docs/clienteling.md`).
+**Next:** demand, allocation and the brand tier dial. The forecasting and inventory scripts still use the retired UCI outputs until they are rebuilt.
 
 ```bash
 make all    # ingest data, build SQL marts and the luxury layer, refit client models (a few minutes)
