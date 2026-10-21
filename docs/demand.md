@@ -70,14 +70,17 @@ Features known at launch: category, colour, fabric, price, launch month, the pie
 
 Same real weekly demand, but each boutique gets 70% of a planner's estimate as opening stock and no restock, as for a scarce luxury piece. 38.7% of weeks then sell out and 38.6% of demand is lost. Two planners each train the same launch forecast on what they can see, then allocate the Jul–Nov 2019 launches from it:
 
-| | Treats capped sales as demand | **Recovers demand first** |
-|---|---:|---:|
-| Forecast bias vs true demand | −21.8% | **−9.3%** |
-| Forecast WAPE vs true demand | 0.390 | **0.362** |
-| Units allocated to the next launches | 193,926 | 225,155 |
-| Demand lost to stock-outs | 29.1% | **21.1%** |
-| Stock left unsold | 8.5% | 12.4% |
+| | Treats capped sales as demand | Recovers demand (one pass) | **Recovers demand with EM** |
+|---|---:|---:|---:|
+| Recovered demand in sold-out weeks vs truth | −80.9% | −46.6% | **−36.6%** |
+| Forecast bias vs true demand | −21.8% | −9.3% | **−6.1%** |
+| Forecast WAPE vs true demand | 0.390 | 0.362 | **0.359** |
+| Units allocated to the next launches | 193,926 | 225,155 | 232,999 |
+| Demand lost to stock-outs | 29.1% | 21.1% | **19.3%** |
+| Stock left unsold | 8.5% | 12.4% | 13.4% |
 
 Learning demand from capped sales shrinks the next allocation, which caps sales again: the error compounds season after season. Recovering demand first halves the forecast bias and cuts lost demand by 8 points, at the cost of more unsold stock. Deciding how much of that trade-off to accept, under the EU ban on destroying unsold goods, is the allocation phase's job.
 
-Recovery is still 9% short under heavy scarcity because the weekly model learns from weeks that did not sell out, which are biased toward lower demand.
+**One pass vs EM.** A weekly model trained only on weeks where stock lasted learns from the lower-demand weeks. Expectation-maximisation fixes that selection: replace each sold-out week's target with its expected demand given the units sold, refit on all weeks, and repeat (`em_recover` in `src/couture_atelier/demand.py`). Mean recovered demand in sold-out weeks rises 0.82 → 0.90 → 0.94 → 0.96 → 0.98 over five iterations, against a true 1.54.
+
+EM cannot close the whole gap here: under heavy scarcity the signals themselves (last week's sales, the same piece's sales in other stores) come from sold-out stock too, so they carry little information about true demand. Better uncapped signals, such as waitlists, client requests or store traffic, are what a luxury house would add.

@@ -1,10 +1,13 @@
 import numpy as np
+import pandas as pd
 import pytest
+from sklearn.linear_model import PoissonRegressor
 
 from couture_atelier.demand import (
     artificial_censoring,
     conditional_demand,
     coverage,
+    em_recover,
     pinball_loss,
     recover,
     wape,
@@ -59,3 +62,23 @@ def test_forecast_metrics() -> None:
     assert pinball_loss(y, y, 0.9) == 0
     assert pinball_loss(y, y - 1, 0.9) > pinball_loss(y, y + 1, 0.9)
     assert coverage(y, y - 0.5, y + 0.5) == 1.0
+
+
+def test_em_recovers_more_than_a_model_trained_only_on_uncensored_weeks() -> None:
+    rng = np.random.default_rng(3)
+    n = 40_000
+    x = rng.uniform(0, 2, n)
+    demand = rng.poisson(np.exp(0.3 + 0.8 * x))
+    stock = np.floor(np.exp(0.3 + 0.8 * x) * rng.uniform(0.3, 1.2, n))
+    frame = pd.DataFrame({"x": x, "units_sold": np.minimum(demand, stock), "censored": demand >= stock})
+
+    def fit(X, y):
+        return PoissonRegressor(alpha=0).fit(X, y)
+
+    one_pass = fit(frame.loc[~frame.censored, ["x"]], frame.loc[~frame.censored, "units_sold"])
+    first = recover(frame.units_sold, frame.censored, one_pass.predict(frame[["x"]]))
+    em, path = em_recover(frame, ["x"], fit, iterations=8)
+
+    truth = demand[frame.censored].sum()
+    assert abs(em[frame.censored].sum() / truth - 1) < abs(first[frame.censored].sum() / truth - 1)
+    assert path == sorted(path)  # recovered demand rises monotonically towards the truth

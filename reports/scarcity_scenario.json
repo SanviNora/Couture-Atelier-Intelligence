@@ -2,6 +2,19 @@
   "allocation_share": 0.7,
   "censored_week_share_under_scarcity": 0.387,
   "true_demand_lost_to_stockouts_pct": 38.6,
+  "recovery_bias_in_sold_out_weeks_pct": {
+    "sales_as_demand": -80.9,
+    "one_pass_recovery": -46.6,
+    "em_recovery": -36.6
+  },
+  "em_mean_recovered_demand_by_iteration": [
+    0.822,
+    0.895,
+    0.935,
+    0.959,
+    0.976
+  ],
+  "true_mean_demand_in_sold_out_weeks": 1.539,
   "planners": {
     "treats_sales_as_demand": {
       "forecast_bias_vs_true_demand_pct": -21.8,
@@ -16,6 +29,13 @@
       "next_allocation_units": 225155,
       "demand_lost_to_stockouts_pct": 21.1,
       "stock_left_unsold_pct": 12.4
+    },
+    "recovers_demand_with_em": {
+      "forecast_bias_vs_true_demand_pct": -6.1,
+      "forecast_wape_vs_true_demand": 0.3591,
+      "next_allocation_units": 232999,
+      "demand_lost_to_stockouts_pct": 19.3,
+      "stock_left_unsold_pct": 13.4
     }
   }
 }

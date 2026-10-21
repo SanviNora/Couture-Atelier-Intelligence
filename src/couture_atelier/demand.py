@@ -44,6 +44,34 @@ def recover(sold: np.ndarray, censored: np.ndarray, mu: np.ndarray, method: str 
     return np.where(censored, estimate, sold)
 
 
+def em_recover(
+    frame: pd.DataFrame, features: list[str], fit_model, iterations: int = 5
+) -> tuple[np.ndarray, list[float]]:
+    """Expectation-maximisation for censored Poisson demand.
+
+    A model trained only on weeks where stock lasted learns from the
+    lower-demand weeks and under-predicts the rest. EM fixes that selection:
+    start from that model, replace each censored week's target with its
+    expected demand given the units sold (E-step), refit on all weeks
+    (M-step), and repeat.
+
+    ``fit_model(X, y)`` returns a fitted regressor with ``predict``. Returns the
+    recovered demand and the mean recovered demand in censored weeks after each
+    iteration, to show convergence.
+    """
+    sold = frame["units_sold"].to_numpy(dtype=float)
+    censored = frame["censored"].to_numpy(dtype=bool)
+    model = fit_model(frame.loc[~censored, features], sold[~censored])
+    path = []
+    target = sold
+    for _ in range(iterations):
+        mu = model.predict(frame[features])
+        target = recover(sold, censored, mu, "conditional")
+        path.append(float(target[censored].mean()))
+        model = fit_model(frame[features], target)
+    return target, path
+
+
 def artificial_censoring(
     true_demand: np.ndarray, expected: np.ndarray, share: float, seed: int
 ) -> tuple[np.ndarray, np.ndarray]:

@@ -21,7 +21,7 @@ import pandas as pd
 from scripts.build_demand import SPLITS, WEEK_FEATURES, launch_frame, recovery_study, weekly_frame
 
 from couture_atelier.client_models import DEFAULT_PARAMS, gbm
-from couture_atelier.demand import category_codes, recover, wape
+from couture_atelier.demand import category_codes, em_recover, recover, wape
 from couture_atelier.paths import REPORTS, WAREHOUSE
 
 ALLOCATION_SHARE = 0.7  # opening stock as a share of the planner's estimate: deliberately tight
@@ -79,9 +79,22 @@ def run(warehouse: Path = WAREHOUSE) -> dict:
         scarce["expected_units"] = model.predict(scarce[WEEK_FEATURES])
         recovered = scarce.assign(
             recovered_units=recover(scarce["units_sold"], scarce["censored"], scarce["expected_units"], "conditional"))
+        em_units, em_path = em_recover(
+            scarce, WEEK_FEATURES,
+            lambda X, y: gbm("regressor", {**DEFAULT_PARAMS, "min_samples_leaf": 200}, "poisson").fit(X, y))
+        recovered_em = scarce.assign(recovered_units=em_units)
         naive = scarce.assign(recovered_units=scarce["units_sold"])
         worlds = {"treats_sales_as_demand": prepare(launch_frame(con, naive), vocab),
-                  "recovers_demand_first": prepare(launch_frame(con, recovered), vocab)}
+                  "recovers_demand_first": prepare(launch_frame(con, recovered), vocab),
+                  "recovers_demand_with_em": prepare(launch_frame(con, recovered_em), vocab)}
+        censored = scarce["censored"].to_numpy()
+        true_censored = scarce["true_demand"].to_numpy()[censored].sum()
+        recovery_check = {
+            name: round(float(units[censored].sum() / true_censored - 1) * 100, 1)
+            for name, units in (("sales_as_demand", scarce["units_sold"].to_numpy()),
+                                ("one_pass_recovery", recovered["recovered_units"].to_numpy()),
+                                ("em_recovery", em_units))
+        }
 
     key = ["product_id", "store_id"]
     true_rate = truth.set_index(key)["rate_recovered"]
@@ -89,6 +102,9 @@ def run(warehouse: Path = WAREHOUSE) -> dict:
               "censored_week_share_under_scarcity": round(float(scarce["censored"].mean()), 3),
               "true_demand_lost_to_stockouts_pct": round(float(
                   1 - scarce["units_sold"].sum() / scarce["true_demand"].sum()) * 100, 1),
+              "recovery_bias_in_sold_out_weeks_pct": recovery_check,
+              "em_mean_recovered_demand_by_iteration": [round(v, 3) for v in em_path],
+              "true_mean_demand_in_sold_out_weeks": round(float(scarce["true_demand"].to_numpy()[censored].mean()), 3),
               "planners": {}}
     test_truth = truth[truth["split"] == "test"]
     for name, world in worlds.items():
