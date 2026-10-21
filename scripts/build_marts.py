@@ -17,6 +17,8 @@ CHECKS = {
     "from marts.fct_store_product_week group by all having n <> 12)",
     "units sold non-negative": "select count(*) from marts.fct_store_product_week where units_sold < 0",
     "one row per client": "select count(*) - count(distinct client_id) from marts.client_profile",
+    "one stock row per store-product-week": "select count(*) - (select count(*) from marts.fct_store_product_week) "
+    "from marts.fct_stock_week",
     "every purchase has a client profile": "select count(*) from marts.fct_purchase "
     "where client_id not in (select client_id from marts.client_profile)",
 }

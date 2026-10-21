@@ -1,0 +1,21 @@
+{
+  "allocation_share": 0.7,
+  "censored_week_share_under_scarcity": 0.387,
+  "true_demand_lost_to_stockouts_pct": 38.6,
+  "planners": {
+    "treats_sales_as_demand": {
+      "forecast_bias_vs_true_demand_pct": -21.8,
+      "forecast_wape_vs_true_demand": 0.3897,
+      "next_allocation_units": 193926,
+      "demand_lost_to_stockouts_pct": 29.1,
+      "stock_left_unsold_pct": 8.5
+    },
+    "recovers_demand_first": {
+      "forecast_bias_vs_true_demand_pct": -9.3,
+      "forecast_wape_vs_true_demand": 0.3619,
+      "next_allocation_units": 225155,
+      "demand_lost_to_stockouts_pct": 21.1,
+      "stock_left_unsold_pct": 12.4
+    }
+  }
+}
