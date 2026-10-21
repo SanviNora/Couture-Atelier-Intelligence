@@ -1,14 +1,19 @@
 PY ?= ../.venv/bin/python
 
-.PHONY: data models all test lint
+.PHONY: data select models all test lint
 
-# Rebuild the warehouse from the raw Visuelle files (about 10 seconds).
+# Rebuild the warehouse from the raw Visuelle and Google Trends files (about 10 seconds).
 data:
 	$(PY) scripts/ingest_visuelle.py
 	$(PY) scripts/build_marts.py
 	$(PY) scripts/build_luxury_layer.py
+	$(PY) scripts/ingest_google_trends.py
 
-# Client value, VIC upgrade and return models (about 20 seconds).
+# Model selection on pre-test data only; writes configs/client_models.yml (about 10 minutes).
+select:
+	$(PY) scripts/experiment_client_models.py
+
+# Refit the selected client models, test once on 2019, score clients (about 1 minute).
 models:
 	$(PY) scripts/build_client_value.py
 

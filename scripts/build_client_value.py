@@ -1,14 +1,12 @@
-"""VIC client intelligence: next-year value, tiers, VIC upgrade odds, lapse and win-back.
+"""VIC client intelligence: next-year value, tiers, VIC upgrade odds, return and win-back.
 
-Three chronological windows. Features use only data up to each cut-off; the
-following 12 months are the outcome.
+Refits the setup chosen by ``experiment_client_models.py`` (``configs/client_models.yml``)
+on every client at the four 2017 training cut-offs, then evaluates once:
 
-- 2017-12-31 -> 2018: training window for the machine-learning challengers
 - 2018-12-31 -> 2019: main test window
 - 2019-12-31 -> 2020: COVID stress test, reported separately
 
-Spend predictions compared: last-year spend (naive), BG/NBD x Gamma-Gamma,
-and a gradient-boosting challenger trained on the earlier window.
+Finally scores every client as of 2019-12-31 into ``lux.client_value``.
 """
 
 from __future__ import annotations
@@ -19,150 +17,36 @@ from pathlib import Path
 import duckdb
 import numpy as np
 import pandas as pd
+import yaml
 from scipy.stats import spearmanr
-from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
-from couture_atelier.clv import fit_bgnbd, fit_gamma_gamma
+from couture_atelier.client_frames import (
+    FEATURE_SETS,
+    add_probabilistic,
+    label_outcomes,
+    spend_metrics,
+    window_frame,
+)
+from couture_atelier.client_models import fit_return, fit_spend, gbm
+from couture_atelier.evaluation import paired_bootstrap
 from couture_atelier.luxury import client_tier, load_calibration
-from couture_atelier.paths import REPORTS, WAREHOUSE
+from couture_atelier.paths import CONFIGS, PROCESSED, REPORTS, WAREHOUSE
 
-WINDOWS = {"train": "2017-12-31", "test": "2018-12-31", "covid": "2019-12-31"}
-WEEKS_PER_YEAR = 365 / 7
-SEED = 42
-FEATURES = [
-    "recency_weeks", "tenure_weeks_capped", "visits_12m", "spend_12m", "mean_visit_value_12m",
-    "max_visit_value_12m", "last_visit_value", "products_12m", "stores_12m", "full_price_share_12m",
-    "hero_share_12m", "lifetime_visits", "expected_visits_bgnbd", "p_alive",
-    "visits_90d", "spend_90d", "spend_180d", "spend_momentum",
-]
-VIC_SHARE = 0.01
-SPEND_SCALE = 1_000  # model spend in thousands of euros for a well-conditioned Poisson fit
+TEST, COVID = "2018-12-31", "2019-12-31"
+CACHE = PROCESSED / "client_frames"
 
 
-def window_frame(con: duckdb.DuckDBPyConnection, cutoff: str) -> pd.DataFrame:
-    """One row per client with history up to the cut-off and the next 12 months' outcome."""
-    return con.execute(
-        f"""
-        with days as (
-            select client_id, cast(purchased_at as date) as day, sum(value_eur) as value_eur
-            from lux.receipt group by all
-        ),
-        hist as (select * from days where day <= date '{cutoff}'),
-        future as (
-            select client_id, count(*) as visits_next, sum(value_eur) as spend_next
-            from days where day > date '{cutoff}' and day <= date '{cutoff}' + interval 365 day
-            group by 1
-        ),
-        first_last as (
-            select client_id, min(day) as first_day, max(day) as last_day, count(*) as lifetime_visits,
-                   arg_max(value_eur, day) as last_visit_value
-            from hist group by 1
-        ),
-        repeat_value as (
-            select client_id, avg(value_eur) as monetary
-            from (select *, row_number() over (partition by client_id order by day) as n from hist)
-            where n > 1 group by 1
-        ),
-        recent as (
-            select client_id, count(*) as visits_12m, sum(value_eur) as spend_12m,
-                   avg(value_eur) as mean_visit_value_12m, max(value_eur) as max_visit_value_12m,
-                   count(*) filter (where day > date '{cutoff}' - interval 90 day) as visits_90d,
-                   coalesce(sum(value_eur) filter (where day > date '{cutoff}' - interval 90 day), 0) as spend_90d,
-                   coalesce(sum(value_eur) filter (where day > date '{cutoff}' - interval 180 day), 0) as spend_180d
-            from hist where day > date '{cutoff}' - interval 365 day group by 1
-        ),
-        lines as (
-            select v.client_id, v.product_id, v.store_id, v.qty, p.hero_piece,
-                   w.on_discount
-            from lux.purchase_value v
-            join lux.product p using (product_id)
-            left join marts.fct_store_product_week w
-              on w.product_id = v.product_id and w.store_id = v.store_id
-             and w.week_start = cast(date_trunc('week', v.purchased_at) as date)
-            where cast(v.purchased_at as date) <= date '{cutoff}'
-              and cast(v.purchased_at as date) > date '{cutoff}' - interval 365 day
-        ),
-        line_features as (
-            select client_id,
-                   count(distinct product_id) as products_12m,
-                   count(distinct store_id) as stores_12m,
-                   sum(qty) filter (where on_discount = false) / sum(qty) as full_price_share_12m,
-                   sum(qty) filter (where hero_piece) / sum(qty) as hero_share_12m
-            from lines group by 1
-        )
-        select f.client_id,
-               f.lifetime_visits - 1 as frequency,
-               date_diff('day', f.first_day, f.last_day) / 7.0 as recency_span_weeks,
-               date_diff('day', f.first_day, date '{cutoff}') / 7.0 as tenure_weeks,
-               date_diff('day', f.last_day, date '{cutoff}') / 7.0 as recency_weeks,
-               least(date_diff('day', f.first_day, date '{cutoff}') / 7.0, 52) as tenure_weeks_capped,
-               f.lifetime_visits, f.last_visit_value,
-               coalesce(m.monetary, 0) as monetary,
-               coalesce(r.visits_12m, 0) as visits_12m, coalesce(r.spend_12m, 0) as spend_12m,
-               coalesce(r.mean_visit_value_12m, 0) as mean_visit_value_12m,
-               coalesce(r.max_visit_value_12m, 0) as max_visit_value_12m,
-               coalesce(r.visits_90d, 0) as visits_90d, coalesce(r.spend_90d, 0) as spend_90d,
-               coalesce(r.spend_180d, 0) as spend_180d,
-               coalesce(r.spend_180d, 0) / greatest(coalesce(r.spend_12m, 0), 1) as spend_momentum,
-               coalesce(l.products_12m, 0) as products_12m, coalesce(l.stores_12m, 0) as stores_12m,
-               coalesce(l.full_price_share_12m, 0) as full_price_share_12m,
-               coalesce(l.hero_share_12m, 0) as hero_share_12m,
-               coalesce(n.visits_next, 0) as visits_next, coalesce(n.spend_next, 0) as spend_next
-        from first_last f
-        left join repeat_value m using (client_id)
-        left join recent r using (client_id)
-        left join line_features l using (client_id)
-        left join future n using (client_id)
-        order by f.client_id
-        """
-    ).fetchdf()
-
-
-def add_probabilistic(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    x = frame["frequency"].to_numpy(float)
-    t_x = frame["recency_span_weeks"].to_numpy(float)
-    T = frame["tenure_weeks"].to_numpy(float)
-    bg = fit_bgnbd(x, t_x, T)
-    gg = fit_gamma_gamma(x, frame["monetary"].to_numpy(float))
-    frame = frame.copy()
-    frame["p_alive"] = bg.p_alive(x, t_x, T)
-    frame["expected_visits_bgnbd"] = bg.expected_visits(WEEKS_PER_YEAR, x, t_x, T)
-    frame["pred_spend_probabilistic"] = frame["expected_visits_bgnbd"] * gg.expected_spend_per_visit(
-        x, frame["monetary"].to_numpy(float)
-    )
-    params = {"bgnbd": {k: round(float(v), 4) for k, v in vars(bg).items()},
-              "gamma_gamma": {k: round(float(v), 4) for k, v in vars(gg).items()}}
+def load_frame(con: duckdb.DuckDBPyConnection, cutoff: str) -> tuple[pd.DataFrame, dict]:
+    frame, params = add_probabilistic(window_frame(con, cutoff))
+    frame = label_outcomes(frame)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    frame.to_parquet(CACHE / f"{cutoff}.parquet", index=False)
     return frame, params
 
 
-def label_vic(frame: pd.DataFrame) -> pd.DataFrame:
-    frame = frame.copy()
-    now_cut = frame["spend_12m"].quantile(1 - VIC_SHARE)
-    next_cut = frame["spend_next"].quantile(1 - VIC_SHARE)
-    frame["is_vic_now"] = frame["spend_12m"] >= now_cut
-    frame["is_vic_next"] = frame["spend_next"] >= next_cut
-    frame["upgraded"] = ~frame["is_vic_now"] & frame["is_vic_next"]
-    frame["lapsed_now"] = frame["visits_12m"] == 0
-    frame["returned_next"] = frame["visits_next"] > 0
-    return frame
-
-
-def spend_metrics(actual: pd.Series, pred: pd.Series) -> dict[str, float]:
-    order = pred.sort_values(ascending=False).index
-    k = max(1, int(len(pred) * VIC_SHARE))
-    top_pred = order[:k]
-    top_actual = actual.sort_values(ascending=False).index[:k]
-    return {
-        "total_bias_pct": round(float(pred.sum() / actual.sum() - 1) * 100, 1),
-        "mae_eur": round(float((pred - actual).abs().mean()), 1),
-        "spearman": round(float(spearmanr(pred, actual).statistic), 3),
-        "top1pct_spend_capture": round(float(actual.loc[top_pred].sum() / actual.sum()), 3),
-        "top1pct_precision": round(float(len(set(top_pred) & set(top_actual)) / k), 3),
-    }
-
-
-def decile_table(actual: pd.Series, pred: pd.Series, model: str) -> pd.DataFrame:
+def decile_table(actual: pd.Series, pred: np.ndarray, model: str) -> pd.DataFrame:
+    pred = pd.Series(pred, index=actual.index)
     decile = pd.qcut(pred.rank(method="first"), 10, labels=range(1, 11))
     table = pd.DataFrame({"decile": decile, "pred": pred, "actual": actual}).groupby("decile", observed=True).agg(
         n=("pred", "size"), predicted_mean_eur=("pred", "mean"), actual_mean_eur=("actual", "mean")
@@ -171,89 +55,131 @@ def decile_table(actual: pd.Series, pred: pd.Series, model: str) -> pd.DataFrame
     return table
 
 
+def spearman(y: np.ndarray, score: np.ndarray) -> float:
+    return float(spearmanr(score, y).statistic)
+
+
+def top1_precision(y: np.ndarray, score: np.ndarray) -> float:
+    k = max(1, int(len(y) * 0.01))
+    return len(set(np.argsort(-score)[:k]) & set(np.argsort(-y)[:k])) / k
+
+
+def precision_at_k(y: np.ndarray, score: np.ndarray) -> float:
+    k = int(y.sum())
+    return float(y[np.argsort(-score)[:k]].mean())
+
+
 def build_client_value(warehouse: Path = WAREHOUSE) -> dict[str, object]:
-    cfg = load_calibration()["assumptions"]
-    with duckdb.connect(str(warehouse)) as con:
-        frames, params = {}, {}
-        for name, cutoff in WINDOWS.items():
-            frame, fitted = add_probabilistic(window_frame(con, cutoff))
-            frames[name], params[name] = label_vic(frame), fitted
+    selection = yaml.safe_load((CONFIGS / "client_models.yml").read_text())
+    tiers = load_calibration()["assumptions"]["client_tiers"]
+    with duckdb.connect(str(warehouse), read_only=True) as con:
+        loaded = {cutoff: load_frame(con, cutoff) for cutoff in [*selection["training_origins"], TEST, COVID]}
+    frames = {cutoff: frame for cutoff, (frame, _) in loaded.items()}
+    fitted_params = {cutoff: params for cutoff, (_, params) in loaded.items() if cutoff in (TEST, COVID)}
+    train = pd.concat([frames[c] for c in selection["training_origins"]], ignore_index=True)
 
-    train = frames["train"]
-    regressor = HistGradientBoostingRegressor(loss="poisson", max_iter=300, learning_rate=0.06,
-                                              l2_regularization=1.0, random_state=SEED)
-    regressor.fit(train[FEATURES], train["spend_next"] / SPEND_SCALE)
-    spend_ceiling = float(train["spend_next"].max())
+    spend_cfg, return_cfg, upgrade_cfg = selection["spend"], selection["return"], selection["vic_upgrade"]
+    spend_features = FEATURE_SETS[spend_cfg["feature_set"]]
+    predict_spend = fit_spend(spend_cfg["structure"], train, spend_features, spend_cfg["params"])
+    recalibration = spend_cfg["validation_recalibration_factor"]
+    return_features = FEATURE_SETS[return_cfg["feature_set"]]
+    predict_return = fit_return(return_cfg["model"], train, return_features, return_cfg["params"])
+    upgrade_features = FEATURE_SETS[upgrade_cfg["feature_set"]]
+    pool_train = train[~train["is_vic_now"]]
+    upgrader = gbm("classifier", {**upgrade_cfg["params"], "class_weight": upgrade_cfg["class_weight"]}).fit(
+        pool_train[upgrade_features], pool_train["upgraded"]
+    )
 
-    def predict_spend(frame: pd.DataFrame) -> np.ndarray:
-        return np.clip(regressor.predict(frame[FEATURES]) * SPEND_SCALE, 0, spend_ceiling)
-
-    returner = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.06, l2_regularization=1.0,
-                                              random_state=SEED)
-    returner.fit(train[FEATURES], train["returned_next"])
-    upgrade_pool = train[~train["is_vic_now"]]
-    classifier = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.06, l2_regularization=1.0,
-                                                random_state=SEED)
-    classifier.fit(upgrade_pool[FEATURES], upgrade_pool["upgraded"])
-
-    report: dict[str, object] = {"windows": WINDOWS, "fitted_params": params, "evaluation": {}}
+    report: dict[str, object] = {"selection": selection, "fitted_params": fitted_params, "evaluation": {}}
     deciles = []
-    for name in ("test", "covid"):
-        frame = frames[name]
-        frame["pred_spend_naive"] = frame["spend_12m"]
-        frame["pred_spend_ml"] = predict_spend(frame)
+    for name, cutoff in (("test", TEST), ("covid", COVID)):
+        frame = frames[cutoff]
         actual = frame["spend_next"]
-        spend = {model: spend_metrics(actual, frame[f"pred_spend_{model}"])
-                 for model in ("naive", "probabilistic", "ml")}
-        pool = frame[~frame["is_vic_now"]]
-        upgrade_prob = classifier.predict_proba(pool[FEATURES])[:, 1]
-        k = int(pool["upgraded"].sum())
-        upgrade = {
-            "candidates": len(pool),
-            "upgraders": k,
-            "base_rate": round(float(pool["upgraded"].mean()), 4),
-            "auc_ml": round(float(roc_auc_score(pool["upgraded"], upgrade_prob)), 3),
-            "auc_naive_spend": round(float(roc_auc_score(pool["upgraded"], pool["spend_12m"])), 3),
-            "avg_precision_ml": round(float(average_precision_score(pool["upgraded"], upgrade_prob)), 3),
-            "avg_precision_naive_spend": round(float(average_precision_score(pool["upgraded"], pool["spend_12m"])), 3),
-            "precision_at_k_ml": round(float(pool["upgraded"].to_numpy()[np.argsort(-upgrade_prob)[:k]].mean()), 3),
+        ml = predict_spend(frame)
+        preds = {
+            "naive_last_12m": frame["spend_12m"].to_numpy(),
+            "bgnbd_gg": frame["pred_spend_bg"].to_numpy(),
+            "mbgnbd_gg": frame["pred_spend_mbg"].to_numpy(),
+            "selected_ml": ml,
+            "selected_ml_recalibrated": ml * recalibration,
         }
-        frame["p_return_ml"] = returner.predict_proba(frame[FEATURES])[:, 1]
-        lapsed = frame[frame["lapsed_now"]]
-        returned, lapsed_returned = frame["returned_next"], lapsed["returned_next"]
+        spend = {model: spend_metrics(actual, pred) for model, pred in preds.items()}
+
+        pool = frame[~frame["is_vic_now"]]
+        upgraded = pool["upgraded"].to_numpy()
+        upgrade_prob = upgrader.predict_proba(pool[upgrade_features])[:, 1]
+        naive_upgrade = pool["spend_12m"].to_numpy()
+        upgrade = {
+            "candidates": len(pool), "upgraders": int(upgraded.sum()), "base_rate": round(float(upgraded.mean()), 4),
+            "auc_ml": round(float(roc_auc_score(upgraded, upgrade_prob)), 3),
+            "auc_naive_spend": round(float(roc_auc_score(upgraded, naive_upgrade)), 3),
+            "avg_precision_ml": round(float(average_precision_score(upgraded, upgrade_prob)), 3),
+            "avg_precision_naive_spend": round(float(average_precision_score(upgraded, naive_upgrade)), 3),
+            "precision_at_k_ml": round(precision_at_k(upgraded, upgrade_prob), 3),
+            "precision_at_k_naive_spend": round(precision_at_k(upgraded, naive_upgrade), 3),
+        }
+
+        p_return = predict_return(frame)
+        returned = frame["returned_next"]
+        lapsed = frame["lapsed_now"].to_numpy()
         lapse = {
             "return_rate": round(float(returned.mean()), 4),
-            "return_auc_ml": round(float(roc_auc_score(returned, frame["p_return_ml"])), 3),
-            "return_auc_bgnbd_p_alive": round(float(roc_auc_score(returned, frame["p_alive"])), 3),
+            "return_auc_ml": round(float(roc_auc_score(returned, p_return)), 3),
+            "return_auc_mbgnbd_p_alive": round(float(roc_auc_score(returned, frame["p_alive_mbg"])), 3),
+            "return_auc_bgnbd_p_alive": round(float(roc_auc_score(returned, frame["p_alive_bg"])), 3),
             "return_auc_recency_only": round(float(roc_auc_score(returned, -frame["recency_weeks"])), 3),
-            "brier_ml": round(float(((frame["p_return_ml"] - returned) ** 2).mean()), 4),
-            "lapsed_clients": len(lapsed),
-            "lapsed_win_back_rate": round(float(lapsed_returned.mean()), 4),
-            "lapsed_win_back_auc_ml": round(float(roc_auc_score(lapsed_returned, lapsed["p_return_ml"])), 3),
-            "lapsed_win_back_auc_recency_only": round(float(roc_auc_score(lapsed_returned, -lapsed["recency_weeks"])), 3),
+            "brier_ml": round(float(brier_score_loss(returned, p_return)), 4),
+            "lapsed_clients": int(lapsed.sum()),
+            "lapsed_win_back_rate": round(float(returned[lapsed].mean()), 4),
+            "lapsed_win_back_auc_ml": round(float(roc_auc_score(returned[lapsed], p_return[lapsed])), 3),
+            "lapsed_win_back_auc_recency_only": round(
+                float(roc_auc_score(returned[lapsed], -frame.loc[lapsed, "recency_weeks"])), 3),
         }
-        report["evaluation"][name] = {"clients": len(frame), "spend": spend, "vic_upgrade": upgrade, "lapse": lapse}
+        # Visits come straight from Visuelle, with no modelled euros: a check on real behaviour only.
+        visits_next = frame["visits_next"].to_numpy()
+        real_behaviour = {
+            f"visits_spearman_{name}": round(spearman(visits_next, score), 3)
+            for name, score in (("naive_visits_12m", frame["visits_12m"].to_numpy()),
+                                ("bgnbd_expected", frame["expected_visits_bg"].to_numpy()),
+                                ("mbgnbd_expected", frame["expected_visits_mbg"].to_numpy()),
+                                ("ml_return_probability", p_return))
+        }
+        real_behaviour["visits_total_bias_pct_mbgnbd"] = round(
+            float(frame["expected_visits_mbg"].sum() / visits_next.sum() - 1) * 100, 1)
+        real_behaviour["visits_total_bias_pct_bgnbd"] = round(
+            float(frame["expected_visits_bg"].sum() / visits_next.sum() - 1) * 100, 1)
+        y_spend, y_return = actual.to_numpy(), returned.to_numpy()
+        uncertainty = {
+            "spend_spearman_ml_minus_naive": paired_bootstrap(spearman, y_spend, ml, preds["naive_last_12m"]),
+            "top1pct_precision_ml_minus_naive": paired_bootstrap(top1_precision, y_spend, ml, preds["naive_last_12m"]),
+            "return_auc_ml_minus_recency": paired_bootstrap(
+                roc_auc_score, y_return, p_return, -frame["recency_weeks"].to_numpy()),
+            "upgrade_avg_precision_ml_minus_naive": paired_bootstrap(
+                average_precision_score, upgraded, upgrade_prob, naive_upgrade),
+        }
+        report["evaluation"][name] = {"clients": len(frame), "spend": spend, "vic_upgrade": upgrade, "lapse": lapse,
+                                      "real_behaviour_visits": real_behaviour, "paired_bootstrap_95ci": uncertainty}
         if name == "test":
-            deciles += [decile_table(actual, frame[f"pred_spend_{m}"], m) for m in ("naive", "probabilistic", "ml")]
+            deciles += [decile_table(actual, preds[m], m) for m in ("naive_last_12m", "mbgnbd_gg", "selected_ml")]
 
-    # Score every client as of the latest cut-off for the clienteling and dashboard phases.
-    latest = frames["covid"]
-    latest["pred_spend_next_eur"] = predict_spend(latest)
-    latest["p_return_next"] = returner.predict_proba(latest[FEATURES])[:, 1]
-    latest["value_tier"] = client_tier(latest["spend_12m"], cfg["client_tiers"])
+    # Score every client as of the latest cut-off for clienteling and the dashboard.
+    latest = frames[COVID].copy()
+    latest["pred_spend_next_eur"] = predict_spend(latest) * recalibration
+    latest["p_return_next"] = predict_return(latest)
+    latest["value_tier"] = client_tier(latest["spend_12m"], tiers)
     latest.loc[latest["lapsed_now"], "value_tier"] = "lapsed"
     pool = ~latest["is_vic_now"]
     latest["vic_upgrade_prob"] = np.nan
-    latest.loc[pool, "vic_upgrade_prob"] = classifier.predict_proba(latest.loc[pool, FEATURES])[:, 1]
-    latest["as_of_date"] = pd.Timestamp(WINDOWS["covid"])
+    latest.loc[pool, "vic_upgrade_prob"] = upgrader.predict_proba(latest.loc[pool, upgrade_features])[:, 1]
+    latest["as_of_date"] = pd.Timestamp(COVID)
     latest["data_provenance"] = "derived"
-    columns = ["client_id", "as_of_date", "value_tier", "spend_12m", "visits_12m", "recency_weeks", "p_alive",
-               "p_return_next", "expected_visits_bgnbd", "pred_spend_next_eur", "vic_upgrade_prob", "full_price_share_12m",
-               "hero_share_12m", "data_provenance"]
+    columns = ["client_id", "as_of_date", "value_tier", "spend_12m", "visits_12m", "recency_weeks",
+               "p_alive_mbg", "p_return_next", "expected_visits_mbg", "pred_spend_next_eur", "vic_upgrade_prob",
+               "full_price_share_12m", "hero_share_12m", "categories_12m", "data_provenance"]
     with duckdb.connect(str(warehouse)) as con:
         con.register("scored", latest[columns])
         con.execute("create or replace table lux.client_value as select * from scored")
-    report["tiers_as_of"] = WINDOWS["covid"]
+    report["tiers_as_of"] = COVID
     report["tier_counts"] = latest["value_tier"].value_counts().to_dict()
 
     REPORTS.mkdir(exist_ok=True)
@@ -263,4 +189,5 @@ def build_client_value(warehouse: Path = WAREHOUSE) -> dict[str, object]:
 
 
 if __name__ == "__main__":
-    print(json.dumps(build_client_value(), indent=2, default=str))
+    result = build_client_value()
+    print(json.dumps(result["evaluation"], indent=2))

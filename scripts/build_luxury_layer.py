@@ -121,8 +121,11 @@ def build_stores(con: duckdb.DuckDBPyConnection, clients: pd.DataFrame, cfg: dic
     return stores
 
 
-def build_luxury_layer(warehouse: Path = WAREHOUSE) -> dict[str, object]:
-    cfg = load_calibration()
+def build_luxury_layer(
+    warehouse: Path = WAREHOUSE, cfg: dict | None = None, write_report: bool = True
+) -> dict[str, object]:
+    """Build the layer. ``cfg`` overrides the calibration file (used by the sensitivity analysis)."""
+    cfg = cfg or load_calibration()
     with duckdb.connect(str(warehouse)) as con:
         con.execute("create schema if not exists lux")
         products = build_products(con, cfg)
@@ -170,8 +173,9 @@ def build_luxury_layer(warehouse: Path = WAREHOUSE) -> dict[str, object]:
         "median_list_price_eur": float(products["list_price_eur"].median()),
         "data_provenance": "synthetic",
     }
-    REPORTS.mkdir(exist_ok=True)
-    (REPORTS / "luxury_layer.json").write_text(json.dumps(report, indent=2) + "\n")
+    if write_report:
+        REPORTS.mkdir(exist_ok=True)
+        (REPORTS / "luxury_layer.json").write_text(json.dumps(report, indent=2) + "\n")
     return report
 
 

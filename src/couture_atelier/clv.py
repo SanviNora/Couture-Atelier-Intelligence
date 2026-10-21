@@ -101,6 +101,69 @@ def fit_bgnbd(x: np.ndarray, t_x: np.ndarray, T: np.ndarray) -> BGNBD:
 
 
 @dataclass(frozen=True)
+class MBGNBD:
+    """Modified BG/NBD (Batislam, Denizel and Filiztekin 2007).
+
+    A client may also drop out right after the first purchase, so a one-time
+    buyer is no longer assumed to be certainly active.
+    """
+
+    r: float
+    alpha: float
+    a: float
+    b: float
+
+    def log_likelihood(self, x: np.ndarray, t_x: np.ndarray, T: np.ndarray) -> np.ndarray:
+        return _mbgnbd_ll(np.array([self.r, self.alpha, self.a, self.b]), x, t_x, T)
+
+    def p_alive(self, x: np.ndarray, t_x: np.ndarray, T: np.ndarray) -> np.ndarray:
+        r, alpha, a, b = self.r, self.alpha, self.a, self.b
+        return 1.0 / (1.0 + (a / (b + x)) * ((alpha + T) / (alpha + t_x)) ** (r + x))
+
+    def expected_visits(
+        self, t: float, x: np.ndarray, t_x: np.ndarray, T: np.ndarray, nodes: int = 48
+    ) -> np.ndarray:
+        """As for BG/NBD, but an active client has survived x + 1 dropout chances,
+        so the churn probability is averaged over Beta(a, b + x + 1)."""
+        r, alpha, a, b = self.r, self.alpha, self.a, self.b
+        x, T = np.asarray(x, dtype=float), np.asarray(T, dtype=float)
+        active_mean = np.empty_like(x)
+        for value in np.unique(x):
+            rows = x == value
+            u, w = roots_jacobi(nodes, b + value, a - 1)
+            p = (1 + u) / 2
+            base = (alpha + T[rows])[:, None]
+            integrand = (1 - (base / (base + p * t)) ** (r + value)) / p
+            active_mean[rows] = integrand @ w / w.sum()
+        return self.p_alive(x, np.asarray(t_x, dtype=float), T) * active_mean
+
+
+def _mbgnbd_ll(params: np.ndarray, x: np.ndarray, t_x: np.ndarray, T: np.ndarray) -> np.ndarray:
+    r, alpha, a, b = params
+    ln_a1 = gammaln(r + x) - gammaln(r) + r * np.log(alpha)
+    ln_beta = gammaln(a) + gammaln(b) - gammaln(a + b)
+    ln_survive = gammaln(a) + gammaln(b + x + 1) - gammaln(a + b + x + 1) - ln_beta
+    ln_drop = gammaln(a + 1) + gammaln(b + x) - gammaln(a + b + x + 1) - ln_beta
+    return ln_a1 + np.logaddexp(
+        ln_survive - (r + x) * np.log(alpha + T), ln_drop - (r + x) * np.log(alpha + t_x)
+    )
+
+
+def fit_mbgnbd(x: np.ndarray, t_x: np.ndarray, T: np.ndarray) -> MBGNBD:
+    x, t_x, T = (np.asarray(v, dtype=float) for v in (x, t_x, T))
+    if (t_x > T + 1e-9).any() or (t_x < 0).any():
+        raise ValueError("Recency must lie between 0 and tenure")
+
+    def loss(log_params: np.ndarray) -> float:
+        return -_mbgnbd_ll(np.exp(log_params), x, t_x, T).mean()
+
+    result = minimize(loss, x0=np.log([0.5, 5.0, 1.5, 3.0]), method="L-BFGS-B")
+    if not result.success:
+        raise RuntimeError(f"MBG/NBD fit did not converge: {result.message}")
+    return MBGNBD(*np.exp(result.x))
+
+
+@dataclass(frozen=True)
 class GammaGamma:
     p: float
     q: float
