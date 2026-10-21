@@ -27,10 +27,10 @@ Shared or promotional cards (25 IDs) and staff-like accounts (36 IDs with 100+ v
 | Question | Naive | Probabilistic | Gradient boosting |
 |---|---:|---:|---:|
 | Rank clients by next-year spend (Spearman) | 0.383 | 0.401 | **0.426** |
-| Next year's VICs found in predicted top 1% | **45.0%** | 45.6% | 42.8% |
-| Total spend bias | −15% | −33% | +35% |
-| Will the client return next year? (AUC) | 0.659 (recency) | 0.371 (P alive) | **0.713** |
-| VIC upgrade among non-VICs (AUC / avg. precision) | 0.928 / 0.131 | | **0.935 / 0.132** |
+| Next year's VICs found in predicted top 1% | 45.0% | **45.6%** | 44.2% |
+| Total spend bias | −15% | −33% | +36% |
+| Will the client return next year? (AUC) | 0.659 (recency) | 0.371 (P alive) | **0.714** |
+| VIC upgrade among non-VICs (AUC / avg. precision) | 0.928 / **0.131** | | **0.935** / 0.130 |
 
 What this means:
 
@@ -38,10 +38,11 @@ What this means:
 - **Finding next year's VICs:** last year's spend is a hard baseline to beat, because VIC status is persistent. No model clearly beats it, and the project says so.
 - **Totals:** no model is calibrated in total. The probabilistic model under-predicts because Gamma-Gamma assumes spend per visit is stable, while clients here trade up. Gradient boosting over-predicts because it learned from 2017, when most clients were new and trading up fast. Predictions are used for ranking and prioritisation; totals would need recalibration before any finance use.
 - **Return and lapse:** BG/NBD's "probability still active" ranks worse than random (AUC 0.37), because it treats every one-time buyer as certainly active. A dedicated return classifier fixes this (AUC 0.71).
+- **VIC upgrade:** the model ranks upgrade candidates slightly better overall (AUC 0.935 vs 0.928), but its precision on the very top candidates is no better than ranking by current spend.
 
 ## COVID stress test (2020)
 
-Return rate fell from 37.5% to 10.6%. Every model over-predicted total spend by 270–670%, and ranking quality fell from about 0.42 to 0.24. None of these models can anticipate a shock like store closures; in production this is what drift monitoring and a fallback rule are for.
+Return rate fell from 37.5% to 10.6%. Every model over-predicted total spend by 280–690%, and ranking quality fell from about 0.42 to 0.24. None of these models can anticipate a shock like store closures; in production this is what drift monitoring and a fallback rule are for.
 
 ## Output for later phases
 

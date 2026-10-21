@@ -114,6 +114,7 @@ def window_frame(con: duckdb.DuckDBPyConnection, cutoff: str) -> pd.DataFrame:
         left join recent r using (client_id)
         left join line_features l using (client_id)
         left join future n using (client_id)
+        order by f.client_id
         """
     ).fetchdf()
 
