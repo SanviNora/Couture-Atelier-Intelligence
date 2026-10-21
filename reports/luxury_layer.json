@@ -1,13 +1,18 @@
 {
   "concentration": {
-    "trade_up_beta": 1.0766,
-    "base_top_0_1pct_spend_share": 0.0271,
-    "modelled_top_0_1pct_spend_share": 0.23,
-    "target_top_0_1pct_spend_share": 0.23
+    "trade_up_beta": 0.9363,
+    "trade_up_cap_prior_visits": 12,
+    "target_top1pct_share": 0.3,
+    "base_top1pct_share": 0.1155,
+    "modelled_top1pct_share": 0.3,
+    "cross_check_top_0_1pct_share": 0.0773,
+    "cross_check_top_0_1pct_mean_annual_spend_eur": 896434,
+    "median_client_annual_spend_eur": 2253
   },
-  "clients": 665260,
+  "clients": 665224,
   "shared_cards_excluded": 25,
-  "receipts": 1723383,
+  "staff_like_excluded": 36,
+  "receipts": 1718713,
   "consent_rate": 0.6494,
   "advisors": 2732,
   "store_formats": {

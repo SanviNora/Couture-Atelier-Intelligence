@@ -1,0 +1,152 @@
+{
+  "windows": {
+    "train": "2017-12-31",
+    "test": "2018-12-31",
+    "covid": "2019-12-31"
+  },
+  "fitted_params": {
+    "train": {
+      "bgnbd": {
+        "r": 0.3684,
+        "alpha": 10.7285,
+        "a": 0.5562,
+        "b": 1.9436
+      },
+      "gamma_gamma": {
+        "p": 1.8039,
+        "q": 3.8437,
+        "gamma": 27255.0802
+      }
+    },
+    "test": {
+      "bgnbd": {
+        "r": 0.4493,
+        "alpha": 18.0201,
+        "a": 0.31,
+        "b": 1.9563
+      },
+      "gamma_gamma": {
+        "p": 1.8456,
+        "q": 4.0928,
+        "gamma": 33592.4391
+      }
+    },
+    "covid": {
+      "bgnbd": {
+        "r": 0.4483,
+        "alpha": 20.2327,
+        "a": 0.3009,
+        "b": 2.1139
+      },
+      "gamma_gamma": {
+        "p": 1.8081,
+        "q": 4.0734,
+        "gamma": 36470.3006
+      }
+    }
+  },
+  "evaluation": {
+    "test": {
+      "clients": 394076,
+      "spend": {
+        "naive": {
+          "total_bias_pct": -15.4,
+          "mae_eur": 29340.4,
+          "spearman": 0.383,
+          "top1pct_spend_capture": 0.197,
+          "top1pct_precision": 0.45
+        },
+        "probabilistic": {
+          "total_bias_pct": -32.8,
+          "mae_eur": 29635.3,
+          "spearman": 0.401,
+          "top1pct_spend_capture": 0.199,
+          "top1pct_precision": 0.456
+        },
+        "ml": {
+          "total_bias_pct": 36.5,
+          "mae_eur": 36914.9,
+          "spearman": 0.429,
+          "top1pct_spend_capture": 0.19,
+          "top1pct_precision": 0.427
+        }
+      },
+      "vic_upgrade": {
+        "candidates": 390135,
+        "upgraders": 2167,
+        "base_rate": 0.0056,
+        "auc_ml": 0.935,
+        "auc_naive_spend": 0.928,
+        "avg_precision_ml": 0.127,
+        "avg_precision_naive_spend": 0.131,
+        "precision_at_k_ml": 0.19
+      },
+      "lapse": {
+        "return_rate": 0.3753,
+        "return_auc_ml": 0.715,
+        "return_auc_bgnbd_p_alive": 0.371,
+        "return_auc_recency_only": 0.659,
+        "brier_ml": 0.2059,
+        "lapsed_clients": 119835,
+        "lapsed_win_back_rate": 0.2287,
+        "lapsed_win_back_auc_ml": 0.562,
+        "lapsed_win_back_auc_recency_only": 0.542
+      }
+    },
+    "covid": {
+      "clients": 619076,
+      "spend": {
+        "naive": {
+          "total_bias_pct": 370.0,
+          "mae_eur": 24118.6,
+          "spearman": 0.24,
+          "top1pct_spend_capture": 0.21,
+          "top1pct_precision": 0.281
+        },
+        "probabilistic": {
+          "total_bias_pct": 276.7,
+          "mae_eur": 19678.3,
+          "spearman": 0.246,
+          "top1pct_spend_capture": 0.203,
+          "top1pct_precision": 0.269
+        },
+        "ml": {
+          "total_bias_pct": 683.3,
+          "mae_eur": 39716.5,
+          "spearman": 0.246,
+          "top1pct_spend_capture": 0.187,
+          "top1pct_precision": 0.259
+        }
+      },
+      "vic_upgrade": {
+        "candidates": 612885,
+        "upgraders": 4451,
+        "base_rate": 0.0073,
+        "auc_ml": 0.924,
+        "auc_naive_spend": 0.904,
+        "avg_precision_ml": 0.102,
+        "avg_precision_naive_spend": 0.106,
+        "precision_at_k_ml": 0.164
+      },
+      "lapse": {
+        "return_rate": 0.1064,
+        "return_auc_ml": 0.719,
+        "return_auc_bgnbd_p_alive": 0.395,
+        "return_auc_recency_only": 0.675,
+        "brier_ml": 0.2299,
+        "lapsed_clients": 246165,
+        "lapsed_win_back_rate": 0.0464,
+        "lapsed_win_back_auc_ml": 0.605,
+        "lapsed_win_back_auc_recency_only": 0.572
+      }
+    }
+  },
+  "tiers_as_of": "2019-12-31",
+  "tier_counts": {
+    "aspirational": 311004,
+    "lapsed": 246165,
+    "core": 55717,
+    "vic": 5571,
+    "top_tier": 619
+  }
+}

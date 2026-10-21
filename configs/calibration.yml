@@ -2,15 +2,27 @@
 # assumptions are labelled as project choices and are stress-tested later.
 
 targets:
-  top_0_1pct_client_spend_share:
-    value: 0.23
-    meaning: Share of total spend held by the top 0.1% of clients.
+  vic_revenue_share:
+    value: 0.30
+    client_fraction: 0.01
+    meaning: Share of a brand's revenue held by its VICs, taken here as the top 1% of clients.
     source: >-
-      BCG-Altagamma True-Luxury Global Consumer Insight 2025. Top-tier clients
-      (0.1% of luxury consumers) hold over 23% of spend excluding luxury mobility
-      and wellness, 37% including them. The 23% figure is used because this
-      project covers personal luxury goods only.
+      Coverage of the 2025 Altagamma luxury conference in Milan: VICs account for
+      on average 30% of brands' revenues. Press-reported, and the VIC share of
+      clients is not stated; top 1% is a project assumption.
+    url: https://www.iads.org/member/news/takeaways-from-milan-luxury-conference-a-dual-challenge-with-aspirational-customers-and-vics
+
+cross_checks:
+  top_tier_market_share:
+    value: 0.23
+    meaning: >-
+      Market-wide, the top 0.1% of luxury consumers hold over 23% of spend
+      (excluding mobility and wellness) and spend over EUR 50,000 a year. This
+      describes all luxury consumers across brands, so it is reported as a cross-
+      check, not used as a single-brand target.
+    source: BCG-Altagamma True-Luxury Global Consumer Insight 2025
     url: https://altagamma.it/media/source/Summary%20True-Luxury%20Global%20Consumer%20Insight%202025%20ENG_v05.docx
+  top_tier_min_annual_spend_eur: 50000
 
 regulation:
   eu_destruction_ban:
@@ -36,15 +48,21 @@ assumptions:
     value: 0.02
     meaning: Share of each season's products flagged as scarce hero pieces, chosen by full-price sales velocity.
   trade_up:
+    cap_prior_visits: 12
     meaning: >-
-      Each purchase is worth list value x (1 + prior visits)^beta: clients trade
-      up as the relationship deepens. Only visits before the purchase count, so
-      the layer never encodes a client's future. One global beta is fitted so
-      the top 0.1% of clients reach the target spend share; total spend is kept.
-  shared_card_rule:
+      Each purchase is worth list value x (1 + min(prior visits, 12))^beta:
+      clients trade up as the relationship deepens, levelling off after about a
+      year of monthly visits. Only visits before the purchase count, so the layer
+      never encodes a client's future. A first purchase keeps its list value.
+      One global beta is fitted to the VIC revenue share target.
+  non_client_rules:
     max_receipts_per_day: 10
     max_stores_per_day: 4
-    meaning: IDs at or above either limit on any day are shared or promotional cards and are excluded from client modelling.
+    max_lifetime_visits: 100
+    meaning: >-
+      IDs at or above the daily limits are shared or promotional cards; IDs with
+      100+ visits are likely staff or personal-shopper accounts. Both are excluded
+      from client modelling and kept in store demand.
   client_tiers:
     top_tier: 0.001
     vic: 0.01

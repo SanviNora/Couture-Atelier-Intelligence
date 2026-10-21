@@ -1,6 +1,8 @@
 -- One row per client: home store (most visited), visit history, breadth.
 -- IDs with 10+ receipts or 4+ stores on a single day are shared or promotional
--- cards, not people; they are flagged so client models can exclude them.
+-- cards, and IDs with 100+ visits are likely staff accounts. Neither is a
+-- client; both are flagged so client models can exclude them.
+-- Thresholds match non_client_rules in configs/calibration.yml.
 create or replace table marts.client_profile as
 with daily as (
     select client_id, purchase_date,
@@ -35,6 +37,7 @@ select
     any_value(k.max_receipts_per_day) as max_receipts_per_day,
     any_value(k.max_stores_per_day) as max_stores_per_day,
     any_value(k.max_receipts_per_day) >= 10 or any_value(k.max_stores_per_day) >= 4 as is_shared_card,
+    count(distinct p.receipt_id) >= 100 as is_staff_like,
     'derived' as data_provenance
 from marts.fct_purchase p
 join home h using (client_id)

@@ -58,7 +58,7 @@ def build_products(con: duckdb.DuckDBPyConnection, cfg: dict) -> pd.DataFrame:
 def build_clients(con: duckdb.DuckDBPyConnection, cfg: dict) -> pd.DataFrame:
     a = cfg["assumptions"]
     clients = con.execute(
-        "select client_id, home_store_id from marts.client_profile where not is_shared_card"
+        "select client_id, home_store_id from marts.client_profile where not is_shared_card and not is_staff_like"
     ).fetchdf()
     clients["consent_status"] = consent_status(clients["client_id"], a["consent"]["rate"], a["seed"])
     book = a["advisor_book_size"]["value"]
@@ -70,7 +70,8 @@ def build_clients(con: duckdb.DuckDBPyConnection, cfg: dict) -> pd.DataFrame:
 
 
 def build_receipts(con: duckdb.DuckDBPyConnection, cfg: dict) -> tuple[pd.DataFrame, dict]:
-    target = cfg["targets"]["top_0_1pct_client_spend_share"]["value"]
+    target = cfg["targets"]["vic_revenue_share"]
+    cap = cfg["assumptions"]["trade_up"]["cap_prior_visits"]
     receipts = con.execute(
         """
         select f.client_id, f.receipt_id, any_value(f.store_id) as store_id,
@@ -86,16 +87,24 @@ def build_receipts(con: duckdb.DuckDBPyConnection, cfg: dict) -> tuple[pd.DataFr
     receipts["prior_visits"] = receipts.groupby("client_id").cumcount()
     codes = pd.factorize(receipts["client_id"])[0]
     beta, values = calibrate_trade_up(
-        receipts["base_value_eur"].to_numpy(), receipts["prior_visits"].to_numpy(), codes, target
+        receipts["base_value_eur"].to_numpy(), receipts["prior_visits"].to_numpy(), codes,
+        target["value"], fraction=target["client_fraction"], cap=cap,
     )
     receipts["value_eur"] = values
     receipts["data_provenance"] = "synthetic"
     base_by_client = np.bincount(codes, weights=receipts["base_value_eur"].to_numpy())
+    by_client = np.bincount(codes, weights=values)
+    years = (receipts["purchased_at"].max() - receipts["purchased_at"].min()).days / 365
+    top_tier = np.sort(by_client)[::-1][: max(1, round(len(by_client) * 0.001))]
     stats = {
         "trade_up_beta": round(float(beta), 4),
-        "base_top_0_1pct_spend_share": round(top_share(base_by_client, 0.001), 4),
-        "modelled_top_0_1pct_spend_share": round(top_share(np.bincount(codes, weights=values), 0.001), 4),
-        "target_top_0_1pct_spend_share": target,
+        "trade_up_cap_prior_visits": cap,
+        "target_top1pct_share": target["value"],
+        "base_top1pct_share": round(top_share(base_by_client, 0.01), 4),
+        "modelled_top1pct_share": round(top_share(by_client, 0.01), 4),
+        "cross_check_top_0_1pct_share": round(top_share(by_client, 0.001), 4),
+        "cross_check_top_0_1pct_mean_annual_spend_eur": round(float(top_tier.mean() / years)),
+        "median_client_annual_spend_eur": round(float(np.median(by_client) / years)),
     }
     return receipts, stats
 
@@ -142,12 +151,16 @@ def build_luxury_layer(warehouse: Path = WAREHOUSE) -> dict[str, object]:
         ).fetchone()[0]
         if gap > 1e-6:
             raise ValueError(f"Purchase values do not reconcile with receipts ({gap:.2e})")
-        shared = con.execute("select count(*) from marts.client_profile where is_shared_card").fetchone()[0]
+        shared, staff = con.execute(
+            "select count(*) filter (where is_shared_card), count(*) filter (where is_staff_like and not is_shared_card) "
+            "from marts.client_profile"
+        ).fetchone()
 
     report = {
         "concentration": stats,
         "clients": len(clients),
         "shared_cards_excluded": int(shared),
+        "staff_like_excluded": int(staff),
         "receipts": len(receipts),
         "consent_rate": round(float(clients["consent_status"].eq("consented").mean()), 4),
         "advisors": int(stores["advisors"].sum()),

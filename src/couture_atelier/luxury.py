@@ -56,14 +56,15 @@ def calibrate_trade_up(
     prior_visits: np.ndarray,
     client_codes: np.ndarray,
     target_share: float,
-    fraction: float = 0.001,
+    fraction: float = 0.01,
+    cap: int = 12,
 ) -> tuple[float, np.ndarray]:
-    """Find beta so that receipt values ``base * (1 + prior_visits) ** beta``
+    """Find beta so that receipt values ``base * (1 + min(prior_visits, cap)) ** beta``
     give the top ``fraction`` of clients ``target_share`` of total spend.
 
     Each receipt's value depends only on visits that happened before it, so
-    the layer never encodes a client's future. One global beta is calibrated,
-    and the result is rescaled to keep total spend unchanged.
+    the layer never encodes a client's future. A first purchase keeps its list
+    value; the trade-up levels off after ``cap`` prior visits.
     """
     base = np.asarray(base, dtype=float)
     prior_visits = np.asarray(prior_visits, dtype=float)
@@ -71,10 +72,10 @@ def calibrate_trade_up(
         raise ValueError("Base spend must be positive")
     if (prior_visits < 0).any():
         raise ValueError("Prior visits must be non-negative")
+    lift = 1 + np.minimum(prior_visits, cap)
 
     def shaped(beta: float) -> np.ndarray:
-        values = base * (1 + prior_visits) ** beta
-        return values * base.sum() / values.sum()
+        return base * lift**beta
 
     def share(beta: float) -> float:
         return top_share(np.bincount(client_codes, weights=shaped(beta)), fraction)

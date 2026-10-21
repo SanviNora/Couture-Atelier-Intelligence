@@ -22,24 +22,24 @@ def receipts_fixture(n_clients: int = 5_000, seed: int = 0):
     return base, prior, codes
 
 
-def test_trade_up_hits_target_and_keeps_total() -> None:
+def test_trade_up_hits_target() -> None:
     base, prior, codes = receipts_fixture()
 
-    beta, values = calibrate_trade_up(base, prior, codes, target_share=0.05)
+    beta, values = calibrate_trade_up(base, prior, codes, target_share=0.12, fraction=0.01)
 
     assert beta > 0
-    assert top_share(np.bincount(codes, weights=values), 0.001) == pytest.approx(0.05, abs=0.005)
-    assert values.sum() == pytest.approx(base.sum())
+    assert top_share(np.bincount(codes, weights=values), 0.01) == pytest.approx(0.12, abs=0.005)
 
 
-def test_trade_up_uses_only_past_visits() -> None:
+def test_trade_up_uses_only_past_visits_and_levels_off() -> None:
     base, prior, codes = receipts_fixture()
-    _, values = calibrate_trade_up(base, prior, codes, target_share=0.05)
-    first_visits = prior == 0
+    beta, values = calibrate_trade_up(base, prior, codes, target_share=0.12, fraction=0.01, cap=3)
+    lift = values / base
 
-    # A first purchase carries no trade-up, so its value is the base value up to one global scale.
-    ratio = values[first_visits] / base[first_visits]
-    assert np.allclose(ratio, ratio[0])
+    # A first purchase keeps its list value; later ones depend only on visits before them.
+    assert np.allclose(lift[prior == 0], 1.0)
+    assert np.allclose(lift[prior == 2], 3**beta)
+    assert np.allclose(lift[prior >= 3], 4**beta)
 
 
 def test_trade_up_rejects_invalid_inputs() -> None:
