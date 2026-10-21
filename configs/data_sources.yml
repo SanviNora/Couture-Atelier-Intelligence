@@ -4,92 +4,70 @@ project:
   affiliated_brand: none
 
 sources:
-  - id: hm_personalized_fashion
-    name: H&M Personalized Fashion Recommendations
-    role: fashion transaction, customer, and product foundation
-    status: planned
+  - id: visuelle_2_0
+    name: Visuelle 2.0
+    role: observed fashion retail backbone (clients, stores, weekly sales, discounts, restocks)
+    status: acquired_and_staged
     observed: true
-    license: Kaggle competition rules; review before redistribution
-    url: https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations
+    license: access by request form; cite the CVPRW 2022 paper; no redistribution of raw rows
+    url: https://humaticslab.github.io/forecasting/visuelle
     supports:
-      - customer segmentation
-      - product affinity
-      - recommendation benchmarking
+      - client value and lapse modelling
+      - store-level demand and stockout analysis
+      - allocation against real restock decisions
+      - full-price versus discount policy comparison
     limitations:
-      - mass-market rather than luxury
-      - no store inventory
-      - no boutique appointments
+      - one Italian fast-fashion retailer, 2016 to 2021
+      - prices are max-normalised for confidentiality
+      - no consent, advisor, or outreach records
 
-  - id: m5_forecasting
-    name: M5 Forecasting Accuracy
-    role: hierarchical store-item forecasting benchmark
-    status: planned
+  - id: visuelle_gtrends
+    name: Google Trends series shipped with Visuelle 2.0
+    role: weekly search-interest signal by category, colour and fabric
+    status: acquired_and_staged
     observed: true
-    license: Kaggle competition rules; review before redistribution
-    url: https://www.kaggle.com/competitions/m5-forecasting-accuracy
+    license: Google Trends terms, via the Visuelle 2.0 release
+    url: https://humaticslab.github.io/forecasting/visuelle
     supports:
-      - time-series forecasting
-      - store-item hierarchy
-      - price and event features
+      - demand forecasting covariates
     limitations:
-      - Walmart rather than fashion or luxury
-      - separate benchmark, not joined to H&M customers
+      - search interest is not sales
+      - relative index, not absolute demand
+
+  - id: couture_luxury_layer
+    name: Couture Atelier calibrated luxury layer
+    role: luxury prices, hero pieces, client value tiers, consent, advisors
+    status: built
+    observed: false
+    license: project-created
+    url: null
+    supports:
+      - VIC-centred client intelligence
+      - clienteling with advisor capacity
+      - scarce-piece allocation
+    limitations:
+      - modelled, not observed; every target and assumption is in configs/calibration.yml
+
+  - id: published_benchmarks
+    name: Published industry figures
+    role: calibration targets and regulatory constraints
+    status: cited
+    observed: true
+    license: cited reports (BCG-Altagamma, Bain, EU ESPR)
+    url: null
+    supports:
+      - top-client spend concentration
+      - destruction-ban inventory rules
+    limitations:
+      - industry aggregates, not brand-level data
 
   - id: uci_online_retail_ii
     name: UCI Online Retail II
-    role: customer value and repeat-purchase robustness benchmark
-    status: acquired_and_staged
+    role: retired; former transaction source (UK giftware, 2009 to 2011)
+    status: retired
     observed: true
     license: CC BY 4.0
     url: https://archive.ics.uci.edu/dataset/502/online+retail+ii
-    supports:
-      - RFM segmentation
-      - customer lifetime value
-      - repeat purchase analysis
+    supports: []
     limitations:
-      - many customers are wholesalers
-      - online giftware rather than luxury fashion
-
-  - id: fashion_product_images
-    name: Fashion Product Images Dataset
-    role: visual product intelligence support
-    status: planned
-    observed: true
-    license: MIT (as listed by dataset publisher; verify source terms)
-    url: https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset
-    supports:
-      - image embeddings
-      - visual similarity
-      - product attribute modeling
-    limitations:
-      - no transaction outcomes
-      - separate product catalog
-
-  - id: google_trends
-    name: Google Trends
-    role: external demand signal
-    status: planned
-    observed: true
-    license: Google Trends terms and attribution requirements
-    url: https://trends.google.com/trends/
-    supports:
-      - normalized search-interest features
-      - regional trend context
-    limitations:
-      - search interest is not sales
-      - relative index rather than absolute demand
-
-  - id: couture_atelier_synthetic
-    name: Couture Atelier Synthetic Luxury Layer
-    role: boutique, inventory, appointments, and clienteling simulation
-    status: planned
-    observed: false
-    license: project-created synthetic data
-    url: null
-    supports:
-      - boutique-level allocation
-      - stockout and transfer simulation
-      - consent-aware clienteling evaluation
-    limitations:
-      - simulated outcomes are not real commercial results
-      - assumptions must be documented and stress-tested
+      - giftware with many wholesale buyers; not representative of fashion or luxury

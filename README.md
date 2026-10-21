@@ -27,7 +27,7 @@ The project is a portfolio simulation. It is not affiliated with Louis Vuitton, 
 - DuckDB and Parquet for local analytical storage
 - SQL for transformations
 - pytest for data-quality checks
-- Streamlit or Tableau for the executive interface
+- Streamlit for the executive interface
 
 ## Repository map
 
@@ -43,11 +43,16 @@ notebooks/            exploratory analysis
 
 ## Current milestone
 
-The UCI Online Retail II source has been acquired, profiled, validated, staged, and transformed into customer, product, daily-sales, demand-panel, baseline-segmentation, and stronger demand-model artifacts. Raw and generated data are acquired locally and are not committed.
+The project is being rebuilt on **Visuelle 2.0**, real fashion retail data from one retailer: 665k clients, 110 stores, store-level weekly sales and discounts, and weekly restocks. On top of it sits a **luxury layer calibrated to published figures** (`configs/calibration.yml`). For example, the top 0.1% of clients are calibrated to hold 23% of spend (BCG-Altagamma 2025), up from the 4.7% this retailer shows.
 
-## Next step
+Rebuild the data foundation (about 10 seconds):
 
-The stronger demand benchmark, synthetic luxury retail layer, inventory-transfer decision layer, improved CLV baseline, churn model, behavioral segments, and first clienteling decision layer are complete. See `docs/data_contract.md`, `docs/forecasting.md`, `docs/synthetic_layer.md`, `docs/inventory_optimization.md`, `docs/client_intelligence.md`, `docs/clienteling.md`, and `docs/ingestion.md` for current lineage, modeling, simulation, and validation rules.
+```bash
+make data   # ingest Visuelle, build SQL marts, build the luxury layer
+make test
+```
+
+Raw Visuelle files stay local and are never published; see `docs/data_card.md`. The modules after the data foundation (client value, clienteling, demand, allocation) are being rebuilt in that order; until then those scripts still use the retired UCI outputs.
 
 ## Study guide
 

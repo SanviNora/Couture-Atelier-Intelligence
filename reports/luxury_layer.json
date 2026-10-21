@@ -1,0 +1,31 @@
+{
+  "concentration": {
+    "alpha": 1.3001,
+    "observed_top_0_1pct_unit_share": 0.0454,
+    "base_top_0_1pct_spend_share": 0.0471,
+    "modelled_top_0_1pct_spend_share": 0.23,
+    "target_top_0_1pct_spend_share": 0.23
+  },
+  "clients": 665285,
+  "value_tiers": {
+    "aspirational": 598757,
+    "core": 59876,
+    "vic": 5987,
+    "top_tier": 665
+  },
+  "consent_rate": 0.5947,
+  "advisors": 2732,
+  "store_formats": {
+    "boutique": 116,
+    "flagship": 13
+  },
+  "hero_pieces": 112,
+  "price_tiers": {
+    "core": 2234,
+    "entry": 1391,
+    "high": 1367,
+    "exceptional": 585
+  },
+  "median_list_price_eur": 2450.0,
+  "data_provenance": "synthetic"
+}

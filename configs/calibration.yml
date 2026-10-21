@@ -1,0 +1,56 @@
+# Every number the luxury layer uses. Targets cite a published source;
+# assumptions are labelled as project choices and are stress-tested later.
+
+targets:
+  top_0_1pct_client_spend_share:
+    value: 0.23
+    meaning: Share of total spend held by the top 0.1% of clients.
+    source: >-
+      BCG-Altagamma True-Luxury Global Consumer Insight 2025. Top-tier clients
+      (0.1% of luxury consumers) hold over 23% of spend excluding luxury mobility
+      and wellness, 37% including them. The 23% figure is used because this
+      project covers personal luxury goods only.
+    url: https://altagamma.it/media/source/Summary%20True-Luxury%20Global%20Consumer%20Insight%202025%20ENG_v05.docx
+
+regulation:
+  eu_destruction_ban:
+    effective: 2026-07-19
+    meaning: Large companies may not destroy unsold apparel, accessories or footwear, including returns.
+    source: Ecodesign for Sustainable Products Regulation, Delegated Regulation (EU) 2026/296
+    url: https://cms.law/en/int/legal-updates/new-eu-rules-to-prevent-the-destruction-of-unsold-textiles
+
+assumptions:
+  price_ladder_eur:
+    min: 650
+    max: 9500
+    meaning: >-
+      Luxury ready-to-wear price range. The observed (normalised) price index is
+      mapped onto this range by percentile on a log scale, so the retailer's own
+      price ordering is kept.
+  price_tiers:
+    entry: 0.25
+    core: 0.65
+    high: 0.90
+    meaning: Percentile cut points of the price ladder; above 0.90 is "exceptional".
+  hero_share:
+    value: 0.02
+    meaning: Share of each season's products flagged as scarce hero pieces, chosen by full-price sales velocity.
+  client_tiers:
+    top_tier: 0.001
+    vic: 0.01
+    core: 0.10
+    meaning: Cumulative top shares of clients by modelled spend; everyone else is "aspirational".
+  consent:
+    base_rate: 0.55
+    max_rate: 0.85
+    meaning: >-
+      Probability a client has opted in to personalised contact. Rises with the
+      number of visits (capped at 10), on the assumption that engaged clients
+      opt in more often.
+  advisor_book_size:
+    value: 250
+    meaning: Clients per client advisor at their home store.
+  flagship_share:
+    value: 0.10
+    meaning: Share of stores, by client volume, treated as flagships.
+  seed: 42
