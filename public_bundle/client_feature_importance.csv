@@ -1,0 +1,73 @@
+feature,importance,std,model,metric
+lifetime_visits,0.0688,0.0024,spend (hurdle),Spearman drop
+products_12m,0.0061,0.0014,spend (hurdle),Spearman drop
+p_alive_mbg,0.0031,0.0003,spend (hurdle),Spearman drop
+spend_momentum,0.0019,0.0002,spend (hurdle),Spearman drop
+p_alive_bg,0.0019,0.0009,spend (hurdle),Spearman drop
+visits_12m,0.0014,0.0012,spend (hurdle),Spearman drop
+mean_gap_weeks,0.0011,0.0002,spend (hurdle),Spearman drop
+mean_visit_value_12m,0.0007,0.0004,spend (hurdle),Spearman drop
+spend_per_visit_gg,0.0007,0.0002,spend (hurdle),Spearman drop
+holiday_share,0.0005,0.0004,spend (hurdle),Spearman drop
+hero_share_12m,0.0003,0.0001,spend (hurdle),Spearman drop
+full_price_share_12m,0.0003,0.0001,spend (hurdle),Spearman drop
+ticket_trend,0.0001,0.0001,spend (hurdle),Spearman drop
+cutoff_month,0.0,0.0,spend (hurdle),Spearman drop
+visits_90d,-0.0001,0.0,spend (hurdle),Spearman drop
+stores_12m,-0.0002,0.0,spend (hurdle),Spearman drop
+expected_visits_bg,-0.0005,0.0004,spend (hurdle),Spearman drop
+spend_180d,-0.0007,0.0006,spend (hurdle),Spearman drop
+recency_weeks,-0.0007,0.0003,spend (hurdle),Spearman drop
+categories_12m,-0.0009,0.0001,spend (hurdle),Spearman drop
+max_visit_value_12m,-0.001,0.0003,spend (hurdle),Spearman drop
+last_visit_value,-0.0012,0.0002,spend (hurdle),Spearman drop
+expected_visits_mbg,-0.0013,0.0003,spend (hurdle),Spearman drop
+pred_spend_mbg,-0.0014,0.0002,spend (hurdle),Spearman drop
+spend_12m,-0.0021,0.0005,spend (hurdle),Spearman drop
+spend_90d,-0.0021,0.0001,spend (hurdle),Spearman drop
+tenure_weeks_capped,-0.0117,0.0008,spend (hurdle),Spearman drop
+lifetime_visits,0.0855,0.0014,return (logistic),AUC drop
+products_12m,0.0461,0.0016,return (logistic),AUC drop
+max_visit_value_12m,0.0308,0.0012,return (logistic),AUC drop
+mean_visit_value_12m,0.0208,0.0013,return (logistic),AUC drop
+pred_spend_mbg,0.018,0.0004,return (logistic),AUC drop
+visits_12m,0.0081,0.0005,return (logistic),AUC drop
+p_alive_mbg,0.0074,0.0006,return (logistic),AUC drop
+recency_weeks,0.0051,0.0005,return (logistic),AUC drop
+spend_momentum,0.0037,0.0002,return (logistic),AUC drop
+spend_90d,0.0032,0.0001,return (logistic),AUC drop
+holiday_share,0.0022,0.0003,return (logistic),AUC drop
+spend_12m,0.0011,0.0,return (logistic),AUC drop
+categories_12m,0.0011,0.0001,return (logistic),AUC drop
+spend_per_visit_gg,0.0006,0.0003,return (logistic),AUC drop
+hero_share_12m,0.0005,0.0001,return (logistic),AUC drop
+expected_visits_bg,0.0004,0.0,return (logistic),AUC drop
+last_visit_value,0.0003,0.0001,return (logistic),AUC drop
+visits_90d,0.0003,0.0003,return (logistic),AUC drop
+p_alive_bg,0.0001,0.0001,return (logistic),AUC drop
+ticket_trend,0.0001,0.0001,return (logistic),AUC drop
+expected_visits_mbg,0.0001,0.0,return (logistic),AUC drop
+full_price_share_12m,0.0,0.0,return (logistic),AUC drop
+cutoff_month,0.0,0.0,return (logistic),AUC drop
+tenure_weeks_capped,-0.0005,0.0,return (logistic),AUC drop
+spend_180d,-0.0006,0.0004,return (logistic),AUC drop
+mean_gap_weeks,-0.0009,0.0006,return (logistic),AUC drop
+stores_12m,-0.0009,0.0001,return (logistic),AUC drop
+products_12m,0.0302,0.005,VIC upgrade (gbm),avg. precision drop
+lifetime_visits,0.0225,0.0035,VIC upgrade (gbm),avg. precision drop
+max_visit_value_12m,0.0136,0.0026,VIC upgrade (gbm),avg. precision drop
+expected_visits_bg,0.0131,0.007,VIC upgrade (gbm),avg. precision drop
+spend_180d,0.0104,0.0025,VIC upgrade (gbm),avg. precision drop
+visits_12m,0.0064,0.0003,VIC upgrade (gbm),avg. precision drop
+spend_12m,0.005,0.0071,VIC upgrade (gbm),avg. precision drop
+recency_weeks,0.0045,0.0029,VIC upgrade (gbm),avg. precision drop
+mean_visit_value_12m,0.0037,0.0025,VIC upgrade (gbm),avg. precision drop
+full_price_share_12m,0.002,0.0013,VIC upgrade (gbm),avg. precision drop
+p_alive_bg,0.0017,0.0012,VIC upgrade (gbm),avg. precision drop
+last_visit_value,0.0007,0.0005,VIC upgrade (gbm),avg. precision drop
+hero_share_12m,0.0003,0.0007,VIC upgrade (gbm),avg. precision drop
+visits_90d,-0.0,0.0,VIC upgrade (gbm),avg. precision drop
+stores_12m,-0.0001,0.0001,VIC upgrade (gbm),avg. precision drop
+spend_90d,-0.0002,0.0005,VIC upgrade (gbm),avg. precision drop
+spend_momentum,-0.0009,0.0001,VIC upgrade (gbm),avg. precision drop
+tenure_weeks_capped,-0.0028,0.0008,VIC upgrade (gbm),avg. precision drop

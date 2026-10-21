@@ -15,7 +15,8 @@ What data this project uses, where it comes from, and what may be shown publicly
 ## Public / private rule
 
 - Raw files live outside the repository (`COUTURE_VISUELLE_DIR`) and under `data/`, which Git ignores.
-- The live demo reads only `public_bundle/`. Every file there is declared in `public_bundle/MANIFEST.json` with a provenance of `aggregate`, `synthetic`, `model_output`, or `public_source`.
+- The live demo reads only `public_bundle/`. Every file there is declared in `public_bundle/MANIFEST.json` with a provenance of `aggregate`, `synthetic`, `model_output`, `public_source`, or `documentation`.
+- The bundle is rebuilt by `scripts/build_public_bundle.py` in a staging folder and only replaces the published one if the guard passes.
 - `tests/test_public_bundle.py` fails if the bundle contains undeclared files, real client identifiers, raw transaction timestamps, or aggregate groups smaller than 10.
 - Clients shown in the demo are synthetic. No real client's purchase history is ever displayed.
 

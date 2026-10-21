@@ -1,0 +1,91 @@
+{
+  "hero_launches": 15,
+  "boutiques": 105,
+  "units_offered": 10975,
+  "eligible_clients": 193360,
+  "excluded_reseller_risk": 22802,
+  "rising_clients": 21813,
+  "policies": {
+    "revenue_only": {
+      "offers": 10339,
+      "expected_revenue_eur_m": 22.801,
+      "expected_relationship_value_eur_m": 3.411,
+      "expected_total_value_eur_m": 26.212,
+      "expected_units_sold": 6767.6,
+      "share_offers_to_vic": 0.004,
+      "share_offers_to_rising": 0.014,
+      "max_offers_per_client": 1,
+      "total_value_vs_unconstrained_optimum": -0.611
+    },
+    "vic_first": {
+      "offers": 10339,
+      "expected_revenue_eur_m": 20.383,
+      "expected_relationship_value_eur_m": 23.233,
+      "expected_total_value_eur_m": 43.617,
+      "expected_units_sold": 6353.2,
+      "share_offers_to_vic": 0.149,
+      "share_offers_to_rising": 0.012,
+      "max_offers_per_client": 1,
+      "total_value_vs_unconstrained_optimum": -0.3527
+    },
+    "relationship_value": {
+      "offers": 10339,
+      "expected_revenue_eur_m": 17.037,
+      "expected_relationship_value_eur_m": 50.346,
+      "expected_total_value_eur_m": 67.383,
+      "expected_units_sold": 4819.6,
+      "share_offers_to_vic": 0.149,
+      "share_offers_to_rising": 0.361,
+      "max_offers_per_client": 1,
+      "total_value_vs_unconstrained_optimum": 0.0
+    },
+    "relationship_value_with_pipeline_reserve": {
+      "offers": 10339,
+      "expected_revenue_eur_m": 17.041,
+      "expected_relationship_value_eur_m": 50.246,
+      "expected_total_value_eur_m": 67.287,
+      "expected_units_sold": 4820.7,
+      "share_offers_to_vic": 0.148,
+      "share_offers_to_rising": 0.367,
+      "max_offers_per_client": 1,
+      "total_value_vs_unconstrained_optimum": -0.0014
+    }
+  },
+  "relationship_value_sensitivity": [
+    {
+      "relationship_value_share": 0.0,
+      "expected_revenue_now_eur_m": 22.148,
+      "expected_units_sold_now": 6302.8,
+      "share_offers_to_vic": 0.002,
+      "share_offers_to_rising": 0.271
+    },
+    {
+      "relationship_value_share": 0.01,
+      "expected_revenue_now_eur_m": 20.469,
+      "expected_units_sold_now": 5572.4,
+      "share_offers_to_vic": 0.145,
+      "share_offers_to_rising": 0.273
+    },
+    {
+      "relationship_value_share": 0.02,
+      "expected_revenue_now_eur_m": 19.163,
+      "expected_units_sold_now": 5250.7,
+      "share_offers_to_vic": 0.148,
+      "share_offers_to_rising": 0.296
+    },
+    {
+      "relationship_value_share": 0.05,
+      "expected_revenue_now_eur_m": 17.041,
+      "expected_units_sold_now": 4820.7,
+      "share_offers_to_vic": 0.148,
+      "share_offers_to_rising": 0.367
+    },
+    {
+      "relationship_value_share": 0.1,
+      "expected_revenue_now_eur_m": 16.273,
+      "expected_units_sold_now": 4673.4,
+      "share_offers_to_vic": 0.148,
+      "share_offers_to_rising": 0.389
+    }
+  ]
+}

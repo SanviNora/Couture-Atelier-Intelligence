@@ -1,0 +1,146 @@
+{
+  "recovery": {
+    "validation_artificial_censoring": {
+      "censor_10pct_of_weeks": {
+        "weeks_censored": 19134,
+        "naive": {
+          "total_bias_pct": -64.8,
+          "mae_units": 0.901
+        },
+        "max": {
+          "total_bias_pct": -13.9,
+          "mae_units": 0.758
+        },
+        "conditional": {
+          "total_bias_pct": -1.5,
+          "mae_units": 0.775
+        }
+      },
+      "censor_30pct_of_weeks": {
+        "weeks_censored": 57664,
+        "naive": {
+          "total_bias_pct": -64.6,
+          "mae_units": 0.903
+        },
+        "max": {
+          "total_bias_pct": -13.6,
+          "mae_units": 0.764
+        },
+        "conditional": {
+          "total_bias_pct": -1.2,
+          "mae_units": 0.779
+        }
+      },
+      "censor_50pct_of_weeks": {
+        "weeks_censored": 95582,
+        "naive": {
+          "total_bias_pct": -64.9,
+          "mae_units": 0.896
+        },
+        "max": {
+          "total_bias_pct": -13.3,
+          "mae_units": 0.756
+        },
+        "conditional": {
+          "total_bias_pct": -0.8,
+          "mae_units": 0.773
+        }
+      }
+    },
+    "applied_to_real_sell_outs": {
+      "censored_weeks": 24637,
+      "censored_share": 0.0192,
+      "store_products_ever_censored": 0.0724,
+      "units_sold": 1602545,
+      "recovered_units": 1614373,
+      "demand_added_pct": 0.74
+    }
+  },
+  "launch_forecast": {
+    "target": "full-price weekly demand rate per store and piece (recovered)",
+    "rows": {
+      "train": 57158,
+      "valid": 19500,
+      "test": 18412
+    },
+    "models": {
+      "store_category_average": {
+        "valid": {
+          "wape": 0.4679,
+          "bias_pct": -2.3
+        },
+        "test": {
+          "wape": 0.4695,
+          "bias_pct": 10.5
+        }
+      },
+      "gbm|base": {
+        "valid": {
+          "wape": 0.3717,
+          "bias_pct": 1.0
+        },
+        "test": {
+          "wape": 0.3678,
+          "bias_pct": 7.7
+        }
+      },
+      "gbm|base+image": {
+        "valid": {
+          "wape": 0.3713,
+          "bias_pct": 0.5
+        },
+        "test": {
+          "wape": 0.3707,
+          "bias_pct": 9.6
+        }
+      },
+      "gbm|base+trends": {
+        "valid": {
+          "wape": 0.3791,
+          "bias_pct": 2.6
+        },
+        "test": {
+          "wape": 0.3729,
+          "bias_pct": 8.8
+        }
+      },
+      "gbm|base+image+trends": {
+        "valid": {
+          "wape": 0.3746,
+          "bias_pct": 1.5
+        },
+        "test": {
+          "wape": 0.3678,
+          "bias_pct": 9.2
+        }
+      },
+      "gbm|base+image+trends+opening_units": {
+        "valid": {
+          "wape": 0.3642,
+          "bias_pct": 1.4
+        },
+        "test": {
+          "wape": 0.3694,
+          "bias_pct": 10.7
+        }
+      }
+    },
+    "chosen_on_validation": "gbm|base",
+    "quantile_interval_test": {
+      "coverage_q10_q90": 0.796,
+      "pinball_q10": 0.0642,
+      "pinball_q50": 0.1932,
+      "pinball_q90": 0.1173
+    },
+    "raw_sales_vs_recovered_target_test": {
+      "trained_on_raw_sales": {
+        "wape": 0.3666,
+        "bias_pct": 7.6
+      },
+      "trained_on_recovered_demand": {
+        "wape": 0.3678,
+        "bias_pct": 7.7
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+comparison,feature,psi,n,status
+Dec 2017 (training) -> Dec 2018 (test),spend_12m,0.416,394076,act
+Dec 2017 (training) -> Dec 2018 (test),visits_12m,1.201,394076,act
+Dec 2017 (training) -> Dec 2018 (test),recency_weeks,0.691,394076,act
+Dec 2017 (training) -> Dec 2018 (test),lifetime_visits,0.047,394076,stable
+Dec 2017 (training) -> Dec 2018 (test),products_12m,1.201,394076,act
+Dec 2017 (training) -> Dec 2018 (test),full_price_share_12m,0.182,394076,watch
+Dec 2017 (training) -> Dec 2018 (test),p_alive_mbg,1.667,394076,act
+Dec 2017 (training) -> Dec 2018 (test),expected_visits_mbg,0.294,394076,act
+Dec 2018 (test) -> Dec 2019 (before COVID),spend_12m,0.026,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),visits_12m,0.039,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),recency_weeks,0.18,619076,watch
+Dec 2018 (test) -> Dec 2019 (before COVID),lifetime_visits,0.008,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),products_12m,0.039,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),full_price_share_12m,0.009,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),p_alive_mbg,0.058,619076,stable
+Dec 2018 (test) -> Dec 2019 (before COVID),expected_visits_mbg,0.12,619076,watch

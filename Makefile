@@ -1,6 +1,6 @@
 PY ?= ../.venv/bin/python
 
-.PHONY: data select models clienteling demand allocation tiers all test lint
+.PHONY: data select models clienteling demand allocation tiers bundle app all test lint
 
 # Rebuild the warehouse from the raw Visuelle and Google Trends files (about 10 seconds).
 data:
@@ -38,7 +38,14 @@ tiers:
 	$(PY) scripts/discount_effects.py
 	$(PY) scripts/build_tier_dial.py
 
-all: data models clienteling demand allocation tiers
+# Public bundle for the dashboard (guard-checked), then the app.
+bundle:
+	$(PY) scripts/build_public_bundle.py
+
+app:
+	$(PY) -m streamlit run dashboard/app.py
+
+all: data models clienteling demand allocation tiers bundle
 
 test:
 	$(PY) -m pytest -q

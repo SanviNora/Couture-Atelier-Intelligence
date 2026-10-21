@@ -1,0 +1,15 @@
+tier,action,challenger_action,n
+VIC,contact,contact,1860
+VIC,contact,no_action,1402
+aspirational,contact,contact,50520
+aspirational,contact,no_action,21730
+aspirational,no_action,contact,10227
+aspirational,no_action,no_action,90144
+core,contact,contact,24368
+core,contact,no_action,4515
+core,no_action,contact,43
+core,no_action,no_action,26
+lapsed,contact,contact,417
+lapsed,contact,no_action,57
+lapsed,no_action,contact,17405
+lapsed,no_action,no_action,75728

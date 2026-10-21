@@ -1,0 +1,76 @@
+task,model,total_bias_pct,mae_eur,spearman,top1pct_spend_capture,top1pct_precision,params,auc,brier,avg_precision,precision_at_k,positives
+spend,naive_last_12m,-38.9,32120.2,0.347,0.185,0.443,,,,,,
+spend,bgnbd_gg,-47.3,33594.9,0.331,0.184,0.424,,,,,,
+spend,mbgnbd_gg,-49.2,33770.9,0.343,0.183,0.419,,,,,,
+spend,gbm_poisson|single|base,0.0,35775.9,0.399,0.176,0.405,,,,,,
+spend,gbm_poisson|single|base+momentum,0.4,35632.4,0.399,0.181,0.431,,,,,,
+spend,gbm_poisson|single|full,-0.1,35878.4,0.399,0.175,0.403,,,,,,
+spend,gbm_poisson|pooled|base,3.2,35776.3,0.4,0.179,0.426,,,,,,
+spend,gbm_poisson|pooled|base+momentum,2.9,35634.5,0.399,0.182,0.436,,,,,,
+spend,gbm_poisson|pooled|full,1.6,35786.1,0.4,0.18,0.433,,,,,,
+spend,gbm_log_squared|pooled|full,-2.7,42697.8,0.396,0.173,0.403,,,,,,
+spend,hurdle_gamma|pooled|full,0.1,35048.3,0.398,0.184,0.447,,,,,,
+spend,hurdle_poisson|pooled|full,1.4,35479.8,0.399,0.183,0.436,,,,,,
+spend,hurdle_gamma|pooled|full|search00,0.3,35234.7,0.398,0.185,0.454,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 1000, ""l2_regularization"": 8.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search01,-0.1,35167.3,0.396,0.185,0.447,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search02,0.3,35184.1,0.398,0.185,0.452,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 100, ""l2_regularization"": 8.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search03,-0.3,35128.6,0.398,0.187,0.459,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 300, ""l2_regularization"": 0.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search04,-0.5,35185.3,0.395,0.184,0.445,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 1000, ""l2_regularization"": 2.0, ""max_features"": 1.0}",,,,,
+spend,hurdle_gamma|pooled|full|search05,0.2,35191.5,0.4,0.186,0.454,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search06,0.3,35203.6,0.4,0.187,0.452,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.0, ""max_features"": 0.8}",,,,,
+spend,hurdle_gamma|pooled|full|search07,-1.6,34894.3,0.396,0.183,0.44,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 20, ""l2_regularization"": 2.0, ""max_features"": 0.5}",,,,,
+spend,hurdle_gamma|pooled|full|search08,-2.3,34800.9,0.397,0.186,0.45,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.8}",,,,,
+spend,hurdle_gamma|pooled|full|search09,1.1,35302.4,0.4,0.189,0.454,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 15, ""min_samples_leaf"": 1000, ""l2_regularization"": 2.0, ""max_features"": 1.0}",,,,,
+spend,hurdle_gamma|pooled|full|search10,-0.7,35056.0,0.398,0.187,0.457,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 100, ""l2_regularization"": 2.0, ""max_features"": 1.0}",,,,,
+spend,hurdle_gamma|pooled|full|search11,-1.1,34978.8,0.397,0.185,0.445,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 1.0}",,,,,
+spend,hurdle_gamma|pooled|full|search12,-0.4,35102.0,0.397,0.186,0.45,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 0.8}",,,,,
+spend,hurdle_gamma|pooled|full|search13,0.7,35308.0,0.399,0.187,0.454,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.5, ""max_features"": 0.8}",,,,,
+spend,hurdle_gamma|pooled|full|search14,-0.8,35175.7,0.391,0.186,0.445,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 1.0}",,,,,
+spend,hurdle_gamma|pooled|full|search15,-1.7,34990.1,0.394,0.184,0.443,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 100, ""l2_regularization"": 0.5, ""max_features"": 0.5}",,,,,
+spend,rank_blend|ml_weight=0.25,0.0,46193.3,0.366,0.185,0.426,,,,,,
+spend,rank_blend|ml_weight=0.5,0.0,45925.7,0.384,0.186,0.438,,,,,,
+spend,rank_blend|ml_weight=0.75,0.0,45775.1,0.395,0.187,0.445,,,,,,
+spend,hurdle_gamma|pooled|full|search03|recalibrated,0.0,35163.2,0.398,0.187,0.459,,,,,,
+return,recency_only,,,,,,,0.6083,,,,
+return,bgnbd_p_alive,,,,,,,0.3666,0.5229,,,
+return,mbgnbd_p_alive,,,,,,,0.5851,0.2829,,,
+return,logistic|pooled|full,,,,,,,0.6868,0.2149,,,
+return,gbm|single|base,,,,,,,0.687,0.2151,,,
+return,gbm|single|base+momentum,,,,,,,0.6872,0.215,,,
+return,gbm|single|full,,,,,,,0.6873,0.2149,,,
+return,gbm|pooled|base,,,,,,,0.6837,0.2161,,,
+return,gbm|pooled|base+momentum,,,,,,,0.6838,0.216,,,
+return,gbm|pooled|full,,,,,,,0.6846,0.2158,,,
+return,gbm|pooled|full|search00,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.8}",0.6821,0.2169,,,
+return,gbm|pooled|full|search01,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.8}",0.6821,0.2169,,,
+return,gbm|pooled|full|search02,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.0, ""max_features"": 1.0}",0.6821,0.2166,,,
+return,gbm|pooled|full|search03,,,,,,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 0.8}",0.6846,0.2157,,,
+return,gbm|pooled|full|search04,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 1.0}",0.6825,0.2166,,,
+return,gbm|pooled|full|search05,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 300, ""l2_regularization"": 8.0, ""max_features"": 0.8}",0.6828,0.2163,,,
+return,gbm|pooled|full|search06,,,,,,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 1000, ""l2_regularization"": 8.0, ""max_features"": 1.0}",0.6857,0.2153,,,
+return,gbm|pooled|full|search07,,,,,,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 0.5}",0.6843,0.2161,,,
+return,gbm|pooled|full|search08,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 300, ""l2_regularization"": 2.0, ""max_features"": 1.0}",0.6845,0.2157,,,
+return,gbm|pooled|full|search09,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 1000, ""l2_regularization"": 8.0, ""max_features"": 0.5}",0.6818,0.2166,,,
+return,gbm|pooled|full|search10,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.8}",0.6779,0.2187,,,
+return,gbm|pooled|full|search11,,,,,,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.5}",0.6827,0.2165,,,
+vic_upgrade,naive_spend_12m,,,,,,,0.9257,,0.1252,0.1992,251.0
+vic_upgrade,naive_spend_90d,,,,,,,0.7897,,0.0672,0.1355,251.0
+vic_upgrade,best_spend_model,,,,,,,0.9336,,0.1643,0.2311,251.0
+vic_upgrade,gbm|pooled|base|weights=none,,,,,,,0.9325,,0.1312,0.1873,251.0
+vic_upgrade,gbm|pooled|base|weights=balanced,,,,,,,0.9298,,0.1402,0.1912,251.0
+vic_upgrade,gbm|pooled|base+momentum|weights=none,,,,,,,0.9326,,0.1238,0.1793,251.0
+vic_upgrade,gbm|pooled|base+momentum|weights=balanced,,,,,,,0.9302,,0.141,0.1992,251.0
+vic_upgrade,gbm|pooled|full|weights=none,,,,,,,0.9291,,0.125,0.1873,251.0
+vic_upgrade,gbm|pooled|full|weights=balanced,,,,,,,0.9311,,0.1391,0.2151,251.0
+vic_upgrade,gbm|pooled|base+momentum|search00,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 15, ""min_samples_leaf"": 20, ""l2_regularization"": 0.0, ""max_features"": 0.5}",0.9306,,0.152,0.2231,251.0
+vic_upgrade,gbm|pooled|base+momentum|search01,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 300, ""l2_regularization"": 0.0, ""max_features"": 0.5}",0.9253,,0.1464,0.2191,251.0
+vic_upgrade,gbm|pooled|base+momentum|search02,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 300, ""l2_regularization"": 0.5, ""max_features"": 0.5}",0.9307,,0.1425,0.2151,251.0
+vic_upgrade,gbm|pooled|base+momentum|search03,,,,,,"{""learning_rate"": 0.03, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 300, ""l2_regularization"": 0.0, ""max_features"": 0.5}",0.9281,,0.1441,0.2072,251.0
+vic_upgrade,gbm|pooled|base+momentum|search04,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 1000, ""l2_regularization"": 2.0, ""max_features"": 0.8}",0.9295,,0.1375,0.2032,251.0
+vic_upgrade,gbm|pooled|base+momentum|search05,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 300, ""l2_regularization"": 0.0, ""max_features"": 1.0}",0.9267,,0.1397,0.1952,251.0
+vic_upgrade,gbm|pooled|base+momentum|search06,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 127, ""min_samples_leaf"": 1000, ""l2_regularization"": 0.5, ""max_features"": 0.5}",0.923,,0.147,0.2112,251.0
+vic_upgrade,gbm|pooled|base+momentum|search07,,,,,,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 300, ""l2_regularization"": 8.0, ""max_features"": 0.5}",0.9283,,0.1537,0.2191,251.0
+vic_upgrade,gbm|pooled|base+momentum|search08,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 15, ""min_samples_leaf"": 20, ""l2_regularization"": 8.0, ""max_features"": 1.0}",0.9322,,0.1541,0.2191,251.0
+vic_upgrade,gbm|pooled|base+momentum|search09,,,,,,"{""learning_rate"": 0.05, ""max_leaf_nodes"": 15, ""min_samples_leaf"": 100, ""l2_regularization"": 0.0, ""max_features"": 1.0}",0.9315,,0.1394,0.1992,251.0
+vic_upgrade,gbm|pooled|base+momentum|search10,,,,,,"{""learning_rate"": 0.08, ""max_leaf_nodes"": 63, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 0.5}",0.9309,,0.1422,0.2112,251.0
+vic_upgrade,gbm|pooled|base+momentum|search11,,,,,,"{""learning_rate"": 0.12, ""max_leaf_nodes"": 31, ""min_samples_leaf"": 20, ""l2_regularization"": 0.5, ""max_features"": 1.0}",0.9305,,0.138,0.2231,251.0

@@ -1,0 +1,124 @@
+{
+  "files": [
+    {
+      "path": "luxury_layer.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "client_value.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "clienteling.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "recommendations.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "demand.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "scarcity_scenario.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "allocation.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "client_allocation.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "discount_effects.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "tier_dial.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "sensitivity_client.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "client_experiments.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "client_feature_importance.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "clienteling_policies.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "allocation_policies.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "pilot_size_value.csv",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "client_value_deciles.csv",
+      "provenance": "aggregate",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "market_pulse.csv",
+      "provenance": "public_source",
+      "description": "copied from reports/"
+    },
+    {
+      "path": "advisor_reasons.csv",
+      "provenance": "aggregate",
+      "description": "clients by value tier and champion reason (groups of 10+)"
+    },
+    {
+      "path": "champion_challenger_overlap.csv",
+      "provenance": "aggregate",
+      "description": "eligible clients by tier and champion/challenger action"
+    },
+    {
+      "path": "demo_advisor_book.csv",
+      "provenance": "synthetic",
+      "description": "illustrative advisor book drawn from tier-level deciles"
+    },
+    {
+      "path": "forecast_by_category.csv",
+      "provenance": "aggregate",
+      "description": "launch forecast vs true demand by category"
+    },
+    {
+      "path": "drift.csv",
+      "provenance": "aggregate",
+      "description": "population stability index of model inputs between consecutive scoring dates"
+    },
+    {
+      "path": "gaps_log.csv",
+      "provenance": "documentation",
+      "description": "docs/gaps_and_decisions.md as a table"
+    }
+  ]
+}

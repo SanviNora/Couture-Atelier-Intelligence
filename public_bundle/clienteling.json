@@ -1,0 +1,381 @@
+{
+  "cutoffs": {
+    "pilot": "2018-06-30",
+    "deploy": "2019-06-30"
+  },
+  "horizon_days": 90,
+  "capacity_per_advisor": 40,
+  "pilot": {
+    "clients": 198175,
+    "treated": 99045,
+    "observed_lift_eur_per_client": 257.7,
+    "true_mean_tau": 0.0171
+  },
+  "model_choice": {
+    "qini": {
+      "t_logistic_core": {
+        "qini": 16.8,
+        "ci_low": -19.7,
+        "ci_high": 68.0
+      },
+      "t_logistic_full": {
+        "qini": 37.9,
+        "ci_low": 6.3,
+        "ci_high": 88.3
+      },
+      "t_gbm_full": {
+        "qini": 45.2,
+        "ci_low": 2.7,
+        "ci_high": 106.7
+      },
+      "t_gbm_full_large_leaves": {
+        "qini": 53.3,
+        "ci_low": 21.4,
+        "ci_high": 94.8
+      },
+      "transformed_outcome_core": {
+        "qini": 53.3,
+        "ci_low": 11.5,
+        "ci_high": 102.7
+      },
+      "x_learner_spend": {
+        "qini": -14.5,
+        "ci_low": -57.9,
+        "ci_high": 36.8
+      },
+      "s_logistic_core": {
+        "qini": 43.4,
+        "ci_low": 4.5,
+        "ci_high": 85.6
+      },
+      "bagged_t_logistic_core": {
+        "qini": 28.6,
+        "ci_low": -8.8,
+        "ci_high": 74.0
+      }
+    },
+    "best_qini": "t_gbm_full_large_leaves",
+    "indistinguishable_from_best": [
+      "t_logistic_core",
+      "t_logistic_full",
+      "t_gbm_full",
+      "t_gbm_full_large_leaves",
+      "transformed_outcome_core",
+      "s_logistic_core",
+      "bagged_t_logistic_core"
+    ],
+    "stability": {
+      "t_logistic_core": 0.636,
+      "t_logistic_full": 0.647,
+      "t_gbm_full": 0.406,
+      "t_gbm_full_large_leaves": 0.43,
+      "transformed_outcome_core": 0.402,
+      "s_logistic_core": 0.644,
+      "bagged_t_logistic_core": 0.553
+    },
+    "chosen": "t_logistic_full",
+    "trusted": true,
+    "selection_rule": "among learners whose Qini 95% interval reaches the best Qini, the one with the most stable client ranking across bootstrap refits; trusted only if that stability is at least 0.5"
+  },
+  "champion_policy": "status_quo_best_clients",
+  "challenger_policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+  "deploy": {
+    "clients": 498611,
+    "eligible": 298442,
+    "true_effect_correlation_by_learner": {
+      "t_logistic_core": 0.318,
+      "t_logistic_full": 0.34,
+      "t_gbm_full": 0.093,
+      "t_gbm_full_large_leaves": 0.024,
+      "transformed_outcome_core": 0.023,
+      "x_learner_spend": 0.029,
+      "s_logistic_core": 0.357,
+      "bagged_t_logistic_core": 0.392
+    },
+    "true_effect_correlation_ceiling_from_features": 0.706
+  },
+  "robustness_across_pilot_draws": {
+    "draws": [
+      {
+        "draw": 0,
+        "chosen": "t_logistic_full",
+        "stability": 0.647,
+        "trusted": true,
+        "true_effect_correlation": 0.34,
+        "uplift_share_of_oracle": 0.817,
+        "status_quo_share_of_oracle": 0.874,
+        "with_trust_check_share_of_oracle": 0.817
+      },
+      {
+        "draw": 1,
+        "chosen": "t_logistic_full",
+        "stability": 0.546,
+        "trusted": true,
+        "true_effect_correlation": 0.33,
+        "uplift_share_of_oracle": 0.796,
+        "status_quo_share_of_oracle": 0.874,
+        "with_trust_check_share_of_oracle": 0.796
+      },
+      {
+        "draw": 2,
+        "chosen": "t_gbm_full_large_leaves",
+        "stability": 0.405,
+        "trusted": false,
+        "true_effect_correlation": 0.083,
+        "uplift_share_of_oracle": 0.574,
+        "status_quo_share_of_oracle": 0.874,
+        "with_trust_check_share_of_oracle": 0.874
+      }
+    ],
+    "mean_uplift_share": 0.729,
+    "worst_uplift_share": 0.574,
+    "mean_with_trust_check": 0.829,
+    "worst_with_trust_check": 0.796,
+    "status_quo_share": 0.874
+  },
+  "capacity_sweep": [
+    {
+      "contacts_per_advisor": 10,
+      "policy": "random",
+      "share_of_oracle": 0.146,
+      "share_harmful_contacts": 0.1826
+    },
+    {
+      "contacts_per_advisor": 10,
+      "policy": "status_quo_best_clients",
+      "share_of_oracle": 0.793,
+      "share_harmful_contacts": 0.1153
+    },
+    {
+      "contacts_per_advisor": 10,
+      "policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+      "share_of_oracle": 0.696,
+      "share_harmful_contacts": 0.1042
+    },
+    {
+      "contacts_per_advisor": 20,
+      "policy": "random",
+      "share_of_oracle": 0.226,
+      "share_harmful_contacts": 0.1855
+    },
+    {
+      "contacts_per_advisor": 20,
+      "policy": "status_quo_best_clients",
+      "share_of_oracle": 0.848,
+      "share_harmful_contacts": 0.1172
+    },
+    {
+      "contacts_per_advisor": 20,
+      "policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+      "share_of_oracle": 0.764,
+      "share_harmful_contacts": 0.1171
+    },
+    {
+      "contacts_per_advisor": 40,
+      "policy": "random",
+      "share_of_oracle": 0.373,
+      "share_harmful_contacts": 0.1863
+    },
+    {
+      "contacts_per_advisor": 40,
+      "policy": "status_quo_best_clients",
+      "share_of_oracle": 0.874,
+      "share_harmful_contacts": 0.1344
+    },
+    {
+      "contacts_per_advisor": 40,
+      "policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+      "share_of_oracle": 0.817,
+      "share_harmful_contacts": 0.137
+    },
+    {
+      "contacts_per_advisor": 80,
+      "policy": "random",
+      "share_of_oracle": 0.668,
+      "share_harmful_contacts": 0.1863
+    },
+    {
+      "contacts_per_advisor": 80,
+      "policy": "status_quo_best_clients",
+      "share_of_oracle": 0.896,
+      "share_harmful_contacts": 0.1613
+    },
+    {
+      "contacts_per_advisor": 80,
+      "policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+      "share_of_oracle": 0.88,
+      "share_harmful_contacts": 0.1658
+    }
+  ],
+  "policies": [
+    {
+      "policy": "random",
+      "contacts": 104869,
+      "true_incremental_eur": 27236288,
+      "eur_per_contact": 259.7,
+      "share_do_not_disturb": 0.0057,
+      "share_harmful_contacts": 0.1863,
+      "share_of_oracle": 0.373,
+      "vs_status_quo": 0.43
+    },
+    {
+      "policy": "status_quo_best_clients",
+      "contacts": 104869,
+      "true_incremental_eur": 63820844,
+      "eur_per_contact": 608.6,
+      "share_do_not_disturb": 0.0175,
+      "share_harmful_contacts": 0.1344,
+      "share_of_oracle": 0.874,
+      "vs_status_quo": 1.0
+    },
+    {
+      "policy": "response_model",
+      "contacts": 104869,
+      "true_incremental_eur": 63272056,
+      "eur_per_contact": 603.3,
+      "share_do_not_disturb": 0.0175,
+      "share_harmful_contacts": 0.1365,
+      "share_of_oracle": 0.867,
+      "vs_status_quo": 0.99
+    },
+    {
+      "policy": "churn_risk_x_value",
+      "contacts": 104869,
+      "true_incremental_eur": 63759546,
+      "eur_per_contact": 608.0,
+      "share_do_not_disturb": 0.0175,
+      "share_harmful_contacts": 0.136,
+      "share_of_oracle": 0.873,
+      "vs_status_quo": 1.0
+    },
+    {
+      "policy": "uplift_t_logistic_core",
+      "contacts": 104869,
+      "true_incremental_eur": 64501064,
+      "eur_per_contact": 615.1,
+      "share_do_not_disturb": 0.0175,
+      "share_harmful_contacts": 0.1505,
+      "share_of_oracle": 0.883,
+      "vs_status_quo": 1.01
+    },
+    {
+      "policy": "uplift_t_logistic_full",
+      "contacts": 104869,
+      "true_incremental_eur": 59679306,
+      "eur_per_contact": 569.1,
+      "share_do_not_disturb": 0.0074,
+      "share_harmful_contacts": 0.1371,
+      "share_of_oracle": 0.817,
+      "vs_status_quo": 0.94
+    },
+    {
+      "policy": "uplift_t_gbm_full",
+      "contacts": 104869,
+      "true_incremental_eur": 42769020,
+      "eur_per_contact": 407.8,
+      "share_do_not_disturb": 0.002,
+      "share_harmful_contacts": 0.1513,
+      "share_of_oracle": 0.586,
+      "vs_status_quo": 0.67
+    },
+    {
+      "policy": "uplift_t_gbm_full_large_leaves",
+      "contacts": 104869,
+      "true_incremental_eur": 39984211,
+      "eur_per_contact": 381.3,
+      "share_do_not_disturb": 0.0071,
+      "share_harmful_contacts": 0.1585,
+      "share_of_oracle": 0.548,
+      "vs_status_quo": 0.63
+    },
+    {
+      "policy": "uplift_transformed_outcome_core",
+      "contacts": 104869,
+      "true_incremental_eur": 39965523,
+      "eur_per_contact": 381.1,
+      "share_do_not_disturb": 0.0002,
+      "share_harmful_contacts": 0.1593,
+      "share_of_oracle": 0.547,
+      "vs_status_quo": 0.63
+    },
+    {
+      "policy": "uplift_x_learner_spend",
+      "contacts": 104869,
+      "true_incremental_eur": 38529122,
+      "eur_per_contact": 367.4,
+      "share_do_not_disturb": 0.0106,
+      "share_harmful_contacts": 0.177,
+      "share_of_oracle": 0.528,
+      "vs_status_quo": 0.6
+    },
+    {
+      "policy": "uplift_s_logistic_core",
+      "contacts": 104869,
+      "true_incremental_eur": 65288633,
+      "eur_per_contact": 622.6,
+      "share_do_not_disturb": 0.0171,
+      "share_harmful_contacts": 0.1496,
+      "share_of_oracle": 0.894,
+      "vs_status_quo": 1.02
+    },
+    {
+      "policy": "uplift_bagged_t_logistic_core",
+      "contacts": 104869,
+      "true_incremental_eur": 65232429,
+      "eur_per_contact": 622.0,
+      "share_do_not_disturb": 0.0173,
+      "share_harmful_contacts": 0.1492,
+      "share_of_oracle": 0.893,
+      "vs_status_quo": 1.02
+    },
+    {
+      "policy": "uplift_t_logistic_full_no_contact_if_no_lift",
+      "contacts": 104840,
+      "true_incremental_eur": 59664985,
+      "eur_per_contact": 569.1,
+      "share_do_not_disturb": 0.0074,
+      "share_harmful_contacts": 0.137,
+      "share_of_oracle": 0.817,
+      "vs_status_quo": 0.93
+    },
+    {
+      "policy": "oracle_true_effect",
+      "contacts": 104574,
+      "true_incremental_eur": 73019496,
+      "eur_per_contact": 698.3,
+      "share_do_not_disturb": 0.0065,
+      "share_harmful_contacts": 0.0,
+      "share_of_oracle": 1.0,
+      "vs_status_quo": 1.14
+    }
+  ],
+  "power_analysis_for_challenger_contacts": {
+    "contacts": 104840,
+    "spend_eur": {
+      "true_effect_per_contact": 569.1052,
+      "sd": 47038.6191,
+      "holdout_share_client_randomised": null,
+      "cuped_correlation": 0.429,
+      "holdout_share_client_randomised_cuped": null,
+      "advisor_icc": 0.0522,
+      "design_effect_advisor_randomised": 2.96,
+      "holdout_share_advisor_randomised_cuped": null
+    },
+    "visit_rate": {
+      "true_effect_per_contact": 0.0176,
+      "sd": 0.432,
+      "holdout_share_client_randomised": 0.05,
+      "cuped_correlation": 0.292,
+      "holdout_share_client_randomised_cuped": 0.05,
+      "advisor_icc": 0.0644,
+      "design_effect_advisor_randomised": 3.42,
+      "holdout_share_advisor_randomised_cuped": 0.17
+    }
+  },
+  "action_counts": {
+    "below this advisor's capacity cut-off": 193573,
+    "no personalisation consent": 174768,
+    "among this advisor's most valuable clients": 104869,
+    "not active in the last two years": 25401
+  }
+}

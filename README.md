@@ -50,7 +50,8 @@ The project is being rebuilt on **Visuelle 2.0**, real fashion retail data from 
 **Done:** demand: stock rebuilt per store and week, lost sales recovered with a validated method, a store-level launch forecast with uncertainty, and a luxury scarcity scenario (`docs/demand.md`).
 **Done:** allocation: scarce launches split across boutiques and judged on true demand, hero pieces offered to clients through an integer programme with relationship rules, and the economics of unsold stock under the EU destruction ban (`docs/allocation.md`).
 **Done:** the Brand Tier Dial: markdown lift and discount-acquired clients measured on real data, then luxury, aspirational and premium policies priced on the same demand, with an elevation sweep and Google Trends market context (`docs/tier_dial.md`).
-**Next:** the dashboard and public demo, then the executive memo and interview guide. The dashboard still uses the retired UCI outputs until it is rebuilt.
+**Done:** a seven-page decision dashboard reading only a guard-checked public bundle, with model-health monitoring (`docs/dashboard.md`). Run it with `make app`.
+**Next:** the executive memo and interview guide.
 
 ```bash
 make all    # ingest data, build SQL marts and the luxury layer, refit client models (a few minutes)

@@ -1,0 +1,41 @@
+client,tier,spend_last_12m_eur,weeks_since_last_visit,predicted_contact_value_eur,favourite_category,champion_action,challenger_action
+Client 016,VIC,799200.0,0,1640.0,doll dress,contact,contact
+Client 031,VIC,443200.0,2,750.0,kimono dress,contact,no action
+Client 018,VIC,443200.0,0,1640.0,culottes,contact,contact
+Client 040,core,324800.0,22,1630.0,sleeveless,contact,no action
+Client 011,core,222000.0,18,-190.0,long dress,contact,no action
+Client 026,core,166300.0,14,700.0,long sleeve,no action,no action
+Client 001,core,166300.0,10,860.0,long sleeve,contact,no action
+Client 003,core,166300.0,38,2350.0,culottes,no action,contact
+Client 019,core,133500.0,22,2350.0,long sleeve,no action,contact
+Client 033,core,133500.0,27,540.0,long sleeve,no action,no action
+Client 002,core,133500.0,10,2350.0,long sleeve,no action,contact
+Client 029,core,110800.0,18,190.0,culottes,no action,no action
+Client 010,core,94500.0,38,1630.0,culottes,no action,no action
+Client 007,core,82200.0,14,1630.0,culottes,no action,contact
+Client 005,core,82200.0,22,380.0,culottes,no action,no action
+Client 012,core,72200.0,18,-190.0,long sleeve,no action,no action
+Client 032,core,64200.0,38,380.0,culottes,no action,no action
+Client 022,core,57600.0,38,1280.0,culottes,no action,no action
+Client 035,core,57600.0,0,1060.0,doll dress,no action,no action
+Client 017,aspirational,35400.0,23,50.0,long sleeve,no action,no action
+Client 023,aspirational,35400.0,15,30.0,long sleeve,no action,no action
+Client 009,aspirational,35400.0,8,180.0,culottes,no action,no action
+Client 014,aspirational,35400.0,79,10.0,long sleeve,no action,no action
+Client 025,aspirational,12000.0,23,540.0,long sleeve,no action,no action
+Client 013,aspirational,12000.0,30,50.0,sleeveless,no action,no action
+Client 006,aspirational,8200.0,79,90.0,kimono dress,no action,no action
+Client 039,aspirational,8200.0,98,60.0,sleeveless,no action,no action
+Client 004,aspirational,8200.0,30,120.0,culottes,no action,no action
+Client 034,aspirational,8200.0,43,10.0,doll dress,no action,no action
+Client 028,aspirational,5600.0,79,180.0,long dress,no action,no action
+Client 021,aspirational,5600.0,8,120.0,long sleeve,no action,no action
+Client 008,aspirational,3100.0,64,30.0,solid color top,no action,no action
+Client 027,aspirational,700.0,64,30.0,sleeveless,no action,no action
+Client 038,aspirational,700.0,43,20.0,long sleeve,no action,no action
+Client 024,aspirational,700.0,23,540.0,culottes,no action,no action
+Client 030,aspirational,0.0,52,270.0,solid color top,no action,no action
+Client 020,aspirational,0.0,79,270.0,long sleeve,no action,no action
+Client 036,aspirational,0.0,8,50.0,sleeveless,no action,no action
+Client 037,aspirational,0.0,8,30.0,culottes,no action,no action
+Client 015,aspirational,0.0,30,270.0,long sleeve,no action,no action

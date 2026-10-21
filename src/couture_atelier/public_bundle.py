@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ALLOWED_PROVENANCE = {"aggregate", "synthetic", "model_output", "public_source"}
+ALLOWED_PROVENANCE = {"aggregate", "synthetic", "model_output", "public_source", "documentation"}
 # Column names that identify real clients or reproduce raw transaction rows.
 FORBIDDEN_COLUMNS = {"customer", "source_customer_id", "receipt_id", "transaction_at", "data"}
 TABULAR_SUFFIXES = {".parquet", ".csv", ".json"}
