@@ -83,3 +83,27 @@ def test_marts_split_returns_match_restocks_and_group_receipts(tmp_path) -> None
     assert receipts == 3
     # Two visits to store 10 beat one more recent visit to store 20.
     assert home == 10
+
+
+def test_shared_cards_are_flagged(tmp_path) -> None:
+    warehouse = tmp_path / "w.duckdb"
+    with duckdb.connect(str(warehouse)) as con:
+        make_raw(con, [1.0] * 12)
+        burst = pd.DataFrame(
+            {
+                "client_id": 99,
+                "store_id": 10,
+                "product_id": 1,
+                "purchased_at": pd.date_range("2019-11-29 09:00", periods=10, freq="30min"),
+                "qty": 1,
+            }
+        )
+        con.register("burst", burst)
+        con.execute("insert into raw.purchases select * from burst")
+
+    build_marts(warehouse, SQL / "marts")
+
+    with duckdb.connect(str(warehouse)) as con:
+        flags = dict(con.execute("select client_id, is_shared_card from marts.client_profile").fetchall())
+    assert flags[99] is True
+    assert flags[7] is False

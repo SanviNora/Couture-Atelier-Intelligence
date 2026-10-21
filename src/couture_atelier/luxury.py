@@ -51,34 +51,44 @@ def top_share(values: np.ndarray, fraction: float) -> float:
     return float(ordered[:k].sum() / ordered.sum())
 
 
-def calibrate_concentration(
-    base: np.ndarray, target_share: float, fraction: float = 0.001
+def calibrate_trade_up(
+    base: np.ndarray,
+    prior_visits: np.ndarray,
+    client_codes: np.ndarray,
+    target_share: float,
+    fraction: float = 0.001,
 ) -> tuple[float, np.ndarray]:
-    """Find alpha so that base**alpha (rescaled to the same total) gives the
-    top ``fraction`` of clients ``target_share`` of spend.
+    """Find beta so that receipt values ``base * (1 + prior_visits) ** beta``
+    give the top ``fraction`` of clients ``target_share`` of total spend.
 
-    The transform is monotone, so client ranking is unchanged, and total
-    spend is preserved.
+    Each receipt's value depends only on visits that happened before it, so
+    the layer never encodes a client's future. One global beta is calibrated,
+    and the result is rescaled to keep total spend unchanged.
     """
     base = np.asarray(base, dtype=float)
+    prior_visits = np.asarray(prior_visits, dtype=float)
     if (base <= 0).any():
         raise ValueError("Base spend must be positive")
-    scaled = base / base.mean()
+    if (prior_visits < 0).any():
+        raise ValueError("Prior visits must be non-negative")
 
-    def shaped(alpha: float) -> np.ndarray:
-        powered = scaled**alpha
-        return powered * base.sum() / powered.sum()
+    def shaped(beta: float) -> np.ndarray:
+        values = base * (1 + prior_visits) ** beta
+        return values * base.sum() / values.sum()
 
-    low, high = 1.0, 1.0
-    if top_share(base, fraction) >= target_share:
-        return 1.0, base.copy()
-    while top_share(shaped(high), fraction) < target_share:
+    def share(beta: float) -> float:
+        return top_share(np.bincount(client_codes, weights=shaped(beta)), fraction)
+
+    if share(0.0) >= target_share:
+        return 0.0, base.copy()
+    low, high = 0.0, 1.0
+    while share(high) < target_share:
         high *= 2
-        if high > 64:
+        if high > 16:
             raise ValueError("Target concentration is unreachable")
-    for _ in range(60):
+    for _ in range(50):
         mid = (low + high) / 2
-        if top_share(shaped(mid), fraction) < target_share:
+        if share(mid) < target_share:
             low = mid
         else:
             high = mid
@@ -94,7 +104,7 @@ def client_tier(spend: pd.Series, cuts: dict[str, float]) -> pd.Series:
     return tier
 
 
-def consent_status(client_ids: pd.Series, visits: pd.Series, base: float, cap: float, seed: int) -> pd.Series:
-    probability = base + (cap - base) * visits.clip(upper=10).sub(1).clip(lower=0) / 9
+def consent_status(client_ids: pd.Series, rate: float, seed: int) -> pd.Series:
+    """Opt-in status drawn independently of behaviour, so it cannot leak future visits."""
     draw = stable_uniform(client_ids, seed)
-    return pd.Series(np.where(draw < probability, "consented", "not_consented"), index=client_ids.index)
+    return pd.Series(np.where(draw < rate, "consented", "not_consented"), index=client_ids.index)

@@ -35,18 +35,26 @@ assumptions:
   hero_share:
     value: 0.02
     meaning: Share of each season's products flagged as scarce hero pieces, chosen by full-price sales velocity.
+  trade_up:
+    meaning: >-
+      Each purchase is worth list value x (1 + prior visits)^beta: clients trade
+      up as the relationship deepens. Only visits before the purchase count, so
+      the layer never encodes a client's future. One global beta is fitted so
+      the top 0.1% of clients reach the target spend share; total spend is kept.
+  shared_card_rule:
+    max_receipts_per_day: 10
+    max_stores_per_day: 4
+    meaning: IDs at or above either limit on any day are shared or promotional cards and are excluded from client modelling.
   client_tiers:
     top_tier: 0.001
     vic: 0.01
     core: 0.10
-    meaning: Cumulative top shares of clients by modelled spend; everyone else is "aspirational".
+    meaning: Cumulative top shares of clients by trailing 12-month spend at the as-of date; everyone else is "aspirational".
   consent:
-    base_rate: 0.55
-    max_rate: 0.85
+    rate: 0.65
     meaning: >-
-      Probability a client has opted in to personalised contact. Rises with the
-      number of visits (capped at 10), on the assumption that engaged clients
-      opt in more often.
+      Share of clients opted in to personalised contact. Drawn independently of
+      behaviour so it cannot leak future visits.
   advisor_book_size:
     value: 250
     meaning: Clients per client advisor at their home store.

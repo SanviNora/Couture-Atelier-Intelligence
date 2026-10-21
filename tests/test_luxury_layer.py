@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from couture_atelier.luxury import (
-    calibrate_concentration,
+    calibrate_trade_up,
     client_tier,
     consent_status,
     load_calibration,
@@ -13,21 +13,40 @@ from couture_atelier.luxury import (
 )
 
 
-def test_calibration_hits_target_and_keeps_order_and_total() -> None:
-    rng = np.random.default_rng(0)
-    base = rng.lognormal(mean=6, sigma=0.8, size=20_000)
-
-    alpha, shaped = calibrate_concentration(base, target_share=0.23)
-
-    assert alpha > 1
-    assert top_share(shaped, 0.001) == pytest.approx(0.23, abs=0.005)
-    assert shaped.sum() == pytest.approx(base.sum())
-    assert (np.argsort(shaped) == np.argsort(base)).all()
+def receipts_fixture(n_clients: int = 5_000, seed: int = 0):
+    rng = np.random.default_rng(seed)
+    visits = rng.geometric(0.35, size=n_clients)
+    codes = np.repeat(np.arange(n_clients), visits)
+    prior = np.concatenate([np.arange(v) for v in visits])
+    base = rng.lognormal(mean=8, sigma=0.5, size=len(codes))
+    return base, prior, codes
 
 
-def test_calibration_rejects_non_positive_spend() -> None:
+def test_trade_up_hits_target_and_keeps_total() -> None:
+    base, prior, codes = receipts_fixture()
+
+    beta, values = calibrate_trade_up(base, prior, codes, target_share=0.05)
+
+    assert beta > 0
+    assert top_share(np.bincount(codes, weights=values), 0.001) == pytest.approx(0.05, abs=0.005)
+    assert values.sum() == pytest.approx(base.sum())
+
+
+def test_trade_up_uses_only_past_visits() -> None:
+    base, prior, codes = receipts_fixture()
+    _, values = calibrate_trade_up(base, prior, codes, target_share=0.05)
+    first_visits = prior == 0
+
+    # A first purchase carries no trade-up, so its value is the base value up to one global scale.
+    ratio = values[first_visits] / base[first_visits]
+    assert np.allclose(ratio, ratio[0])
+
+
+def test_trade_up_rejects_invalid_inputs() -> None:
     with pytest.raises(ValueError, match="positive"):
-        calibrate_concentration(np.array([10.0, 0.0]), target_share=0.5)
+        calibrate_trade_up(np.array([10.0, 0.0]), np.array([0, 1]), np.array([0, 0]), 0.5)
+    with pytest.raises(ValueError, match="non-negative"):
+        calibrate_trade_up(np.array([10.0, 5.0]), np.array([0, -1]), np.array([0, 0]), 0.5)
 
 
 def test_price_ladder_is_monotone_and_bounded() -> None:
@@ -50,14 +69,12 @@ def test_price_and_client_tiers_cover_everyone() -> None:
     assert tiers[spend.idxmax()] == "top_tier"
 
 
-def test_consent_is_deterministic_and_rises_with_visits() -> None:
+def test_consent_is_deterministic_and_matches_rate() -> None:
     ids = pd.Series(range(20_000))
-    one_visit = consent_status(ids, pd.Series(1, index=ids.index), 0.55, 0.85, seed=42)
-    ten_visits = consent_status(ids, pd.Series(10, index=ids.index), 0.55, 0.85, seed=42)
+    first = consent_status(ids, rate=0.65, seed=42)
 
-    assert one_visit.equals(consent_status(ids, pd.Series(1, index=ids.index), 0.55, 0.85, seed=42))
-    assert one_visit.eq("consented").mean() == pytest.approx(0.55, abs=0.02)
-    assert ten_visits.eq("consented").mean() == pytest.approx(0.85, abs=0.02)
+    assert first.equals(consent_status(ids, rate=0.65, seed=42))
+    assert first.eq("consented").mean() == pytest.approx(0.65, abs=0.02)
 
 
 def test_calibration_targets_cite_sources() -> None:

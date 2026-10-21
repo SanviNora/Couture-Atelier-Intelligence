@@ -1,19 +1,14 @@
 {
   "concentration": {
-    "alpha": 1.3001,
-    "observed_top_0_1pct_unit_share": 0.0454,
-    "base_top_0_1pct_spend_share": 0.0471,
+    "trade_up_beta": 1.0766,
+    "base_top_0_1pct_spend_share": 0.0271,
     "modelled_top_0_1pct_spend_share": 0.23,
     "target_top_0_1pct_spend_share": 0.23
   },
-  "clients": 665285,
-  "value_tiers": {
-    "aspirational": 598757,
-    "core": 59876,
-    "vic": 5987,
-    "top_tier": 665
-  },
-  "consent_rate": 0.5947,
+  "clients": 665260,
+  "shared_cards_excluded": 25,
+  "receipts": 1723383,
+  "consent_rate": 0.6494,
   "advisors": 2732,
   "store_formats": {
     "boutique": 116,

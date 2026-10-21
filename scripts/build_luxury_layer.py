@@ -1,7 +1,9 @@
 """Build the calibrated luxury layer on top of the Visuelle marts.
 
 Writes the ``lux`` schema: product prices and hero flags, store formats and
-advisor counts, client value tiers and consent, and purchase values in euros.
+advisor counts, clients with consent and advisor, and time-safe receipt and
+purchase values in euros. Shared or promotional cards are not clients and
+are left out.
 """
 
 from __future__ import annotations
@@ -14,8 +16,7 @@ import numpy as np
 import pandas as pd
 
 from couture_atelier.luxury import (
-    calibrate_concentration,
-    client_tier,
+    calibrate_trade_up,
     consent_status,
     load_calibration,
     map_price_ladder,
@@ -54,39 +55,49 @@ def build_products(con: duckdb.DuckDBPyConnection, cfg: dict) -> pd.DataFrame:
                      "full_price_velocity", "hero_piece", "data_provenance"]]
 
 
-def build_clients(con: duckdb.DuckDBPyConnection, cfg: dict) -> tuple[pd.DataFrame, dict]:
+def build_clients(con: duckdb.DuckDBPyConnection, cfg: dict) -> pd.DataFrame:
     a = cfg["assumptions"]
-    target = cfg["targets"]["top_0_1pct_client_spend_share"]["value"]
     clients = con.execute(
-        """
-        select c.client_id, c.home_store_id, c.visits, c.units,
-               sum(f.qty * p.list_price_eur) as base_spend_eur
-        from marts.client_profile c
-        join marts.fct_purchase f using (client_id)
-        join lux.product p using (product_id)
-        group by all
-        """
+        "select client_id, home_store_id from marts.client_profile where not is_shared_card"
     ).fetchdf()
-    alpha, spend = calibrate_concentration(clients["base_spend_eur"].to_numpy(), target)
-    clients["modelled_spend_eur"] = spend
-    clients["spend_multiplier"] = spend / clients["base_spend_eur"]
-    clients["value_tier"] = client_tier(clients["modelled_spend_eur"], a["client_tiers"])
-    clients["consent_status"] = consent_status(
-        clients["client_id"], clients["visits"], a["consent"]["base_rate"], a["consent"]["max_rate"], a["seed"]
-    )
+    clients["consent_status"] = consent_status(clients["client_id"], a["consent"]["rate"], a["seed"])
     book = a["advisor_book_size"]["value"]
     advisors = clients.groupby("home_store_id")["client_id"].transform("size").div(book).apply(np.ceil).astype(int)
     slot = (stable_uniform(clients["client_id"], a["seed"] + 1) * advisors).astype(int)
     clients["advisor_id"] = clients["home_store_id"].astype(str) + "-A" + (slot + 1).astype(str).str.zfill(2)
     clients["data_provenance"] = "synthetic"
+    return clients
+
+
+def build_receipts(con: duckdb.DuckDBPyConnection, cfg: dict) -> tuple[pd.DataFrame, dict]:
+    target = cfg["targets"]["top_0_1pct_client_spend_share"]["value"]
+    receipts = con.execute(
+        """
+        select f.client_id, f.receipt_id, any_value(f.store_id) as store_id,
+               min(f.purchased_at) as purchased_at, sum(f.qty) as units,
+               sum(f.qty * p.list_price_eur) as base_value_eur
+        from marts.fct_purchase f
+        join lux.product p using (product_id)
+        where f.client_id in (select client_id from lux.client)
+        group by f.client_id, f.receipt_id
+        """
+    ).fetchdf()
+    receipts = receipts.sort_values(["client_id", "purchased_at", "receipt_id"]).reset_index(drop=True)
+    receipts["prior_visits"] = receipts.groupby("client_id").cumcount()
+    codes = pd.factorize(receipts["client_id"])[0]
+    beta, values = calibrate_trade_up(
+        receipts["base_value_eur"].to_numpy(), receipts["prior_visits"].to_numpy(), codes, target
+    )
+    receipts["value_eur"] = values
+    receipts["data_provenance"] = "synthetic"
+    base_by_client = np.bincount(codes, weights=receipts["base_value_eur"].to_numpy())
     stats = {
-        "alpha": round(float(alpha), 4),
-        "observed_top_0_1pct_unit_share": round(top_share(clients["units"].to_numpy(float), 0.001), 4),
-        "base_top_0_1pct_spend_share": round(top_share(clients["base_spend_eur"].to_numpy(), 0.001), 4),
-        "modelled_top_0_1pct_spend_share": round(top_share(spend, 0.001), 4),
+        "trade_up_beta": round(float(beta), 4),
+        "base_top_0_1pct_spend_share": round(top_share(base_by_client, 0.001), 4),
+        "modelled_top_0_1pct_spend_share": round(top_share(np.bincount(codes, weights=values), 0.001), 4),
         "target_top_0_1pct_spend_share": target,
     }
-    return clients.drop(columns=["units"]), stats
+    return receipts, stats
 
 
 def build_stores(con: duckdb.DuckDBPyConnection, clients: pd.DataFrame, cfg: dict) -> pd.DataFrame:
@@ -107,8 +118,10 @@ def build_luxury_layer(warehouse: Path = WAREHOUSE) -> dict[str, object]:
         con.execute("create schema if not exists lux")
         products = build_products(con, cfg)
         con.execute("create or replace table lux.product as select * from products")
-        clients, stats = build_clients(con, cfg)
+        clients = build_clients(con, cfg)
         con.execute("create or replace table lux.client as select * from clients")
+        receipts, stats = build_receipts(con, cfg)
+        con.execute("create or replace table lux.receipt as select * from receipts")
         stores = build_stores(con, clients, cfg)
         con.execute("create or replace table lux.store as select * from stores")
         con.execute(
@@ -116,24 +129,26 @@ def build_luxury_layer(warehouse: Path = WAREHOUSE) -> dict[str, object]:
             create or replace table lux.purchase_value as
             select f.client_id, f.store_id, f.product_id, f.purchased_at, f.receipt_id, f.qty,
                    p.list_price_eur,
-                   f.qty * p.list_price_eur * c.spend_multiplier as value_eur,
+                   f.qty * p.list_price_eur * r.value_eur / r.base_value_eur as value_eur,
                    'synthetic' as data_provenance
             from marts.fct_purchase f
             join lux.product p using (product_id)
-            join lux.client c using (client_id)
+            join lux.receipt r using (client_id, receipt_id)
             """
         )
-        total_check = con.execute(
-            "select abs(sum(value_eur) - (select sum(modelled_spend_eur) from lux.client)) "
-            "/ (select sum(modelled_spend_eur) from lux.client) from lux.purchase_value"
+        gap = con.execute(
+            "select abs(sum(value_eur) - (select sum(value_eur) from lux.receipt)) "
+            "/ (select sum(value_eur) from lux.receipt) from lux.purchase_value"
         ).fetchone()[0]
-        if total_check > 1e-6:
-            raise ValueError(f"Purchase values do not reconcile with client spend ({total_check:.2e})")
+        if gap > 1e-6:
+            raise ValueError(f"Purchase values do not reconcile with receipts ({gap:.2e})")
+        shared = con.execute("select count(*) from marts.client_profile where is_shared_card").fetchone()[0]
 
     report = {
         "concentration": stats,
         "clients": len(clients),
-        "value_tiers": clients["value_tier"].value_counts().to_dict(),
+        "shared_cards_excluded": int(shared),
+        "receipts": len(receipts),
         "consent_rate": round(float(clients["consent_status"].eq("consented").mean()), 4),
         "advisors": int(stores["advisors"].sum()),
         "store_formats": stores["store_format"].value_counts().to_dict(),
