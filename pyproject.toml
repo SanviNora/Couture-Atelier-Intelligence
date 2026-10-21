@@ -15,8 +15,9 @@ dependencies = [
     "pyarrow>=16.0",
     "pandera>=0.20",
     "scikit-learn>=1.5",
-     "streamlit>=1.40",
-     "plotly>=5.24",
+    "scipy>=1.11",
+    "streamlit>=1.40",
+    "plotly>=5.24",
     "pyyaml>=6.0",
 ]
 
@@ -24,6 +25,9 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "ruff>=0.6",
+]
+docs = [
+    "markdown>=3.5",
 ]
 
 [tool.pytest.ini_options]
