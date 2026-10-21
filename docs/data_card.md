@@ -8,7 +8,7 @@ What data this project uses, where it comes from, and what may be shown publicly
 |---|---|---|---|
 | Visuelle 2.0 (Skenderi et al., CVPRW 2022) | Real fashion retail: 665k anonymised clients, 110 stores, weekly restocks, store-level sales and discounts, 5.5k products | Access by request form; authors ask for citation; no license stated | **No.** Raw files stay local. Only aggregates and model outputs are published |
 | Calibrated luxury layer | Price tiers, hero pieces, VIC spend curve, consent, advisors, outreach experiments | Created by this project; every target cites its source in `configs/calibration.yml` | Yes |
-| Google Trends | Search interest for real luxury and aspirational hero products | Google Trends terms, with attribution | Yes |
+| Google Trends (Oct 2021–Oct 2026) | Weekly US search interest for 30 luxury, aspirational and premium products, brands and themes, plus worldwide brand interest; 6 manual downloads | Google Trends terms, with attribution; raw downloads kept local with checksums | Aggregates and charts only (`reports/market_pulse.csv`) |
 | Published industry figures | Top-client spend shares, revenue mix, regulation | Cited reports (Bain, BCG-Altagamma, LVMH, Kering, EU ESPR) | Yes, as cited numbers |
 | UCI Online Retail II (legacy) | Former transaction source, UK giftware 2009–2011 | CC BY 4.0 | Retired from the pipeline |
 

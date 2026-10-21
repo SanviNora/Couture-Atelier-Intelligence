@@ -1,0 +1,31 @@
+source_file,term,region,tier,common_scale,first_year_mean,last_year_mean,change_pct,weeks_below_one
+aspirational_bags,Coach Tabby,United States,aspirational,True,6.46,55.22,755.3,0
+aspirational_bags,Michael Kors Jet Set,United States,aspirational,True,6.04,24.08,299.0,0
+aspirational_bags,Louis Vuitton Speedy,United States,aspirational,True,7.72,25.97,236.6,0
+aspirational_bags,Tory Burch Kira,United States,aspirational,True,2.97,7.75,160.6,0
+aspirational_bags,Kate Spade bag,United States,aspirational,True,29.73,47.68,60.4,0
+luxury_bags,Louis Vuitton Speedy,United States,luxury,True,7.79,25.98,233.6,0
+luxury_bags,Chanel Classic Flap,United States,luxury,True,5.06,13.52,167.3,0
+luxury_bags,Hermes Birkin,United States,luxury,True,12.54,20.81,66.0,0
+luxury_bags,Louis Vuitton Neverfull,United States,luxury,True,14.19,16.71,17.8,0
+luxury_bags,Dior Saddle Bag,United States,luxury,True,11.48,12.63,10.1,0
+luxury_brands,Hermes,United States,luxury,False,7.67,12.44,62.2,0
+luxury_brands,Chanel,United States,luxury,False,20.96,24.88,18.7,0
+luxury_brands,Louis Vuitton,United States,luxury,False,23.92,26.88,12.4,0
+luxury_brands,Dior,United States,luxury,False,18.04,19.38,7.5,0
+luxury_brands,Gucci,United States,luxury,False,38.48,26.23,-31.8,0
+luxury_brands_worldwide,Louis Vuitton,Worldwide,luxury,False,22.69,30.17,33.0,0
+luxury_brands_worldwide,Hermes,Worldwide,luxury,False,21.88,26.17,19.6,0
+luxury_brands_worldwide,Chanel,Worldwide,luxury,False,28.67,33.19,15.8,0
+luxury_brands_worldwide,Dior,Worldwide,luxury,False,32.06,33.83,5.5,0
+luxury_brands_worldwide,Gucci,Worldwide,luxury,False,41.31,33.92,-17.9,0
+market_themes,luxury resale,United States,theme,True,1.78,9.76,449.0,0
+market_themes,luxury handbag,United States,theme,True,1.88,7.97,323.1,0
+market_themes,Louis Vuitton Speedy,United States,theme,True,7.79,26.0,233.8,0
+market_themes,pre-owned luxury,United States,theme,True,0.02,2.73,,1
+market_themes,quiet luxury,United States,theme,True,0.45,13.56,,0
+premium_brands,Ralph Lauren,United States,premium,False,24.08,44.13,83.3,0
+premium_brands,Calvin Klein,United States,premium,False,14.15,24.46,72.8,0
+premium_brands,Tommy Hilfiger,United States,premium,False,8.54,7.92,-7.2,0
+premium_brands,J.Crew,United States,premium,False,0.97,3.21,,22
+premium_brands,Louis Vuitton Speedy,United States,premium,False,0.72,1.62,,115
