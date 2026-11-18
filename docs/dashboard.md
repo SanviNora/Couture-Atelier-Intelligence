@@ -1,6 +1,6 @@
 # Dashboard
 
-A seven-page Streamlit app that reads only `public_bundle/`: aggregates, model outputs, synthetic examples and public data. The hosted demo and a local run therefore show exactly the same thing, and no raw client row can reach it.
+A seven-page Streamlit app with one or two charts per page that reads only `public_bundle/`: aggregates, model outputs, synthetic examples and public data. The hosted demo and a local run therefore show exactly the same thing, and no raw client row can reach it.
 
 ```bash
 python scripts/build_public_bundle.py      # refresh the bundle from reports/ and the warehouse (guard-checked)
@@ -11,13 +11,13 @@ streamlit run dashboard/app.py             # http://localhost:8501
 
 | Page | For | What it shows |
 |---|---|---|
-| Decision brief | Executive | Four headline results and the elevation chart |
-| Client intelligence | Client development | Model-minus-baseline with 95% intervals, value tiers, what drives each model, the 9-calibration sensitivity, the COVID stress test |
-| Clienteling | Advisors and their managers | Champion vs challenger across pilot draws, advisor capacity, the experiment design, an illustrative advisor book, product picks on real purchases |
-| Demand and allocation | Planners | Allocation rules as supply grows, the scarcity trap, launch-forecast error, demand recovery, hero pieces to clients |
-| Brand Tier Dial | Executive | Profit by brand policy with lift scenario and brand-cost controls, the value of an exit route, market context |
+| Decision brief | Executive | Four headline results, the evidence in five lines, and the elevation chart |
+| Client intelligence | Client development | Model-minus-baseline with 95% intervals, robustness across 9 calibrations, the spend-bias diagnosis, what drives the return model |
+| Clienteling | Advisors and their managers | Champion vs challenger, advisor capacity, the experiment design, an illustrative advisor book with checked notes, product picks for new launches |
+| Demand and allocation | Planners | Allocation rules as supply grows, the scarcity trap, forecast and recovery accuracy, hero pieces to clients by offer rule |
+| Pricing and tiers | Executive | Cut, ladder or hold: break-even volume vs the real price response, the entry-first cohort, then profit by brand policy with lift and brand-cost controls and the value of an exit route |
 | Model health | Data science | Input drift (PSI) between scoring dates and outcome monitoring |
-| Method and gaps | Reviewers | The full gaps log with filters, and where each data source comes from |
+| Method and gaps | Reviewers | The full gaps log with filters, where each data source comes from, and market context from Google Trends |
 
 ## Design rules
 

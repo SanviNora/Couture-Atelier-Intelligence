@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "couture-atelier-intelligence"
 version = "0.1.0"
-description = "Luxury retail forecasting, client intelligence, and inventory decision support."
+description = "Luxury retail decision system: client value, clienteling, demand, allocation and pricing on real fashion data."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -16,8 +16,8 @@ dependencies = [
     "pandera>=0.20",
     "scikit-learn>=1.5",
     "scipy>=1.11",
-    "streamlit>=1.40",
-    "plotly>=5.24",
+    "streamlit>=1.64",
+    "plotly>=6.0",
     "pyyaml>=6.0",
 ]
 

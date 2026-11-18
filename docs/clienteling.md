@@ -65,6 +65,8 @@ The pilot was re-randomised three times and the whole choose-and-deploy process 
 - **But a trusted uplift model still did not beat calling the best clients** in two of two trusted draws. Stability is necessary, not sufficient.
 - In hindsight the core-feature variants (bagged 89.3%, S-learner 89.4%) did beat the status quo on the first draw, but the pilot could not single them out: choosing them now would be tuning to the simulation's known truth.
 
+**Is there a middle ground?** A shortlist hybrid keeps each advisor's top 2× capacity clients by value and lets uplift choose only within that shortlist, so a noisy model cannot send advisors to clients the house would never prioritise. It reached 80.9%, 79.1% and 56.9% on the three draws (mean 72.3%): no better than uplift alone and below calling the best clients, though it made the fewest harmful contacts (12.4% vs 13.4%). Once the uplift ranking is noisy, letting it reorder even a good shortlist costs value (gaps log G81).
+
 **Is a bigger pilot the fix?** Re-running with 25%, 50%, 100% and 200% of a quarter's eligible clients (the last by pooling March and June 2018), three draws each, gave no reliable improvement: run-to-run variation swamps the effect of size (`reports/pilot_size_value.csv`). More data per client (a longer horizon, or a cleaner outcome such as appointments booked) would help more than more clients.
 
 ## Recommendation: champion and challenger

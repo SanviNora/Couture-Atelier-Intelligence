@@ -171,6 +171,22 @@ def allocate(scores: np.ndarray, advisor: pd.Series, eligible: np.ndarray, capac
     return chosen
 
 
+def shortlist_scores(champion: np.ndarray, challenger: np.ndarray, advisor: pd.Series, eligible: np.ndarray,
+                     capacity: int, factor: int = 2) -> np.ndarray:
+    """Keep each advisor's top ``factor x capacity`` clients by the champion score, then order that shortlist
+    by the challenger. The challenger can only choose among clients the champion would call or nearly call,
+    so a noisy uplift model cannot send advisors to clients the house would never prioritise.
+    """
+    frame = pd.DataFrame({"advisor": advisor.to_numpy(), "champion": champion, "challenger": challenger})
+    pool = frame[eligible]
+    rank = pool.groupby("advisor")["champion"].rank(ascending=False, method="first")
+    shortlist = pool[rank <= factor * capacity]
+    within = shortlist.groupby("advisor")["challenger"].rank(pct=True, method="first")
+    scores = np.zeros(len(frame))
+    scores[within.index] = 1 + within.to_numpy()
+    return scores
+
+
 def qini_area(uplift_score: np.ndarray, treated: np.ndarray, outcome: np.ndarray, bins: int = 20) -> float:
     """Area between the model's Qini curve and random targeting, on observed outcomes.
 

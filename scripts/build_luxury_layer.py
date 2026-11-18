@@ -74,7 +74,7 @@ def build_receipts(con: duckdb.DuckDBPyConnection, cfg: dict) -> tuple[pd.DataFr
     cap = cfg["assumptions"]["trade_up"]["cap_prior_visits"]
     receipts = con.execute(
         """
-        select f.client_id, f.receipt_id, any_value(f.store_id) as store_id,
+        select f.client_id, f.receipt_id, min(f.store_id) as store_id,  -- 1,677 receipts span two stores
                min(f.purchased_at) as purchased_at, sum(f.qty) as units,
                sum(f.qty * p.list_price_eur) as base_value_eur
         from marts.fct_purchase f

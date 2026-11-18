@@ -133,3 +133,19 @@ def test_stability_is_high_for_real_signal_and_low_for_noise() -> None:
 
     assert signal > 0.8
     assert noise < signal
+
+
+def test_shortlist_only_reorders_the_champions_own_clients() -> None:
+    from couture_atelier.clienteling import allocate, shortlist_scores
+
+    rng = np.random.default_rng(5)
+    n, capacity = 400, 5
+    advisor = pd.Series(rng.integers(0, 4, n))
+    champion, challenger = rng.random(n), rng.random(n)
+    eligible = rng.random(n) < 0.9
+    chosen = allocate(shortlist_scores(champion, challenger, advisor, eligible, capacity), advisor, eligible, capacity)
+    frame = pd.DataFrame({"advisor": advisor, "champion": champion})[eligible]
+    rank = frame.groupby("advisor")["champion"].rank(ascending=False, method="first")
+    shortlisted = set(frame.index[rank <= 2 * capacity])
+    assert set(np.flatnonzero(chosen)) <= shortlisted
+    assert chosen.sum() == 4 * capacity

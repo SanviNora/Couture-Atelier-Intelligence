@@ -1,68 +1,55 @@
 # Couture Atelier Intelligence
 
-A reproducible luxury retail analytics platform built from public fashion and retail data plus a clearly documented synthetic luxury layer.
+[![checks](https://github.com/SanviNora/Couture-Atelier-Intelligence/actions/workflows/checks.yml/badge.svg)](https://github.com/SanviNora/Couture-Atelier-Intelligence/actions/workflows/checks.yml)
 
-## Purpose
+A luxury retail decision system: which clients matter next year, whom each advisor should call, where scarce pieces should go, and whether a house should cut prices, ladder down or hold. It is built on **real behaviour from 665,000 fashion clients and 110 stores** (Visuelle 2.0) with luxury prices, client tiers and scarcity calibrated to published industry figures.
 
-Couture Atelier Intelligence connects three decisions:
+**Live dashboard:** _link added after deployment_
 
-1. Demand forecasting by product, boutique, region, and channel.
-2. Client segmentation and customer lifetime value.
-3. Inventory allocation and consent-aware clienteling recommendations.
+![Decision brief](docs/img/brief.png)
 
-The project is a portfolio simulation. It is not affiliated with Louis Vuitton, LVMH, or any other luxury house, and it does not claim to represent private company data.
+## Four decisions, four answers
 
-## Data principles
+| Decision | Answer | Evidence |
+|---|---|---|
+| **Cut prices, ladder down or hold?** | Ladder, don't cut | A 10% cut needs +13% volume to break even; real demand gives +5% once the markdown novelty fades (−€48M). Entry-first clients come back nearly as often (−1.1 points, same boutique and month). |
+| **Keep discounting?** | Stop, but keep an exit | Dropping every markdown changes profit by −0.5%; refusing any exit for unsold stock costs about €58M (10%). |
+| **Where do scarce pieces go?** | By forecast to boutiques, by relationship to clients | +€32M over the retailer's own split at 60% of demand; the hero-piece integer programme earns €67M vs €44M for "VICs first". |
+| **Whom do advisors call?** | Their best clients; uplift runs as a challenger | Uplift models were unstable across pilot draws (82.9% vs 87.4% of the best achievable); a randomised challenger is designed, with a 5% client holdout. |
 
-- Public observations and simulated records remain distinguishable.
-- Source licenses and provenance are recorded before use.
-- Customer identities are anonymous and synthetic in the integrated layer.
-- Sensitive attributes and inferred wealth are excluded.
-- Forecasts, simulations, and observed outcomes are reported separately.
-- Recommendations include an explicit no-action option.
+## What is real and what is modelled
 
-## Planned stack
+| Real (Visuelle 2.0, 2016–2021) | Calibrated or simulated (every number in `configs/`) |
+|---|---|
+| Clients, visits, stores, weekly sales, discounts, restocks, product images | Luxury price ladder, VIC concentration (top 1% = 30% of revenue), trade-up, consent, advisors, contact effects, margins |
 
-- Python for ingestion, feature engineering, and modeling
-- DuckDB and Parquet for local analytical storage
-- SQL for transformations
-- pytest for data-quality checks
-- Streamlit for the executive interface
+Raw data never leaves the machine. The dashboard reads only `public_bundle/`: aggregates, model outputs and synthetic examples, checked by an automated guard (no client identifiers, raw timestamps or groups under 10). See `docs/data_card.md`.
 
-## Repository map
+## How it is built
 
-```text
-src/couture_atelier/  package code
-sql/                  analytical transformations
-configs/              source and project configuration
-data/                 raw, staging, synthetic, and processed data (ignored)
-tests/                automated checks
-docs/                 project documentation
-notebooks/            exploratory analysis
-```
+| Module | Method | Result on held-out data |
+|---|---|---|
+| Client value (`docs/client_intelligence.md`) | BG/NBD, MBG/NBD, Gamma-Gamma; gradient-boosting challengers chosen by rolling-origin validation; paired-bootstrap intervals | Return AUC 0.716 (+0.057 over recency); spend ranking +0.029 Spearman over last year's spend; holds in 9 of 9 luxury-layer calibrations |
+| Clienteling (`docs/clienteling.md`) | T/S/X-learners, Qini with a stability-based trust check, champion vs challenger, power analysis with CUPED | Status quo 87.4% of the oracle; trusted uplift 82.9%; visual similarity adds +0.9 points on new launches |
+| Demand (`docs/demand.md`) | Lost sales recovered from stock-outs (conditional expectation, EM), quantile gradient boosting | Launch WAPE 0.368 vs 0.469; 80% interval covers 79.0%; scarcity trap shown |
+| Allocation (`docs/allocation.md`) | Negative-binomial greedy allocation, newsvendor, two-stage integer programme | See the table above |
+| Pricing (`docs/tier_dial.md`, `docs/price_strategy.md`) | Staggered difference-in-differences with placebo, policy simulation, within-boutique cohort comparison | See the table above |
+| Monitoring (`docs/dashboard.md`) | Population stability index, outcome monitoring | 6 of 8 inputs drifted before the 2019 spend bias; none before COVID |
 
-## Current milestone
+Every data issue, shortcut and judgment call (81 so far) is logged in `docs/gaps_and_decisions.md` with what was done about it. Two examples: the 2019 spend bias was traced to a falling return rate (G75), and five sources of run-to-run drift were removed so repeated rebuilds now match by checksum (G76).
 
-The project is being rebuilt on **Visuelle 2.0**, real fashion retail data from one retailer: 665k clients, 110 stores, store-level weekly sales and discounts, and weekly restocks. On top of it sits a **luxury layer calibrated to published figures** (`configs/calibration.yml`). For example, VICs (the top 1% of clients) are calibrated to hold 30% of revenue, up from 11.6% in the raw data, through a time-safe trade-up that uses only each client's past visits.
-
-**Done:** data foundation; VIC client intelligence with model selection on pre-test data, a one-time 2019 test with confidence intervals, a 9-variant sensitivity analysis and a COVID stress test (`docs/client_intelligence.md`); Google Trends market pulse for 2021–2026 (`reports/market_pulse.csv`).
-**Done:** clienteling: uplift models trained on a randomised pilot and judged against known contact effects, policies compared at fixed advisor capacity, an experiment design with power analysis, and product picks judged on real purchases using Silhouette Vision's image embeddings (`docs/clienteling.md`).
-**Done:** demand: stock rebuilt per store and week, lost sales recovered with a validated method, a store-level launch forecast with uncertainty, and a luxury scarcity scenario (`docs/demand.md`).
-**Done:** allocation: scarce launches split across boutiques and judged on true demand, hero pieces offered to clients through an integer programme with relationship rules, and the economics of unsold stock under the EU destruction ban (`docs/allocation.md`).
-**Done:** the Brand Tier Dial: markdown lift and discount-acquired clients measured on real data, then luxury, aspirational and premium policies priced on the same demand, with an elevation sweep and Google Trends market context (`docs/tier_dial.md`).
-**Done:** a seven-page decision dashboard reading only a guard-checked public bundle, with model-health monitoring (`docs/dashboard.md`). Run it with `make app`.
-**Next:** the executive memo and interview guide.
+## Run it
 
 ```bash
-make all    # ingest data, build SQL marts and the luxury layer, refit client models (a few minutes)
-make select # rerun model selection on pre-test data (about 30 minutes)
+pip install -e ".[dev]"
+make all     # raw files -> SQL marts -> luxury layer -> every model -> public bundle (about 1 hour)
+make select  # rerun model selection on pre-test data (about 30 minutes)
+make app     # the dashboard, reading only public_bundle/
 make test
 ```
 
-Raw Visuelle files stay local and are never published; see `docs/data_card.md`. Every data issue and judgment call is logged in `docs/gaps_and_decisions.md`.
+Visuelle 2.0 must be downloaded separately (see `configs/data_sources.yml`); the dashboard and tests run from the committed public bundle without it. Architecture and how each piece maps onto a luxury house's stack: `docs/architecture.md`.
 
-## Study guide
+---
 
-Use [docs/COUTURE_ATELIER_STUDY_GUIDE.md](docs/COUTURE_ATELIER_STUDY_GUIDE.md) as the complete ELI5-to-technical manual for studying and explaining this project.
-
-Download the formatted [COUTURE_ATELIER_STUDY_GUIDE.pdf](docs/COUTURE_ATELIER_STUDY_GUIDE.pdf) version for offline study.
+A portfolio project, not affiliated with Louis Vuitton, Chanel, LVMH or any other house, and not based on any company's private data.

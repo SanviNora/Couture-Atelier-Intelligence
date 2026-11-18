@@ -33,6 +33,7 @@ from couture_atelier.clienteling import (
     fit_transformed_outcome,
     fit_x_learner,
     qini_area,
+    shortlist_scores,
     simulate_contacted_spend,
     true_incremental_value,
     uplift_stability,
@@ -224,12 +225,14 @@ def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
         score = uplift if choice["chosen"] == "x_learner_spend" else uplift * value_at_stake
         uplift_share = share(score, True)
         status_quo_share = share(status_quo_score, False)
+        shortlist_share = share(shortlist_scores(status_quo_score, score, deploy["advisor_id"], eligible, capacity), False)
         robustness.append({
             "draw": draw, "chosen": choice["chosen"], "stability": choice["stability"][choice["chosen"]],
             "trusted": choice["trusted"],
             "true_effect_correlation": round(float(np.corrcoef(uplift[eligible], effect["tau"][eligible])[0, 1]), 3),
             "uplift_share_of_oracle": uplift_share, "status_quo_share_of_oracle": status_quo_share,
             "with_trust_check_share_of_oracle": uplift_share if choice["trusted"] else status_quo_share,
+            "shortlist_hybrid_share_of_oracle": shortlist_share,
         })
         if draw == 0:
             primary = {"pilot": pilot, "choice": choice}
@@ -256,6 +259,8 @@ def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
         "churn_risk_x_value": (status_quo_score * (1 - p_return), False),
         **{f"uplift_{n}": (s, False) for n, s in scorers.items()},
         f"uplift_{chosen}_no_contact_if_no_lift": (scorers[chosen], True),
+        "shortlist_best_clients_reranked_by_uplift": (
+            shortlist_scores(status_quo_score, scorers[chosen], deploy["advisor_id"], eligible, capacity), False),
         "oracle_true_effect": (true_value.to_numpy(), True),
     }
     results, selections = [], {}
@@ -312,6 +317,8 @@ def build_clienteling(warehouse: Path = WAREHOUSE) -> dict:
             "mean_with_trust_check": round(float(robust["with_trust_check_share_of_oracle"].mean()), 3),
             "worst_with_trust_check": round(float(robust["with_trust_check_share_of_oracle"].min()), 3),
             "status_quo_share": float(robust["status_quo_share_of_oracle"].iloc[0]),
+            "mean_shortlist_hybrid": round(float(robust["shortlist_hybrid_share_of_oracle"].mean()), 3),
+            "worst_shortlist_hybrid": round(float(robust["shortlist_hybrid_share_of_oracle"].min()), 3),
         },
         "capacity_sweep": sweep,
         "policies": table.to_dict(orient="records"),

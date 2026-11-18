@@ -17,25 +17,25 @@
   "true_mean_demand_in_sold_out_weeks": 1.539,
   "planners": {
     "treats_sales_as_demand": {
-      "forecast_bias_vs_true_demand_pct": -21.8,
-      "forecast_wape_vs_true_demand": 0.3897,
-      "next_allocation_units": 193926,
+      "forecast_bias_vs_true_demand_pct": -21.9,
+      "forecast_wape_vs_true_demand": 0.3903,
+      "next_allocation_units": 193762,
       "demand_lost_to_stockouts_pct": 29.1,
       "stock_left_unsold_pct": 8.5
     },
     "recovers_demand_first": {
-      "forecast_bias_vs_true_demand_pct": -9.3,
-      "forecast_wape_vs_true_demand": 0.3619,
-      "next_allocation_units": 225155,
-      "demand_lost_to_stockouts_pct": 21.1,
-      "stock_left_unsold_pct": 12.4
+      "forecast_bias_vs_true_demand_pct": -9.5,
+      "forecast_wape_vs_true_demand": 0.3624,
+      "next_allocation_units": 224481,
+      "demand_lost_to_stockouts_pct": 21.3,
+      "stock_left_unsold_pct": 12.3
     },
     "recovers_demand_with_em": {
-      "forecast_bias_vs_true_demand_pct": -6.1,
-      "forecast_wape_vs_true_demand": 0.3591,
-      "next_allocation_units": 232999,
-      "demand_lost_to_stockouts_pct": 19.3,
-      "stock_left_unsold_pct": 13.4
+      "forecast_bias_vs_true_demand_pct": -6.2,
+      "forecast_wape_vs_true_demand": 0.3606,
+      "next_allocation_units": 232915,
+      "demand_lost_to_stockouts_pct": 19.5,
+      "stock_left_unsold_pct": 13.5
     }
   }
 }

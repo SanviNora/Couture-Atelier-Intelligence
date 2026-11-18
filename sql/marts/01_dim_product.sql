@@ -10,7 +10,7 @@ with attributed as (
         any_value(s.fabric) as fabric,
         any_value(s.image_path) as image_path,
         min(s.release_date) as release_date,
-        avg(p.price_index) as price_index,
+        round(avg(p.price_index), 9) as price_index,  -- parallel averages differ in the last bits
         count(distinct s.store_id) as stores_launched
     from raw.sales s
     left join raw.price_discount p using (product_id, store_id)

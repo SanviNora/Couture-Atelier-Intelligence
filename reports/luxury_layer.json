@@ -1,13 +1,13 @@
 {
   "concentration": {
-    "trade_up_beta": 0.9363,
+    "trade_up_beta": 0.9362,
     "trade_up_cap_prior_visits": 12,
     "target_top1pct_share": 0.3,
-    "base_top1pct_share": 0.1155,
+    "base_top1pct_share": 0.1156,
     "modelled_top1pct_share": 0.3,
     "cross_check_top_0_1pct_share": 0.0773,
-    "cross_check_top_0_1pct_mean_annual_spend_eur": 896434,
-    "median_client_annual_spend_eur": 2253
+    "cross_check_top_0_1pct_mean_annual_spend_eur": 893920,
+    "median_client_annual_spend_eur": 2248
   },
   "clients": 665224,
   "shared_cards_excluded": 25,
@@ -22,10 +22,10 @@
   "hero_pieces": 112,
   "price_tiers": {
     "core": 2234,
+    "high": 1448,
     "entry": 1391,
-    "high": 1367,
-    "exceptional": 585
+    "exceptional": 504
   },
-  "median_list_price_eur": 2450.0,
+  "median_list_price_eur": 2470.0,
   "data_provenance": "synthetic"
 }

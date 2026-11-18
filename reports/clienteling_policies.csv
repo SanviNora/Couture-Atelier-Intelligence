@@ -12,4 +12,5 @@ uplift_x_learner_spend,104869,38529122,367.4,0.0106,0.177,0.528,0.6
 uplift_s_logistic_core,104869,65288633,622.6,0.0171,0.1496,0.894,1.02
 uplift_bagged_t_logistic_core,104869,65232429,622.0,0.0173,0.1492,0.893,1.02
 uplift_t_logistic_full_no_contact_if_no_lift,104840,59664985,569.1,0.0074,0.137,0.817,0.93
+shortlist_best_clients_reranked_by_uplift,104869,59056971,563.1,0.0078,0.1242,0.809,0.93
 oracle_true_effect,104574,73019496,698.3,0.0065,0.0,1.0,1.14

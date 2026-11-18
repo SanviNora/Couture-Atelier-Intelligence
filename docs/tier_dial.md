@@ -17,22 +17,22 @@ The same piece starts its markdown in different weeks in different stores. For e
 
 | Depth at start | Events | Lift, weeks 1–2 [95% CI] | Lift, weeks 3–4 | Placebo (should be ≈1) |
 |---|---:|---:|---:|---:|
-| up to 20% | 5,184 | **1.56×** [1.50, 1.64] | 1.08× | 0.97 [0.94, 1.00] |
-| 20-35% | 4,105 | **3.31×** [3.09, 3.57] | 2.71× | 0.79 [0.74, 0.84] |
-| 35-55% | 1,085 | **3.13×** [2.73, 3.64] | 1.86× | 0.76 [0.69, 0.82] |
+| up to 20% | 5,300 | **1.57×** [1.51, 1.65] | 1.07× | 0.97 [0.95, 1.00] |
+| 20-35% | 4,004 | **3.35×** [3.09, 3.59] | 2.87× | 0.79 [0.74, 0.84] |
+| 35-55% | 1,070 | **3.12×** [2.71, 3.79] | 1.84× | 0.76 [0.69, 0.83] |
 | over 55% | 74 | **2.92×** [1.52, 7.38] | 1.27× | 0.23 [0.12, 0.39] |
 
-- **Shallow markdowns pass the placebo cleanly** and lift sales 1.57× at first, but the effect almost disappears by weeks 3–4 (1.08×): mostly demand pulled forward.
+- **Shallow markdowns pass the placebo cleanly** and lift sales 1.57× at first, but the effect almost disappears by weeks 3–4 (1.07×): mostly demand pulled forward.
 - **Deeper markdowns fail the placebo** (0.76–0.79): the retailer discounts where sales are already slipping. The bias could run either way, so the dial is also run with the extra lift above the clean shallow estimate halved ("conservative").
 
 ### Do discounts attract weaker clients?
 
-152,983 clients whose first purchase could be labelled; 32% started on a discount. Matched exactly on store, category, month and price tier (35,019 discount starters in 9,812 matched cells):
+152,983 clients whose first purchase could be labelled; 32% started on a discount. Matched exactly on store, category, month and price tier (35,069 discount starters in 9,500 matched cells):
 
 | | Raw | Matched |
 |---|---:|---:|
-| Return within 12 months, discount start minus full-price start | -1.8 points | +0.4 points |
-| Spend in the next 12 months | | +12.9% |
+| Return within 12 months, discount start minus full-price start | -1.8 points | +0.3 points |
+| Spend in the next 12 months | | +13.5% |
 
 **In this fast-fashion data, discount-acquired clients are not worse.** The luxury view that discounting cheapens the client base cannot be shown here, so the dial treats it as an explicit assumption: a brand cost per unit sold on discount of 0%, 5%, 10% or 20% of list price.
 
@@ -44,21 +44,21 @@ Central lift:
 
 | Policy | Units bought | Full-price share of sales | Sell-through | Revenue | Gross profit | Margin | Profit if each discounted unit costs 10% brand value | … 20% |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Luxury: full price, carry-over or recycle | 288,287 | 100% | 73% | €807M | **€515M** | 63.8% | €515M | €515M |
-| Aspirational: one 20% event from week 9, outlet exit | 299,437 | 88% | 76% | €854M | **€591M** | 69.3% | €581M | €570M |
-| Premium: markdowns optimised per piece, off-price exit | 290,143 | 79% | 82% | €862M | **€560M** | 64.9% | €540M | €520M |
-| Retailer's actual markdown pattern (reference) | 290,143 | 75% | 80% | €837M | **€538M** | 64.2% | €515M | €493M |
+| Luxury: full price, carry-over or recycle | 287,526 | 100% | 73% | €806M | **€514M** | 63.8% | €514M | €514M |
+| Aspirational: one 20% event from week 9, outlet exit | 298,515 | 88% | 76% | €852M | **€590M** | 69.3% | €580M | €570M |
+| Premium: markdowns optimised per piece, off-price exit | 289,334 | 77% | 83% | €865M | **€562M** | 65.0% | €541M | €520M |
+| Retailer's actual markdown pattern (reference) | 289,334 | 74% | 80% | €836M | **€537M** | 64.2% | €514M | €492M |
 
 Conservative lift:
 
 | Policy | Units bought | Full-price share of sales | Sell-through | Revenue | Gross profit | Margin | … 10% brand cost | … 20% |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Luxury: full price, carry-over or recycle | 288,287 | 100% | 73% | €807M | **€515M** | 63.8% | €515M | €515M |
-| Aspirational: one 20% event from week 9, outlet exit | 299,437 | 89% | 75% | €842M | **€584M** | 69.4% | €575M | €566M |
-| Premium: markdowns optimised per piece, off-price exit | 290,143 | 81% | 79% | €836M | **€539M** | 64.5% | €523M | €507M |
-| Retailer's actual markdown pattern (reference) | 290,143 | 77% | 78% | €825M | **€528M** | 64.0% | €508M | €488M |
+| Luxury: full price, carry-over or recycle | 287,526 | 100% | 73% | €806M | **€514M** | 63.8% | €514M | €514M |
+| Aspirational: one 20% event from week 9, outlet exit | 298,515 | 90% | 75% | €840M | **€583M** | 69.4% | €574M | €565M |
+| Premium: markdowns optimised per piece, off-price exit | 289,334 | 81% | 79% | €839M | **€542M** | 64.5% | €525M | €508M |
+| Retailer's actual markdown pattern (reference) | 289,334 | 77% | 79% | €823M | **€526M** | 64.0% | €506M | €487M |
 
-Premium's optimiser most often chose: week 8, 20% (231 pieces), week 6, 20% (212 pieces), week 8, 30% (205 pieces), week 10, 30% (84 pieces), week 4, 20% (80 pieces).
+Premium's optimiser most often chose: week 6, 20% (238 pieces), week 8, 30% (212 pieces), week 8, 20% (202 pieces), week 4, 20% (90 pieces), week 10, 30% (73 pieces).
 
 ## Elevation: what a discounting brand gives up by moving up-market
 
@@ -66,26 +66,26 @@ Starting from the retailer's real markdown pattern, the brand keeps only its las
 
 | Step | Full-price share | Revenue | Gross profit (central) | Margin | Gross profit (conservative) |
 |---|---:|---:|---:|---:|---:|
-| Markdowns in the last 12 weeks, outlet kept | 74% | €850M | €578.3M | 68.0% | €570.8M |
-| Markdowns in the last 6 weeks, outlet kept | 86% | €842M | €578.3M | 68.7% | €573.7M |
-| Markdowns in the last 4 weeks, outlet kept | 91% | €837M | €578.1M | 69.0% | €574.3M |
-| Markdowns in the last 2 weeks, outlet kept | 96% | €830M | €577.3M | 69.5% | €575.2M |
-| **No markdowns**, outlet kept | 100% | €823M | €576.2M | 70.0% | €574.8M |
-| No markdowns, **no outlet** (luxury) | 100% | €810M | €517.6M | 63.9% | €517.0M |
+| Markdowns in the last 12 weeks, outlet kept | 74% | €849M | €577.9M | 68.0% | €569.2M |
+| Markdowns in the last 6 weeks, outlet kept | 86% | €844M | €580.0M | 68.7% | €574.8M |
+| Markdowns in the last 4 weeks, outlet kept | 91% | €838M | €578.3M | 69.0% | €572.9M |
+| Markdowns in the last 2 weeks, outlet kept | 96% | €831M | €577.6M | 69.5% | €575.0M |
+| **No markdowns**, outlet kept | 100% | €822M | €575.1M | 70.0% | €574.9M |
+| No markdowns, **no outlet** (luxury) | 100% | €810M | €517.5M | 63.9% | €516.8M |
 
-- **Dropping every markdown costs almost nothing:** profit falls 0.4% under the central lift and rises under the conservative one, while margin climbs from 68% to 70%. With any brand cost of discounting, it pays. Because the lift fades, markdowns mostly move sales earlier rather than create them.
-- **The real cost of luxury discipline is refusing an exit for unsold stock.** Closing the outlet route costs about €59M (10%).
+- **Dropping every markdown costs almost nothing:** profit falls 0.5% under the central lift and rises under the conservative one, while margin climbs from 68% to 70%. With any brand cost of discounting, it pays. Because the lift fades, markdowns mostly move sales earlier rather than create them.
+- **The real cost of luxury discipline is refusing an exit for unsold stock.** Closing the outlet route costs about €58M (10%).
 
 How much the exit is worth (no markdowns, buy re-optimised for each value):
 
 | Value recovered per unsold unit | Units bought | Gross profit | Margin |
 |---:|---:|---:|---:|
-| 13% | 288,287 | €518.6M | 63.9% |
-| 20% | 295,977 | €540.8M | 66.2% |
-| 25% | 299,437 | €559.7M | 68.0% |
-| 30% | 299,437 | €575.1M | 70.0% |
+| 13% | 287,526 | €516.8M | 63.9% |
+| 20% | 295,087 | €540.9M | 66.2% |
+| 25% | 298,515 | €558.6M | 68.0% |
+| 30% | 298,515 | €575.2M | 70.0% |
 
-Moving from carry-over (13% of price, after a brand-dilution cost) to a controlled outlet or certified pre-owned channel (30%) is worth about €56M. That is the number a luxury house weighs against the brand risk of a resale channel, and, since July 2026, the EU ban on destroying unsold goods makes some non-destructive exit unavoidable.
+Moving from carry-over (13% of price, after a brand-dilution cost) to a controlled outlet or certified pre-owned channel (30%) is worth about €58M. That is the number a luxury house weighs against the brand risk of a resale channel, and, since July 2026, the EU ban on destroying unsold goods makes some non-destructive exit unavoidable.
 
 ## Market context (Google Trends, US, last 12 months vs Oct 2021–Oct 2022)
 

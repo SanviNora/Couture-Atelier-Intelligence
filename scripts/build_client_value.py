@@ -69,6 +69,29 @@ def precision_at_k(y: np.ndarray, score: np.ndarray) -> float:
     return float(y[np.argsort(-score)[:k]].mean())
 
 
+def bias_diagnosis(train: pd.DataFrame, test: pd.DataFrame, ml: np.ndarray, p_return: np.ndarray) -> dict:
+    """Why the spend model over-predicts 2019, using only what was known at the test cut-off.
+
+    Found after the test was scored, so it is reported as a diagnosis, not as a selected model.
+    The return rate fell at every training origin; projecting that trend one year on rescales the level.
+    """
+    rates = train.groupby("cutoff")["returned_next"].mean()
+    years = np.array([(pd.Timestamp(c) - pd.Timestamp(rates.index[0])).days / 365 for c in rates.index])
+    slope, intercept = np.polyfit(years, np.log(rates.to_numpy()), 1)
+    projected = float(np.exp(intercept + slope * (years[-1] + 1)))
+    factor = projected / float(train["returned_next"].mean())
+    returned = test["returned_next"].to_numpy()
+    return {
+        "post_hoc": True,
+        "training_origin_return_rates": {k: round(float(v), 3) for k, v in rates.items()},
+        "test_return_rate": round(float(returned.mean()), 3),
+        "projected_return_rate_from_trend": round(projected, 3),
+        "predicted_returners_over_actual": round(float(p_return.sum() / returned.sum()), 3),
+        "level_factor": round(factor, 3),
+        "selected_ml_trend_level": spend_metrics(test["spend_next"], ml * factor),
+    }
+
+
 def build_client_value(warehouse: Path = WAREHOUSE) -> dict[str, object]:
     selection = yaml.safe_load((CONFIGS / "client_models.yml").read_text())
     tiers = load_calibration()["assumptions"]["client_tiers"]
@@ -161,6 +184,7 @@ def build_client_value(warehouse: Path = WAREHOUSE) -> dict[str, object]:
                                       "real_behaviour_visits": real_behaviour, "paired_bootstrap_95ci": uncertainty}
         if name == "test":
             deciles += [decile_table(actual, preds[m], m) for m in ("naive_last_12m", "mbgnbd_gg", "selected_ml")]
+            report["evaluation"]["test"]["spend_bias_diagnosis"] = bias_diagnosis(train, frame, ml, p_return)
 
     # Score every client as of the latest cut-off for clienteling and the dashboard.
     latest = frames[COVID].copy()

@@ -104,7 +104,8 @@
         "true_effect_correlation": 0.34,
         "uplift_share_of_oracle": 0.817,
         "status_quo_share_of_oracle": 0.874,
-        "with_trust_check_share_of_oracle": 0.817
+        "with_trust_check_share_of_oracle": 0.817,
+        "shortlist_hybrid_share_of_oracle": 0.809
       },
       {
         "draw": 1,
@@ -114,7 +115,8 @@
         "true_effect_correlation": 0.33,
         "uplift_share_of_oracle": 0.796,
         "status_quo_share_of_oracle": 0.874,
-        "with_trust_check_share_of_oracle": 0.796
+        "with_trust_check_share_of_oracle": 0.796,
+        "shortlist_hybrid_share_of_oracle": 0.791
       },
       {
         "draw": 2,
@@ -124,14 +126,17 @@
         "true_effect_correlation": 0.083,
         "uplift_share_of_oracle": 0.574,
         "status_quo_share_of_oracle": 0.874,
-        "with_trust_check_share_of_oracle": 0.874
+        "with_trust_check_share_of_oracle": 0.874,
+        "shortlist_hybrid_share_of_oracle": 0.569
       }
     ],
     "mean_uplift_share": 0.729,
     "worst_uplift_share": 0.574,
     "mean_with_trust_check": 0.829,
     "worst_with_trust_check": 0.796,
-    "status_quo_share": 0.874
+    "status_quo_share": 0.874,
+    "mean_shortlist_hybrid": 0.723,
+    "worst_shortlist_hybrid": 0.569
   },
   "capacity_sweep": [
     {
@@ -336,6 +341,16 @@
       "share_do_not_disturb": 0.0074,
       "share_harmful_contacts": 0.137,
       "share_of_oracle": 0.817,
+      "vs_status_quo": 0.93
+    },
+    {
+      "policy": "shortlist_best_clients_reranked_by_uplift",
+      "contacts": 104869,
+      "true_incremental_eur": 59056971,
+      "eur_per_contact": 563.1,
+      "share_do_not_disturb": 0.0078,
+      "share_harmful_contacts": 0.1242,
+      "share_of_oracle": 0.809,
       "vs_status_quo": 0.93
     },
     {

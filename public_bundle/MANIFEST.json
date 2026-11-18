@@ -91,6 +91,11 @@
       "description": "copied from reports/"
     },
     {
+      "path": "price_strategy.json",
+      "provenance": "model_output",
+      "description": "copied from reports/"
+    },
+    {
       "path": "advisor_reasons.csv",
       "provenance": "aggregate",
       "description": "clients by value tier and champion reason (groups of 10+)"

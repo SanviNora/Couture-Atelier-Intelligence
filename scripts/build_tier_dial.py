@@ -42,7 +42,7 @@ def lifecycle_shape(con: duckdb.DuckDBPyConnection) -> np.ndarray:
         select week_index, avg(units_sold) as units from marts.fct_stock_week join never using (product_id, store_id)
         where not censored group by 1 order by 1
         """
-    ).fetchdf()["units"].to_numpy()
+    ).fetchdf()["units"].round(9).to_numpy()  # parallel averages differ in the last bits between runs
     return shape / shape.mean()
 
 

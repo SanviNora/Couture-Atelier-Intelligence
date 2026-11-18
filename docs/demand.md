@@ -53,18 +53,18 @@ Features known at launch: category, colour, fabric, price, launch month, the pie
 
 | Model | Validation WAPE | Test WAPE | Test bias |
 |---|---:|---:|---:|
-| Store × category average | 0.468 | 0.470 | +10.5% |
-| **Gradient boosting, base features (chosen)** | 0.372 | **0.368** | +7.7% |
-| + Silhouette image features | 0.371 | 0.371 | +9.6% |
-| + Google Trends at launch | 0.379 | 0.373 | +8.8% |
-| + both | 0.375 | 0.368 | +9.2% |
-| + the retailer's opening allocation (not selectable) | 0.364 | 0.369 | +10.7% |
+| Store × category average | 0.468 | 0.469 | +10.5% |
+| **Gradient boosting, base features (chosen)** | 0.374 | **0.368** | +7.5% |
+| + Silhouette image features | 0.371 | 0.372 | +10.3% |
+| + Google Trends at launch | 0.378 | 0.376 | +9.4% |
+| + both | 0.373 | 0.368 | +9.4% |
+| + the retailer's opening allocation (not selectable) | 0.366 | 0.367 | +10.7% |
 
 - **22% lower error than the store × category average.**
 - **Image features and Google Trends add nothing measurable.** The simplest feature set within 0.005 WAPE of the best is used. Store history and launch breadth already carry most of the signal for a piece's store-level demand.
 - The retailer's own opening allocation helps slightly on validation but is excluded from selection, so the forecast does not simply echo the merchant's existing plan.
-- **Uncertainty:** the 10th–90th percentile interval covers 79.6% of test outcomes (nominal 80%).
-- Test demand in H2 2019 ran slightly below earlier years, which explains most of the +7.7% bias.
+- **Uncertainty:** the 10th–90th percentile interval covers 79.0% of test outcomes (nominal 80%).
+- Test demand in H2 2019 ran slightly below earlier years, which explains most of the +7.5% bias. Validation bias was only +1.6%, so no correction is applied (gaps log G77).
 
 ## The luxury scarcity trap
 
@@ -73,11 +73,11 @@ Same real weekly demand, but each boutique gets 70% of a planner's estimate as o
 | | Treats capped sales as demand | Recovers demand (one pass) | **Recovers demand with EM** |
 |---|---:|---:|---:|
 | Recovered demand in sold-out weeks vs truth | −80.9% | −46.6% | **−36.6%** |
-| Forecast bias vs true demand | −21.8% | −9.3% | **−6.1%** |
+| Forecast bias vs true demand | −21.9% | −9.5% | **−6.2%** |
 | Forecast WAPE vs true demand | 0.390 | 0.362 | **0.359** |
-| Units allocated to the next launches | 193,926 | 225,155 | 232,999 |
-| Demand lost to stock-outs | 29.1% | 21.1% | **19.3%** |
-| Stock left unsold | 8.5% | 12.4% | 13.4% |
+| Units allocated to the next launches | 193,762 | 224,481 | 232,915 |
+| Demand lost to stock-outs | 29.1% | 21.3% | **19.5%** |
+| Stock left unsold | 8.5% | 12.3% | 13.5% |
 
 Learning demand from capped sales shrinks the next allocation, which caps sales again: the error compounds season after season. Recovering demand first halves the forecast bias and cuts lost demand by 8 points, at the cost of more unsold stock. Deciding how much of that trade-off to accept, under the EU ban on destroying unsold goods, is the allocation phase's job.
 

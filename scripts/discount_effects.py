@@ -36,7 +36,8 @@ FIRST_PURCHASE_BEFORE = "2019-03-01"  # 12-month follow-up ends before the 2020 
 
 def markdown_events(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     weeks = con.execute(
-        "select product_id, store_id, week_index, units_sold, discount, on_discount from marts.fct_stock_week"
+        "select product_id, store_id, week_index, units_sold, discount, on_discount from marts.fct_stock_week "
+        "order by product_id, store_id, week_index"
     ).fetchdf()
     start = weeks[weeks["on_discount"]].groupby(["product_id", "store_id"])["week_index"].min().rename("start")
     weeks = weeks.merge(start, on=["product_id", "store_id"], how="left")
@@ -48,7 +49,7 @@ def markdown_events(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
             continue
         # Comparison stores still at full price four weeks on, to measure whether the lift fades.
         late_piece = weeks[(weeks["product_id"] == product_id) & (weeks["start"] > k + 3)]
-        depth = treated.loc[treated["week_index"] == k, "discount"].mean()
+        depth = round(float(treated.loc[treated["week_index"] == k, "discount"].mean()), 6)  # no float noise at bin edges
 
         def window(frame: pd.DataFrame, lo: int, hi: int) -> float:
             return float(frame.loc[frame["week_index"].between(lo, hi), "units_sold"].sum())
@@ -102,6 +103,7 @@ def first_purchase_study(con: duckdb.DuckDBPyConnection) -> dict:
         f"""
         with lines as (
             select f.client_id, f.receipt_id, f.purchased_at, f.store_id, f.product_id, p.category, lp.price_tier,
+                   lp.list_price_eur * 1e6 + f.product_id as piece_rank,
                    w.on_discount
             from marts.fct_purchase f
             join lux.client c using (client_id)
@@ -117,7 +119,8 @@ def first_purchase_study(con: duckdb.DuckDBPyConnection) -> dict:
         ),
         labelled as (
             select client_id, any_value(purchased_at) as first_at, any_value(store_id) as store_id,
-                   any_value(category) as category, any_value(price_tier) as price_tier,
+                   -- the most expensive piece of the visit, so the stratum is the same on every run
+                   arg_max(category, piece_rank) as category, arg_max(price_tier, piece_rank) as price_tier,
                    bool_and(on_discount is not null) as known,
                    bool_or(coalesce(on_discount, false)) as discounted
             from first_visit group by 1

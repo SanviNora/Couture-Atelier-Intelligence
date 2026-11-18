@@ -11,44 +11,44 @@
     "by_depth": [
       {
         "depth": "up to 20%",
-        "events": 5184,
-        "mean_depth": 0.135,
-        "lift": 1.565,
-        "ci_low": 1.496,
-        "ci_high": 1.636,
-        "lift_weeks_3_4": 1.076,
-        "placebo_lift": 0.973,
+        "events": 5300,
+        "mean_depth": 0.137,
+        "lift": 1.569,
+        "ci_low": 1.509,
+        "ci_high": 1.65,
+        "lift_weeks_3_4": 1.075,
+        "placebo_lift": 0.974,
         "placebo_ci": [
-          0.945,
-          1.001
+          0.947,
+          1.003
         ]
       },
       {
         "depth": "20-35%",
-        "events": 4105,
-        "mean_depth": 0.281,
-        "lift": 3.309,
-        "ci_low": 3.088,
-        "ci_high": 3.573,
-        "lift_weeks_3_4": 2.708,
-        "placebo_lift": 0.79,
+        "events": 4004,
+        "mean_depth": 0.283,
+        "lift": 3.355,
+        "ci_low": 3.094,
+        "ci_high": 3.594,
+        "lift_weeks_3_4": 2.865,
+        "placebo_lift": 0.786,
         "placebo_ci": [
-          0.741,
-          0.844
+          0.736,
+          0.841
         ]
       },
       {
         "depth": "35-55%",
-        "events": 1085,
-        "mean_depth": 0.466,
-        "lift": 3.135,
-        "ci_low": 2.73,
-        "ci_high": 3.641,
-        "lift_weeks_3_4": 1.864,
-        "placebo_lift": 0.758,
+        "events": 1070,
+        "mean_depth": 0.468,
+        "lift": 3.119,
+        "ci_low": 2.713,
+        "ci_high": 3.787,
+        "lift_weeks_3_4": 1.841,
+        "placebo_lift": 0.762,
         "placebo_ci": [
-          0.687,
-          0.824
+          0.692,
+          0.831
         ]
       },
       {
@@ -70,15 +70,15 @@
   "discount_acquired_clients": {
     "clients_with_known_first_purchase": 152983,
     "share_first_purchase_on_discount": 0.322,
-    "matched_discount_starters": 35019,
-    "matched_cells": 9812,
+    "matched_discount_starters": 35069,
+    "matched_cells": 9500,
     "raw_return_rate": {
       "discount_start": 0.4224,
       "full_price_start": 0.4404
     },
-    "matched_difference_in_return_rate": 0.0035,
-    "matched_full_price_starter_spend_next_12m_eur": 16322,
-    "matched_difference_in_spend_next_12m_eur": 2105,
-    "matched_difference_in_spend_pct": 12.9
+    "matched_difference_in_return_rate": 0.0034,
+    "matched_full_price_starter_spend_next_12m_eur": 16333,
+    "matched_difference_in_spend_next_12m_eur": 2200,
+    "matched_difference_in_spend_pct": 13.5
   }
 }

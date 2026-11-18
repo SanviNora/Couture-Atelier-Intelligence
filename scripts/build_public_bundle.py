@@ -17,6 +17,7 @@ import duckdb
 import numpy as np
 import pandas as pd
 
+from couture_atelier.advisor_notes import facts_of, published_note
 from couture_atelier.client_frames import FEATURE_SETS
 from couture_atelier.paths import PROCESSED, PUBLIC_BUNDLE, REPORTS, ROOT, WAREHOUSE
 from couture_atelier.public_bundle import MIN_GROUP_SIZE, check_bundle
@@ -30,7 +31,9 @@ REPORT_FILES = {
     "client_feature_importance.csv": "model_output", "clienteling_policies.csv": "model_output",
     "allocation_policies.csv": "model_output", "pilot_size_value.csv": "model_output",
     "client_value_deciles.csv": "aggregate", "market_pulse.csv": "public_source",
+    "price_strategy.json": "model_output",
 }
+OPTIONAL_REPORT_FILES = {"advisor_notes_eval.json": "model_output"}
 DRIFT_FEATURES = ["spend_12m", "visits_12m", "recency_weeks", "lifetime_visits", "products_12m",
                   "full_price_share_12m", "p_alive_mbg", "expected_visits_mbg"]
 DRIFT_WINDOWS = {"2017-12-31": "Dec 2017 (training)", "2018-12-31": "Dec 2018 (test)",
@@ -123,6 +126,11 @@ def synthetic_book(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     book["challenger_action"] = np.where(
         (book["predicted_contact_value_eur"].rank(ascending=False, method="first") <= contacts)
         & (book["predicted_contact_value_eur"] > 0), "contact", "no action")
+    cache_path = REPORTS / "advisor_notes_cache.json"
+    cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
+    categories = tuple(book["favourite_category"].unique())
+    notes = [published_note(facts_of(row), cache, categories) for row in book.to_dict("records")]
+    book["advisor_note"], book["note_source"] = zip(*notes, strict=True)
     return book.sort_values("spend_last_12m_eur", ascending=False)
 
 
@@ -160,6 +168,10 @@ def build_public_bundle(target: Path = PUBLIC_BUNDLE) -> dict:
     for name, provenance in REPORT_FILES.items():
         shutil.copy(REPORTS / name, staging / name)
         add(name, provenance, "copied from reports/")
+    for name, provenance in OPTIONAL_REPORT_FILES.items():
+        if (REPORTS / name).exists():
+            shutil.copy(REPORTS / name, staging / name)
+            add(name, provenance, "copied from reports/")
     with duckdb.connect(str(WAREHOUSE), read_only=True) as con:
         reasons, agree = advisor_aggregates(con)
         reasons.to_csv(staging / "advisor_reasons.csv", index=False)

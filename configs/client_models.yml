@@ -10,30 +10,30 @@ spend:
   loss: gamma
   feature_set: full
   params:
-    learning_rate: 0.05
-    max_leaf_nodes: 63
-    min_samples_leaf: 300
-    l2_regularization: 0.0
-    max_features: 0.5
+    learning_rate: 0.08
+    max_leaf_nodes: 31
+    min_samples_leaf: 1000
+    l2_regularization: 0.5
+    max_features: 0.8
   validation_spearman: 0.398
-  validation_top1pct_precision: 0.459
+  validation_top1pct_precision: 0.457
   selection_rule: best Spearman; ties within 0.005 broken by top-1% precision
-  validation_recalibration_factor: 1.0028
-  selected_model: hurdle_gamma|pooled|full|search03
+  validation_recalibration_factor: 0.9932
+  selected_model: hurdle_gamma|pooled|full|search13
 return:
   model: logistic
   feature_set: full
   params: {}
   validation_auc: 0.6868
-  note: within 0.002 AUC of the best gradient boosting (0.6857); simpler model kept
+  note: within 0.002 AUC of the best gradient boosting (0.6848); simpler model kept
 vic_upgrade:
-  feature_set: base+momentum
+  feature_set: base
   class_weight: balanced
   params:
     learning_rate: 0.12
-    max_leaf_nodes: 15
-    min_samples_leaf: 20
-    l2_regularization: 8.0
-    max_features: 1.0
-  validation_avg_precision: 0.1541
+    max_leaf_nodes: 127
+    min_samples_leaf: 1000
+    l2_regularization: 0.5
+    max_features: 0.5
+  validation_avg_precision: 0.1535
 vic_share: 0.01

@@ -34,10 +34,10 @@ Differences are model minus baseline, with 95% paired-bootstrap intervals (200 r
 | Question | Baseline | Selected model | Difference [95% CI] |
 |---|---:|---:|---|
 | Will the client return next year? (AUC) | 0.659 (recency) | **0.716** | +0.057 [0.055, 0.058] |
-| Of next year's VICs, share found in predicted top 1% | 45.0% (last year's spend) | **46.6%** | +1.6 pts [0.9, 2.3] |
-| VIC upgrade among non-VICs (avg. precision) | 0.131 (current spend) | **0.153** | +0.022 [0.012, 0.031] |
-| Rank clients by next-year spend (Spearman) | 0.383 (last year's spend) | 0.399 | +0.016 [0.014, 0.019] |
-| Total spend bias | −15% | +46% | |
+| Of next year's VICs, share found in predicted top 1% | 45.1% (last year's spend) | **46.5%** | +1.5 pts [0.8, 2.4] |
+| VIC upgrade among non-VICs (avg. precision) | 0.128 (current spend) | **0.147** | +0.018 [0.010, 0.028] |
+| Rank clients by next-year spend (Spearman) | 0.383 (last year's spend) | **0.411** | +0.029 [0.027, 0.031] |
+| Total spend bias | −16% | +47% (+3% after the return-rate trend, post hoc) | |
 
 Other models on the same test:
 
@@ -50,8 +50,8 @@ What this means:
 
 - **Return prediction is the strongest result** and uses real behaviour only (visits are observed, not modelled). BG/NBD's "probability still active" ranks worse than random because it treats every one-time buyer as certainly active; MBG/NBD fixes that (0.37 → 0.65), and logistic regression does better still.
 - **VIC identification and upgrade improve significantly** over current spend, which is a hard baseline because VIC status is persistent.
-- **Spend ranking:** all approaches land between 0.38 and 0.41. The gain over the naive baseline is significant but small; the limit is the information in one to two years of history.
-- **Totals are not calibrated.** Pooling cut-offs removed the bias on validation (about 0%) but it returned on the test (+46%): validation shares the training era, when clients were young and trading up fast; by 2019 they had matured. Spend predictions are used for ranking, not euro totals. See gaps log G29.
+- **Spend ranking:** all approaches land between 0.38 and 0.41, and the selected model is now the best of them. Rerunning selection on bit-identical data (gaps log G76) moved its gain over last year's spend from +0.019 to +0.029; the limit is the information in one to two years of history.
+- **Totals are not calibrated, and the cause is now known.** Validation bias was about 0% but test bias +47%. The return rate fell at every training date (51% → 44%) and reached 37.5% in 2019, so the model over-predicts both who returns (+27%) and how much returners spend. Projecting that trend with data known at the end of 2018 brings the bias to +3% without changing any ranking; because this was found after the test, it is reported as a diagnosis (`spend_bias_diagnosis`, gaps log G75). Spend predictions are used for ranking.
 
 ## Real behaviour only: next-year visits
 
@@ -72,11 +72,11 @@ The whole pipeline was rerun under 9 calibrations: VIC revenue share 25%, 30% or
 
 | Comparison | Range across all 9 variants | Holds in all 9? |
 |---|---|---|
-| Spend Spearman, model minus naive | +0.014 to +0.029 | Yes |
-| Next year's VICs found, model minus naive | +1.0 to +1.9 pts | Yes |
-| Upgrade avg. precision, model minus naive | +0.016 to +0.031 | Yes |
+| Spend Spearman, model minus naive | +0.028 to +0.042 | Yes |
+| Next year's VICs found, model minus naive | +1.2 to +1.8 pts | Yes |
+| Upgrade avg. precision, model minus naive | +0.014 to +0.028 | Yes |
 | Return AUC | 0.716 to 0.717 (recency 0.659) | Yes |
-| Total spend bias | +40% to +47% | Consistently biased |
+| Total spend bias | +41% to +48% | Consistently biased |
 
 Relative conclusions are robust. Absolute levels are not: for example the share of next year's VICs found ranges from 40% to 54% depending on the trade-up cap, so absolute figures are reported as dependent on the calibration.
 
@@ -85,12 +85,12 @@ Relative conclusions are robust. Absolute levels are not: for example the share 
 Permutation importance on 60k test clients (`reports/client_feature_importance.csv`):
 
 - **Return:** lifetime visits, product breadth over the last 12 months, and largest and average visit value. Loyal, broad shoppers come back; this is real Visuelle behaviour.
-- **VIC upgrade:** product breadth, lifetime visits, largest visit value, and expected visits. Upgraders explore more of the collection before they spend more.
+- **VIC upgrade:** current spend, product breadth, lifetime visits and expected visits. Upgraders explore more of the collection before they spend more.
 - **Spend:** dominated by lifetime visits. Part of this is the model learning the luxury layer's own trade-up rule, since purchase value depends on prior visits by design (gaps log G33).
 
 ## COVID stress test (2020)
 
-Return rate fell from 37.5% to 10.6%. Every spend model over-predicted totals by 270–750% and ranking fell from about 0.40 to 0.23–0.25. The return model kept its edge over recency (AUC 0.721 vs 0.675). No model trained on normal years anticipates store closures; production use needs drift monitoring and a fallback rule.
+Return rate fell from 37.5% to 10.6%. Every spend model over-predicted totals by 270–750% and ranking fell from about 0.40 to 0.23–0.25. The return model kept its edge over recency (AUC 0.722 vs 0.675). No model trained on normal years anticipates store closures; production use needs drift monitoring and a fallback rule.
 
 ## Output for later phases
 

@@ -1,0 +1,18 @@
+# Cut, ladder or hold: three answers to luxury price fatigue (2026).
+# The cohort evidence and the price response come from real Visuelle data;
+# margins, the entry-line size and cannibalisation are assumptions.
+
+gross_margin: 0.70                     # shared with configs/tier_dial.yml
+cohort:
+  first_visit_from: "2017-01-01"       # clients whose first visit falls in 2017
+  first_visit_to: "2017-12-31"
+  window_days: 730                     # two years after the first visit, ending before COVID
+  bootstrap_draws: 400                 # resampling boutiques
+cut:
+  depths: [0.05, 0.10, 0.15]
+  # Sustained response: the shallow-markdown lift in weeks 3-4 (novelty gone), from discount_effects.json.
+  # The short-run response (weeks 1-2) is shown as an upper bound, not as a plan.
+ladder:
+  entry_units_share_of_sales: 0.05     # an entry line adding 5% to units sold (assumption)
+  cannibalisation: [0.0, 0.25, 0.50]   # share of entry purchases that would otherwise have been a core piece
+seed: 23

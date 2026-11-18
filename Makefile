@@ -13,9 +13,12 @@ data:
 select:
 	$(PY) scripts/experiment_client_models.py
 
-# Refit the selected client models, test once on 2019, score clients (about 1 minute).
+# Refit the selected client models, test once on 2019, score clients (about 5 minutes),
+# then the 9-calibration sensitivity and permutation importance.
 models:
 	$(PY) scripts/build_client_value.py
+	$(PY) -m scripts.sensitivity_client_models
+	$(PY) scripts/explain_client_models.py
 
 # Uplift over 3 pilot draws, policies, power analysis (8 minutes); pilot-size study (1 minute); product picks (12 minutes).
 clienteling:
@@ -37,6 +40,7 @@ allocation:
 tiers:
 	$(PY) scripts/discount_effects.py
 	$(PY) scripts/build_tier_dial.py
+	$(PY) scripts/price_strategy.py
 
 # Public bundle for the dashboard (guard-checked), then the app.
 bundle:

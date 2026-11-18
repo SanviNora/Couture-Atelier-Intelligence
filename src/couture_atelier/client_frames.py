@@ -120,6 +120,9 @@ def window_frame(con: duckdb.DuckDBPyConnection, cutoff: str) -> pd.DataFrame:
     )
     frame["cutoff_month"] = pd.Timestamp(cutoff).month
     frame["cutoff"] = cutoff
+    # DuckDB's parallel sums differ in the last bits between runs, which is enough to move a tree split.
+    floats = frame.select_dtypes("float").columns
+    frame[floats] = frame[floats].round(6)
     return frame
 
 
